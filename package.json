@@ -25,6 +25,7 @@
   "devDependencies": {
     "@babel/core": "^7.7.5",
     "@babel/helper-annotate-as-pure": "^7.7.4",
+    "@mdi/font": "^5.9.55",
     "@mdi/js": "^4.6.95",
     "@vue/cli-plugin-babel": "^4.5.11",
     "@vue/cli-plugin-e2e-nightwatch": "^4.5.11",
