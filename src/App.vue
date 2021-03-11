@@ -1,5 +1,5 @@
 <template lang="pug">
-	v-app
+	v-app(d-flex)
 		Header
 		v-content
 			v-container(fill-height)
@@ -12,8 +12,6 @@ import Vue from 'vue';
 import Vuetify from 'vuetify/lib'
 import '@mdi/font/css/materialdesignicons.css'
 import Header from './components/global/Header.vue';
-
-
 
 export default Vue.extend({
 	name: 'App',

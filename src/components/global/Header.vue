@@ -1,12 +1,12 @@
 <template lang="pug">
-	div
-		v-toolbar(app clipped-left elevate-on-scroll)
-			v-toolbar-title(class="ml-4") DIGING Scheduler
-			v-spacer
-			v-btn(color="#F2594B" class="white--text" medium v-if="!this.$store.getters.loggedIn" @click="signup") Sign In
-			v-btn(text v-if="this.$store.getters.loggedIn" @click="logout") Sign Out	
+	v-card(width="256" clipped-left permanent)
+		v-navigation-drawer(app class="elevation-3")
+			v-list-item
+				v-list-item-content
+					v-list-item-title(class="title") DIGING Scheduler
+			
+			v-divider
 
-		v-navigation-drawer(clipped permanent app class="mt-16")
 			v-list(dense nav)
 				v-list-item(v-for="item in items" :key="item.title" link)
 					v-list-item-icon
@@ -14,7 +14,10 @@
 					v-list-item-content
 						v-list-item-title {{ item.title }}
 
-				
+
+			v-btn(color="#F2594B" class="white--text" medium v-if="!this.$store.getters.loggedIn" to="Signin") Sign In
+			v-btn(text v-if="this.$store.getters.loggedIn" @click="signout") Sign Out
+		
 </template>
 
 <script lang="ts">
@@ -35,7 +38,7 @@ export default Vue.extend({
 		};
   	},
 	methods: {
-		
+
 	},
 });
 </script>
