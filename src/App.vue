@@ -1,6 +1,6 @@
 <template lang="pug">
 	v-app(d-flex)
-		Header
+		Header(v-if="this.$route.path != '/'")
 		v-content
 			v-container(fill-height)
 				router-view
@@ -12,11 +12,13 @@ import Vue from 'vue';
 import Vuetify from 'vuetify/lib'
 import '@mdi/font/css/materialdesignicons.css'
 import Header from './components/global/Header.vue';
+import Signin from './components/auth/Signin.vue';
 
 export default Vue.extend({
 	name: 'App',
 	components: {
 		Header,
+		Signin,
 		//Footer,
 	},
 	data: () => ({
@@ -29,6 +31,7 @@ export default Vue.extend({
 	font-family: "Roboto",  sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	background: #f2f2f2;
 }
 #nav {
 	padding: 30px;

@@ -15,14 +15,15 @@
 						v-list-item-title {{ item.title }}
 
 
-			v-btn(color="#F2594B" class="white--text" medium v-if="!this.$store.getters.loggedIn" to="Signin") Sign In
-			v-btn(text v-if="this.$store.getters.loggedIn" @click="signout") Sign Out
+			v-btn(color="#F2594B" class="white--text" medium v-if="" to="Signin") Sign In
+			v-btn(text v-if="" @click="") Sign Out
 		
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import '@mdi/font/css/materialdesignicons.css'
+
 export default Vue.extend({
 	name: 'Header',
 	props: {
@@ -45,11 +46,5 @@ export default Vue.extend({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-li a {
-	color: inherit; /* blue colors for links too */
-	text-decoration: inherit; /* no underline */
-}
-.v-toolbar {
-	flex: unset;
-}
+
 </style>
