@@ -1,6 +1,6 @@
 <template lang="pug">
 	v-app(d-flex)
-		Header(v-if="this.$route.path != '/'")
+		headerAdmin(v-if="this.$route.path != '/' && this.$route.path != '/createAccount'")
 		v-content
 			v-container(fill-height)
 				router-view
@@ -11,13 +11,15 @@ import router from '@/router';
 import Vue from 'vue';
 import Vuetify from 'vuetify/lib'
 import '@mdi/font/css/materialdesignicons.css'
-import Header from './components/global/Header.vue';
+import headerUser from './components/global/headerUser.vue';
+import headerAdmin from './components/global/headerAdmin.vue';
 import Signin from './components/auth/Signin.vue';
 
 export default Vue.extend({
 	name: 'App',
 	components: {
-		Header,
+		headerUser,
+		headerAdmin,
 		Signin,
 		//Footer,
 	},
@@ -26,6 +28,7 @@ export default Vue.extend({
 	
 });
 </script>
+
 <style lang="scss">
 #app {
 	font-family: "Roboto",  sans-serif;
@@ -33,16 +36,4 @@ export default Vue.extend({
 	-moz-osx-font-smoothing: grayscale;
 	background: #f2f2f2;
 }
-#nav {
-	padding: 30px;
-	a {
-		font-weight: bold;
-		color: #2c3e50;
-		&.router-link-exact-active {
-			color: #42b983;
-		}
-	}
-}
-
-
 </style>

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import SigninView from '../views/auth/SigninView.vue';
+import createAccountView from '../views/auth/createAccountView.vue';
 import adminHome from '../views/auth/adminHomeView.vue';
 import HomeView from '../views/auth/HomeView.vue';
 
@@ -16,6 +17,11 @@ const routes = [
     path: '/',
     name: 'Signin',
     component: SigninView,
+  },
+  {
+    path: '/createaccount',
+    name: 'createAccount',
+    component: createAccountView,
   },
   {
     path: '/adminHome',
