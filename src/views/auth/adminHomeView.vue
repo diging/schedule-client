@@ -1,31 +1,32 @@
 <template lang="pug">
-    div(id="secure")
-        h1 Secure Area
-        p This is a secure area
-        p {{ message }}
+    div()
+        h1  {{ moment().format('DD MMMM YYYY') }}
+        p {{ }} 6 people working today.
+        dailyCalendar
 </template>
 
 <script>
-    export default {
+    import Vue from 'vue';
+    import '@mdi/font/css/materialdesignicons.css'
+    import moment from 'moment'
+    import dailyCalendar from '@/components/global/dailyCalendar.vue'
+
+    export default Vue.extend({
         name: 'adminHomeView',
-        data: { 
-          message: "Welcome, Please Wait...."
+        components: {
+            dailyCalendar,
+        },
+        data() { 
+            return {
+
+            };
         },
         methods:{
-            callFunction: function () {
-    
-                var currentDate = new Date();
-                console.log(currentDate);
-    
-                var currentDateWithFormat = new Date().toJSON().slice(0,10).replace(/-/g,'/');
-                console.log(currentDateWithFormat);
-        
+            moment: function () {
+                return moment();
             }
         },
-        mounted () {
-            this.callFunction()
-        }
-        }
+    });
 </script>
 
 <style scoped>

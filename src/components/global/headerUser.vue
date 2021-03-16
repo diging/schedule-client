@@ -31,9 +31,9 @@ export default Vue.extend({
 	data() {
 		return {
 			items: [
-				{ title: 'Worker Schedule', icon: 'mdi-clock-time-five-outline'},
-				{ title: 'Leave Requests', icon: 'mdi-list-status'},
-				{ title: 'Your Schedule', icon: 'mdi-briefcase'},
+				{ title: 'Worker Schedule', icon: 'mdi-calendar-clock'},
+				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked'},
+				{ title: 'Your Schedule', icon: 'mdi-clock-time-five-outline'},
 			]			
 		};
   	},

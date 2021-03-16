@@ -12,23 +12,30 @@
             v-spacer
             v-sheet(height="600")
                 v-calendar(ref="calendar" v-model="focus" color="primary" type="category" category-show-all 
-                    :categories="categories" :events="events" :event-color="getEventColor" @change="fetchEvents")
+                    :categories="categories")
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import '@mdi/font/css/materialdesignicons.css'
+import Component from 'vue-class-component';
 
-export default Vue.extend({
+@Component({
     name: 'dailyCalendar',
-    data: () => ({
-      focus: '',
-      events: [],
-      colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
-      names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
-      categories: ['John Smith', 'Tori Walker'],
-    }),
-});
+})
+
+export default class dailyCalendar extends Vue{
+    data() {
+        return {
+            focus: '',
+            events: [],
+            colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
+            names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
+            categories: ['John Smith', 'Tori Walker'],
+        };
+    }
+    
+}
 </script>
 
 <style scoped>
