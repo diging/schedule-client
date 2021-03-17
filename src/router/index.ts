@@ -4,6 +4,8 @@ import SigninView from '../views/auth/SigninView.vue';
 import createAccountView from '../views/auth/createAccountView.vue';
 import adminHome from '../views/auth/adminHomeView.vue';
 import HomeView from '../views/auth/HomeView.vue';
+import leaveRequests from '../views/auth/leaveRequestsView.vue';
+import employees from '../views/auth/employeesView.vue';
 
 Vue.use(VueRouter)
 
@@ -27,6 +29,16 @@ const routes = [
     path: '/adminHome',
     name: 'adminHome',
     component: adminHome,
+  },
+  {
+    path: '/leaveRequests',
+    name: 'leaveRequests',
+    component: leaveRequests,
+  },
+  {
+    path: '/employees',
+    name: 'employees',
+    component: employees,
   }
 ]
 

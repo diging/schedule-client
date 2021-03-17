@@ -15,6 +15,8 @@ import headerUser from './components/global/headerUser.vue';
 import headerAdmin from './components/global/headerAdmin.vue';
 import Signin from './components/auth/Signin.vue';
 
+Vue.use(Vuetify)
+
 export default Vue.extend({
 	name: 'App',
 	components: {
@@ -29,7 +31,7 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss">
+<style>
 #app {
 	font-family: "Roboto",  sans-serif;
 	-webkit-font-smoothing: antialiased;
