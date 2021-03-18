@@ -8,7 +8,7 @@
 			v-divider
 
 			v-list(dense nav)
-				v-list-item(v-for="item in items" :key="item.title" link)
+				v-list-item(v-for="item in items" :key="item.title" :to="item.path" link)
 					v-list-item-icon
 						v-icon {{ item.icon }}
 					v-list-item-content
@@ -31,9 +31,9 @@ export default Vue.extend({
 	data() {
 		return {
 			items: [
-				{ title: 'Worker Schedule', icon: 'mdi-calendar-clock'},
-				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked'},
-				{ title: 'Your Schedule', icon: 'mdi-clock-time-five-outline'},
+				{ title: 'Worker Schedule', icon: 'mdi-calendar-clock', path: '/userHome'},
+				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/workerRequests'},
+				{ title: 'Your Schedule', icon: 'mdi-clock-time-five-outline', path: '/yourSchedule'},
 			]			
 		};
   	},

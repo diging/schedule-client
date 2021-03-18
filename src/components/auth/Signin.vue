@@ -30,8 +30,8 @@ export default class Signin extends Vue{
         if(this.username != "" && this.password != "") {
             if(this.username == "admin" && this.password == "admin") {
                 this.$router.push({ name: "adminHome" });
-            } else {
-                console.log("The username and / or password is incorrect");
+            } else if(this.username == "user" && this.password == "user"){
+                this.$router.push({ name: "userHome" });
             }
         } else {
             console.log("A username and password must be present");
