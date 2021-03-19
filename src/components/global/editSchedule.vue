@@ -2,8 +2,8 @@
     v-dialog(v-model="dialog" max-width="500px")
         template(v-slot:activator="{ on, attrs }")
             v-btn(color="#F2594B" class="white--text" medium v-bind="attrs" v-on="on")
-                v-icon mdi-plus
-                span New Request
+                v-icon mdi-pencil
+                span Edit Schedule
         v-card(class="pa-5")
             h4(class="text-center") Leave request form.
             v-card-text
@@ -44,10 +44,10 @@ import '@mdi/font/css/materialdesignicons.css'
 import Component from 'vue-class-component';
 
 @Component({
-    name: 'requestForm',
+    name: 'editSchedule',
 })
 
-export default class requestForm extends Vue{
+export default class editSchedule extends Vue{
     private menu1: string='';
     private dateFrom: string='';
     private menu2: string='';
