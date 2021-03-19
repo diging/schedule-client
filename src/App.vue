@@ -2,7 +2,7 @@
 	v-app(d-flex)
 		headerAdmin(v-if="this.username='admin' && this.$route.path != '/' && this.$route.path != '/createAccount'")
 		headerUser(v-if="this.username='user' && this.$route.path != '/' && this.$route.path != '/createAccount'")
-		v-content
+		v-main
 			v-container(fill-height)
 				router-view
 </template>

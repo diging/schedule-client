@@ -3,10 +3,10 @@
         v-col
             v-sheet(height="64")
                 v-toolbar(flat)
-                    v-btn(outlined class="mr-4" color="grey darken-2" @click="setToday") Today
-                    v-btn(fab text small color="grey darken-2" @click="prev")
+                    v-btn(outlined class="mr-4" color="grey darken-2" @click="") Today
+                    v-btn(fab text small color="grey darken-2" @click="")
                         v-icon(small) mdi-chevron-left
-                    v-btn(fab text small color="grey darken-2" @click="next")
+                    v-btn(fab text small color="grey darken-2" @click="")
                         v-icon(small) mdi-chevron-right
                     v-toolbar-title(v-if="$refs.calendar") {{ $refs.calendar.title }}
             v-spacer
