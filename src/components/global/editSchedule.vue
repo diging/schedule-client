@@ -5,32 +5,28 @@
                 v-icon mdi-pencil
                 span Edit Schedule
         v-card(class="pa-5")
-            h4(class="text-center") Leave request form.
-            v-card-text
-                v-container
-                    v-row
-                        v-col(cols="12")
-                            v-select(:items="['Time off', 'Sick leave', 'Vacation', 'Additional work hours']" label="Request type*" required)
-                        v-col(cols="6")
-                            v-menu(ref="menuFrom" v-model="menu1" :close-on-content-click="false" :return-value.sync="dateFrom"
-                                    transition="scale-transition" offset-y min-width="auto")
-                                    template(v-slot:activator="{ on, attrs }")
-                                        v-text-field(v-model="dateFrom" label="From" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on")
-                                    v-date-picker(v-model="dateFrom" no-title scrollable)
-                                        v-spacer
-                                        v-btn(text color="grey" @click="menuFrom = false") Cancel
-                                        v-btn(text color="#F2594B" @click="$refs.menuFrom.save(dateFrom)") OK
-                        v-col(cols="6")
-                            v-menu(ref="menuTo" v-model="menu2" :close-on-content-click="false" :return-value.sync="dateTo"
-                                    transition="scale-transition" offset-y min-width="auto")
-                                    template(v-slot:activator="{ on, attrs }")
-                                        v-text-field(v-model="dateTo" label="To" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on")
-                                    v-date-picker(v-model="dateTo" no-title scrollable)
-                                        v-spacer
-                                        v-btn(text color="grey" @click="menuTo = false") Cancel
-                                        v-btn(text color="#F2594B" @click="$refs.menuTo.save(dateTo)") OK
-                        v-col(cols="12")
-                            v-textarea(outlined name="request description" label="Description")
+            h4(class="text-center") Edit your schedule.
+            v-container
+                p(class="body-2 mb-10") Lab hours are from 9:00 AM to 4:30 PM.
+                div(v-for="day in days" :key="day")
+                    v-row()
+                        v-col(cols='3')
+                            p(class="font-weight-medium body-2") {{day}}
+                        v-col(cols='4')
+                            timePicker
+                        v-col(cols='4') 
+                            timePicker
+                        v-col(cols='1')
+                            v-btn(icon color="#F2594B"  v-on:click="isHidden=true") 
+                                v-icon mdi-plus-circle-outline
+                    v-row(class="mt-n6 mb-4" v-if="isHidden")
+                        v-col(cols='3')
+                        v-col(cols='4')
+                            timePicker
+                        v-col(cols='4') 
+                            timePicker
+                        v-col(cols='1')
+                            
             v-card-actions
                 v-spacer
                 v-btn(color="grey" text @click="dialog = false") Cancel
@@ -39,20 +35,27 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
 import '@mdi/font/css/materialdesignicons.css'
-import Component from 'vue-class-component';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import timePicker from '@/components/global/timePicker.vue'
 
 @Component({
     name: 'editSchedule',
+    components: {
+        timePicker,
+    },
+    data() {
+        return {
+            days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        }
+    }
 })
 
 export default class editSchedule extends Vue{
-    private menu1: string='';
-    private dateFrom: string='';
-    private menu2: string='';
-    private dateTo: string='';
+    private isHidden: boolean=false;
     private dialog: boolean=false;
+
+    @Prop() private text!: any;
     
 }
 </script>
