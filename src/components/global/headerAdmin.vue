@@ -3,7 +3,7 @@
 		v-navigation-drawer(app class="elevation-3")
 			v-list-item
 				v-list-item-content
-					v-list-item-title(class="title") DIGING Scheduler
+					v-list-item-title(class="title") Demi.
 			
 			v-divider
 

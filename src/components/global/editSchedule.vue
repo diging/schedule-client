@@ -37,10 +37,13 @@
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import Vuex from 'vuex';
 import timePicker from '@/components/global/timePicker.vue'
+import store from '@/store';
 
 @Component({
     name: 'editSchedule',
+    store: store,
     components: {
         timePicker,
     },
@@ -55,7 +58,13 @@ export default class editSchedule extends Vue{
     private isHidden: boolean=false;
     private dialog: boolean=false;
 
-    @Prop() private text!: any;
+    @Prop() private day!: any;
+    @Prop() private timeSlot1!: any;
+    @Prop() private timeSlot2!: any;
+    @Prop() private startTime1!: any;
+    @Prop() private endTime1!: any;
+    @Prop() private startTime2!: any;
+    @Prop() private endTime2!: any;
     
 }
 </script>
