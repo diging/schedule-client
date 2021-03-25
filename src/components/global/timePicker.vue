@@ -16,15 +16,29 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 export default class timePicker extends Vue{
     private menu2: string = '';
-    private time: string = '';
 
-    @Prop() private day!: any;
-    @Prop() private timeSlot1!: any;
-    @Prop() private timeSlot2!: any;
-    @Prop() private startTime1!: any;
-    @Prop() private endTime1!: any;
-    @Prop() private startTime2!: any;
-    @Prop() private endTime2!: any;
+    @Prop() private time: string = '';
+    @Prop() private day: string = '';
+    @Prop() private index: string = '';
+
+    public watchStoreForTime() {
+	this.$store.watch(
+		(state) => {
+		return this.$store.getters.timeValues;
+		},
+		(val) => {
+		if (val) {
+			// FIXME: This should set selected text to the actual text id
+			this.time = val;
+		} else {
+			
+		}
+		},
+		{
+		deep: true,
+		},
+	);
+  }
 
 }
 </script>

@@ -13,18 +13,18 @@
                         v-col(cols='3')
                             p(class="font-weight-medium body-2") {{day}}
                         v-col(cols='4')
-                            timePicker(:startTime1 = 'startTime1')
+                            timePicker(:startTime1 = 'time' :day='day' :index = 'startTime1')
                         v-col(cols='4') 
-                            timePicker(:endTime1 = 'endTime1')
+                            timePicker(:endTime1 = 'time' :day='day')
                         v-col(cols='1')
                             v-btn(icon color="#F2594B"  v-on:click="isHidden=true") 
                                 v-icon mdi-plus-circle-outline
                     v-row(class="mt-n6 mb-4" v-if="isHidden")
                         v-col(cols='3')
                         v-col(cols='4')
-                            timePicker(:startTime2 = 'startTime2')
+                            timePicker(:startTime2 = 'time' :day='day')
                         v-col(cols='4') 
-                            timePicker(:endTime2 = 'endTime2')
+                            timePicker(:endTime2 = 'time' :day='day')
                         v-col(cols='1')
                             
             v-card-actions
