@@ -9,24 +9,6 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import Vuex from 'vuex'
-
-Vue.use(Vuex)
-
-const store = new Vuex.Store({
-  state: {
-    day: '',
-    timeSlot1: '',
-    timeSlot2: '',
-    startTime1: '',
-    endTime1: '',
-    startTime2: '',
-    endTime2: '',
-  },
-  mutations: {
-    
-  }
-})
 
 @Component({
     name: 'timePicker',

@@ -21,3 +21,16 @@ export interface TokenDto {
 	user_id: number;
 	github_token: boolean;
   }
+
+export interface time {
+    startTime1: string;
+    startTime2: string;
+    endTime1: string;
+    endTime2: string;
+}
+
+export interface RootState {
+	schedule: {
+        [key: string] : time
+    };
+  }

@@ -9,22 +9,22 @@
             v-container
                 p(class="body-2 mb-10") Lab hours are from 9:00 AM to 4:30 PM.
                 div(v-for="day in days" :key="day")
-                    v-row()
+                    v-row
                         v-col(cols='3')
                             p(class="font-weight-medium body-2") {{day}}
                         v-col(cols='4')
-                            timePicker
+                            timePicker(:startTime1 = 'startTime1')
                         v-col(cols='4') 
-                            timePicker
+                            timePicker(:endTime1 = 'endTime1')
                         v-col(cols='1')
                             v-btn(icon color="#F2594B"  v-on:click="isHidden=true") 
                                 v-icon mdi-plus-circle-outline
                     v-row(class="mt-n6 mb-4" v-if="isHidden")
                         v-col(cols='3')
                         v-col(cols='4')
-                            timePicker
+                            timePicker(:startTime2 = 'startTime2')
                         v-col(cols='4') 
-                            timePicker
+                            timePicker(:endTime2 = 'endTime2')
                         v-col(cols='1')
                             
             v-card-actions
@@ -43,7 +43,6 @@ import store from '@/store';
 
 @Component({
     name: 'editSchedule',
-    store: store,
     components: {
         timePicker,
     },
@@ -51,20 +50,20 @@ import store from '@/store';
         return {
             days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         }
-    }
+    },
 })
 
 export default class editSchedule extends Vue{
     private isHidden: boolean=false;
     private dialog: boolean=false;
 
-    @Prop() private day!: any;
-    @Prop() private timeSlot1!: any;
-    @Prop() private timeSlot2!: any;
+    @Prop() private day: string = '';
     @Prop() private startTime1!: any;
     @Prop() private endTime1!: any;
     @Prop() private startTime2!: any;
     @Prop() private endTime2!: any;
+
+    
     
 }
 </script>
