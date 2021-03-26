@@ -1,5 +1,5 @@
 export interface timePickerType {
-    index: string;
+    name: string;
     day: string;
     time: string;
 }
