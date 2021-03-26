@@ -1,12 +1,19 @@
 <template lang="pug">
     div
-        h1 Employees
-        p This is a test.
+        addEmployee
+        employeeTable
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import addEmployee from '@/components/global/addEmployee.vue'
+import employeeTable from '@/components/global/employeeTable.vue'
+
 export default Vue.extend({
+    components: {
+        addEmployee,
+        employeeTable,
+    }
     
 })
 </script>

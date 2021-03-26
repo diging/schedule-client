@@ -14,21 +14,21 @@
                         v-col(cols="6")
                             v-menu(ref="menuFrom" v-model="menu1" :close-on-content-click="false" :return-value.sync="dateFrom"
                                     transition="scale-transition" offset-y min-width="auto")
-                                    template(v-slot:activator="{ on, attrs }")
-                                        v-text-field(v-model="dateFrom" label="From" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on")
-                                    v-date-picker(v-model="dateFrom" no-title scrollable)
-                                        v-spacer
-                                        v-btn(text color="grey" @click="menuFrom = false") Cancel
-                                        v-btn(text color="#F2594B" @click="$refs.menuFrom.save(dateFrom)") OK
+                                template(v-slot:activator="{ on, attrs }")
+                                    v-text-field(v-model="dateFrom" label="From" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on")
+                                v-date-picker(v-model="dateFrom" no-title scrollable)
+                                    v-spacer
+                                    v-btn(text color="grey" @click="menuFrom = false") Cancel
+                                    v-btn(text color="#F2594B" @click="$refs.menuFrom.save(dateFrom)") OK
                         v-col(cols="6")
                             v-menu(ref="menuTo" v-model="menu2" :close-on-content-click="false" :return-value.sync="dateTo"
                                     transition="scale-transition" offset-y min-width="auto")
-                                    template(v-slot:activator="{ on, attrs }")
-                                        v-text-field(v-model="dateTo" label="To" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on")
-                                    v-date-picker(v-model="dateTo" no-title scrollable)
-                                        v-spacer
-                                        v-btn(text color="grey" @click="menuTo = false") Cancel
-                                        v-btn(text color="#F2594B" @click="$refs.menuTo.save(dateTo)") OK
+                                template(v-slot:activator="{ on, attrs }")
+                                    v-text-field(v-model="dateTo" label="To" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on")
+                                v-date-picker(v-model="dateTo" no-title scrollable)
+                                    v-spacer
+                                    v-btn(text color="grey" @click="menuTo = false") Cancel
+                                    v-btn(text color="#F2594B" @click="$refs.menuTo.save(dateTo)") OK
                         v-col(cols="12")
                             v-textarea(outlined name="request description" label="Description")
             v-card-actions
