@@ -14,8 +14,9 @@
 					v-list-item-content
 						v-list-item-title {{ item.title }}
 
-
-			v-btn(color="#F2594B" class="white--text text-center" medium v-if="" to="/") Sign Out
+			template(v-slot:append)
+				div(class="pa-5")
+					v-btn(color="#F2594B" block class="white--text text-center" medium v-if="" to="/") Sign Out
 		
 </template>
 
