@@ -30,7 +30,7 @@
             v-card-actions
                 v-spacer
                 v-btn(color="grey" text @click="dialog = false") Cancel
-                v-btn(color="#F2594B" medium class="white--text" @click="dialog = false") Submit
+                v-btn(color="#F2594B" medium class="white--text" @click="postSched() && dialog = false") Submit
 
 </template>
 
@@ -40,6 +40,8 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import Vuex from 'vuex';
 import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';
+
+const axios = require('axios')
 
 @Component({
     name: 'editSchedule',
@@ -63,6 +65,21 @@ export default class editSchedule extends Vue{
     @Prop() private startTime2!: any;
     @Prop() private endTime2!: any;
 
+    postSched() {
+        axios.post('./schedules/availability/create', {
+            schedule: store.getters.timeValues,
+        })
+        .then(function (response: any) {
+            console.log(response);
+        })
+        .catch(function (error: any) {
+            console.log(error);
+        })
+    }
+
+    getSched() {
+
+    }
     
     
 }
