@@ -30,7 +30,7 @@
             v-card-actions
                 v-spacer
                 v-btn(color="grey" text @click="dialog = false") Cancel
-                v-btn(color="#F2594B" medium class="white--text" @click="postSched() && dialog = false") Submit
+                v-btn(color="#F2594B" medium class="white--text" @click="postSched()") Submit
 
 </template>
 
@@ -78,7 +78,20 @@ export default class editSchedule extends Vue{
     }
 
     getSched() {
-
+        axios.get('/user', {
+            params: {
+            ID: 12345
+            }
+        })
+        .then(function (response: any) {
+            console.log(response);
+        })
+        .catch(function (error: any) {
+            console.log(error);
+        })
+        .then(function () {
+            // always executed
+        });  
     }
     
     
