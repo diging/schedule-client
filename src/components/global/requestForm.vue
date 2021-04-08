@@ -10,7 +10,7 @@
                 v-container
                     v-row
                         v-col(cols="12")
-                            v-select(:items="['Time off', 'Sick leave', 'Vacation', 'Additional work hours']" label="Request type*" required)
+                            v-select(v-model="type" :items="['Time off', 'Sick leave', 'Vacation', 'Additional work hours']" label="Request type*" required)
                         v-col(cols="6")
                             v-menu(ref="menuFrom" v-model="menu1" :close-on-content-click="false" :return-value.sync="dateFrom"
                                     transition="scale-transition" offset-y min-width="auto")
@@ -29,6 +29,12 @@
                                     v-spacer
                                     v-btn(text color="grey" @click="menuTo = false") Cancel
                                     v-btn(text color="#F2594B" @click="$refs.menuTo.save(dateTo)") OK
+                        v-col(cols="6" v-show="this.type=='Time off' && this.allDay!=true")
+                            timePicker
+                        v-col(cols="6" v-show="this.type=='Time off' && this.allDay!=true")
+                            timePicker
+                        v-col(cols="6" v-show="this.type=='Time off'")
+                            v-checkbox(v-model="allDay" label="All Day" color="#F2594B")
                         v-col(cols="12")
                             v-textarea(outlined name="request description" label="Description")
             v-card-actions
@@ -42,9 +48,13 @@
 import Vue from 'vue'
 import '@mdi/font/css/materialdesignicons.css'
 import Component from 'vue-class-component';
+import timePicker from '@/components/global/timePicker.vue'
 
 @Component({
     name: 'requestForm',
+    components: {
+        timePicker,
+    }
 })
 
 export default class requestForm extends Vue{

@@ -9,7 +9,7 @@
                 v-text-field(v-model='lastname' label="Last Name" required)
                 v-text-field(v-model='email' label="ASU Email" required)
                 v-text-field(v-model='password' label="Password" required)
-                v-text-field(class="mb-5" label="Retype password" required)
+                v-text-field(v-model='retype' class="mb-5" label="Retype password" required)
                 v-btn(color="#F2594B" class="white--text" medium @click="post()") Create
 </template>
 
@@ -28,20 +28,25 @@ export default class createAccount extends Vue{
     private email: string = '';
     private lastname: string = '';
     private password: string = '';
+    private retype: string = '';
 
     post() {
-        this.$axios.post('/accounts/signup', {
-            email: this.email,
-            first_name: this.firstname,
-            last_name: this.lastname,
-            password: this.password,
-        })
-        .then(function (response: any) {
-            console.log(response);
-        })
-        .catch(function (error: any) {
-            console.log(error);
-        })
+        if(this.retype==this.password) {
+            this.$axios.post('/accounts/signup', {
+                email: this.email,
+                first_name: this.firstname,
+                last_name: this.lastname,
+                password: this.password,
+            })
+            .then( (context: any) => {
+                localStorage.setItem('access_token', context['access']);
+                localStorage.setItem('refresh_token', context['refresh']);
+                this.$router.push({name: 'userHome'});
+            })
+            .catch(function (error: any) {
+                console.log(error);
+            })
+        }
     }
 
 }
