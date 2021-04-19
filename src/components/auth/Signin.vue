@@ -33,30 +33,31 @@ import Component from 'vue-class-component';
 })
 
 export default class Signin extends Vue{
-    private email: string='';
-    private password: string='';
+	private email: string='';
+	private password: string='';
 
-    login() {
-        if(this.email != "" && this.password != "") {
-            this.$axios.post('/token/', {
-                email: this.email,
-                password: this.password,
-            })
-            .then( (serializer) => {
-                localStorage.setItem('access_token', serializer.data);
-                if(this.email=='admin') {
-                    this.$router.push({name: 'adminHome'});
-                } else {
-                    this.$router.push({name: 'userHome'});
-                }
-            })
-            .catch(function (error: any) {
-                console.log(error);
-            })
-        } else {
-            console.log("A username and password must be present");
-        }
-    }
+	login() {
+		if(this.email != "" && this.password != "") {
+			this.$axios.post('/token/', {
+				email: this.email,
+				password: this.password,
+			})
+			.then( (result) => {
+				localStorage.setItem('token', result.data.access);
+				Vue.$axios.defaults.headers.common.Authorization = `Bearer ${result.data.access}`;
+				if(this.email=='admin') {
+					this.$router.push({name: 'adminHome'});
+				} else {
+					this.$router.push({name: 'userHome'});
+				}
+			})
+			.catch(function (error: any) {
+				console.log(error);
+			})
+		} else {
+			console.log("A username and password must be present");
+		}
+	}
 }
 </script>
 
