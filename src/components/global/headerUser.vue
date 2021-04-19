@@ -3,7 +3,7 @@
 		v-navigation-drawer(app class="elevation-3")
 			v-list-item
 				v-list-item-content
-					v-list-item-title(class="title") Demi.
+					v-list-item-title(class="title") Sched - O - Matic 5000
 			
 			v-divider
 
@@ -34,7 +34,7 @@ export default Vue.extend({
 			items: [
 				{ title: 'Worker Schedule', icon: 'mdi-calendar-clock', path: '/userHome'},
 				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/workerRequests'},
-				{ title: 'Your Schedule', icon: 'mdi-clock-time-five-outline', path: '/yourSchedule'},
+				{ title: 'Availability', icon: 'mdi-clock-time-five-outline', path: '/user/availability'},
 			]			
 		};
   	},

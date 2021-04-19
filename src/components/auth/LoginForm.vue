@@ -34,6 +34,7 @@ export default class Login extends Vue {
 	)
 	.then((result) => {
 		this.$root.$data.loggedIn = true;
+		console.log(result.data.access)
 		localStorage.setItem('token', result.data.access);
 		Vue.$axios.defaults.headers.common.Authorization = `Bearer ${result.data.access}`;
 		this.$router.push('home');

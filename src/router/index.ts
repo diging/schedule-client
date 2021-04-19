@@ -7,7 +7,7 @@ import userHome from '../views/auth/userHomeView.vue';
 import leaveRequests from '../views/auth/leaveRequestsView.vue';
 import employees from '../views/auth/employeesView.vue';
 import workerRequests from '../views/auth/workerRequestsView.vue'
-import yourSchedule from '../views/auth/yourScheduleView.vue'
+import userAvailability from '../views/auth/userAvailabilityView.vue'
 
 Vue.use(VueRouter)
 
@@ -48,9 +48,9 @@ const routes = [
     component: workerRequests,
   },
   {
-    path: '/yourSchedule',
-    name: 'yourSchedule',
-    component: yourSchedule,
+    path: '/user/availability',
+    name: 'userAvailability',
+    component: userAvailability,
   }
 ]
 

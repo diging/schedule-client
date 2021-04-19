@@ -8,7 +8,7 @@ import Vue from 'vue'
 import editSchedule from '@/components/global/editSchedule.vue'
 
 export default Vue.extend({
-    name: 'yourScheduleView',
+    name: 'userAvailabilityView',
     components: {
         editSchedule,
     }

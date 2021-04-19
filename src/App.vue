@@ -1,9 +1,9 @@
 <template lang="pug">
-	v-app(d-flex color="primary")
-		headerAdmin(v-if="username='admin' && this.$route.path != '/' && this.$route.path != '/createAccount'")
-		headerUser(v-if="username='user' && this.$route.path != '/' && this.$route.path != '/createAccount'")
-		v-main
-			v-container(fill-height)
+	v-app(d-flex flex-row color="primary")
+		v-main(d-flex flex-row)
+			headerAdmin.flex-column.justify-start(v-if="username='admin' && this.$route.path != '/' && this.$route.path != '/createAccount'")
+			headerUser.flex-column.justify-start(v-if="username='user' && this.$route.path != '/' && this.$route.path != '/createAccount'")
+			v-container.flex-column(fill-height)
 				router-view
 </template>
 

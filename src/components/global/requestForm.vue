@@ -10,7 +10,7 @@
                 v-container
                     v-row
                         v-col(cols="12")
-                            v-select(v-model="type" :items="['Time off', 'Sick leave', 'Vacation', 'Additional work hours']" label="Request type*" required)
+                            v-select(v-model="type" :items="['Time off', 'Sick leave', 'Additional work hours']" label="Request type*" required)
                         v-col(cols="6")
                             v-menu(ref="menuFrom" v-model="menu1" :close-on-content-click="false" :return-value.sync="dateFrom"
                                     transition="scale-transition" offset-y min-width="auto")
@@ -40,7 +40,7 @@
             v-card-actions
                 v-spacer
                 v-btn(color="grey" text @click="dialog = false") Cancel
-                v-btn(color="#F2594B" medium class="white--text" @click="dialog = false") Submit
+                v-btn(color="#F2594B" medium class="white--text" @click="dialog = false && submit()") Submit
 
 </template>
 
@@ -63,6 +63,20 @@ export default class requestForm extends Vue{
     private menu2: string='';
     private dateTo: string='';
     private dialog: boolean=false;
+	private type: string = '';
+	private allDay: boolean = false;
+
+	submit(){
+this.$axios.post('/schedules/availability/create', {
+
+		})
+		.then(function (response: any) {
+			console.log(response);
+		})
+		.catch(function (error: any) {
+			console.log(error);
+		})
+	}
     
 }
 </script>
