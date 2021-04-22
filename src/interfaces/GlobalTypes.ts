@@ -33,4 +33,14 @@ export interface RootState {
 	schedule: {
         [key: string] : time
     };
-  }
+}
+
+export interface schedule {
+	created: string;
+	mon: string;
+	tue: string;
+	wed: string;
+	thu: string;
+	fri: string;
+	max_hours: string;
+}
