@@ -1,72 +1,55 @@
 <template lang="pug">
-	v-app
-		Header
-		v-content
-			v-container(fill-height)
+	v-app(d-flex flex-row color="primary")
+		v-main(d-flex flex-row)
+			headerAdmin.flex-column.justify-start(v-if="username='admin' && this.$route.path != '/' && this.$route.path != '/createAccount'")
+			headerUser.flex-column.justify-start(v-if="username='user' && this.$route.path != '/' && this.$route.path != '/createAccount'")
+			v-container.flex-column(fill-height)
 				router-view
 </template>
 
 <script lang="ts">
 import router from '@/router';
 import Vue from 'vue';
-//import Footer from './components/global/Footer.vue';
-import Header from './components/global/Header.vue';
-//import '@fortawesome/fontawesome-free/css/all.css';
-//import '@fortawesome/fontawesome-free/js/all.js';
+import Vuetify from 'vuetify/lib'
+import '@mdi/font/css/materialdesignicons.css'
+import headerUser from './components/global/headerUser.vue';
+import headerAdmin from './components/global/headerAdmin.vue';
+import Signin from './components/auth/Signin.vue';
+
+Vue.use(Vuetify)
+
+const vuetify = new Vuetify({
+  theme: {
+    themes: {
+      light: {
+        primary: '#F2594B',
+        secondary: '#b0bec5',
+        anchor: '#8c9eff',
+      },
+    },
+  },
+})
+
+
 export default Vue.extend({
 	name: 'App',
 	components: {
-		Header,
+		headerUser,
+		headerAdmin,
+		Signin,
 		//Footer,
 	},
 	data: () => ({
 	}),
-	// beforeCreate() {
-	// 	/**
-	// 	 * run verify on pages other than signup and home during app setup
-	// 	 */
-	// 	if (this.$route.path !== '/signup' && this.$route.path !== '/' && this.$route.path !== '/about') {
-	// 		Vue.$verify(router, true);
-	// 	} else {
-	// 		Vue.$verify(router, false);
-	// 	}
-	// },
-	// created() {
-	// 	/**
-	// 	 * run verify on pages after load
-	// 	 * @param {Route} to - route that page is directing to
-	// 	 * @param {Route} from - route that page is directed from
-	// 	 * @param {Function} next - move on to the next hook in the pipeline.
-	// 	 * 		If no hooks are left, the navigation is confirmed.
-	// 	 */
-	// 	router.beforeEach((to, from, next) => {
-	// 		if (to.path === '/signup' || to.path === '/' || to.path === '/about') {
-	// 			Vue.$verify(router, false);
-	// 			next();
-	// 		} else {
-	// 			Vue.$verify(router, true);
-	// 			next();
-	// 		}
-	// 	});
-	// },
+	
 });
 </script>
-<style lang="scss">
+
+<style>
 #app {
-	font-family: "Avenir", Helvetica, Arial, sans-serif;
+	font-family: "Roboto",  sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	text-align: center;
-	color: #2c3e50;
-}
-#nav {
-	padding: 30px;
-	a {
-		font-weight: bold;
-		color: #2c3e50;
-		&.router-link-exact-active {
-			color: #42b983;
-		}
-	}
+	background: #f2f2f2;
 }
 </style>

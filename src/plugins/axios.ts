@@ -6,23 +6,23 @@ import axios from 'axios';
 // axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
-const config = {
-  // baseURL: process.env.baseURL || process.env.apiUrl || ""
-  // timeout: 60 * 1000, // Timeout
-  // withCredentials: true, // Check cross-site Access-Control
-  baseURL: 'http://localhost:8000/api/v1/',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': {
-      toString() {
-        return `Bearer ${localStorage.getItem('token')}`;
-      },
-    },
-  },
-  xsrfCookieName: 'csrftoken',
-  xsrfHeaderName: 'X-CSRFToken',
-  withCredentials: true,
-};
+const authHeader: any = {};   
+if (localStorage.getItem('token')) {   
+  authHeader.Authorization = {    
+    toString() {    
+      return `Bearer ${localStorage.getItem('token')}`;    },    
+    };   
+  } 
+  
+const config = {    
+  // baseURL: process.env.baseURL || process.env.apiUrl || ""    
+  // timeout: 60 * 1000, // Timeout    
+  // withCredentials: true, 
+  // Check cross-site Access-Control    
+  baseURL: process.env.VUE_APP_BACKEND_BASE_URL,    
+  headers: {    'Content-Type': 'application/json',    ...authHeader,    },    
+  xsrfCookieName: 'csrftoken',    xsrfHeaderName: 'X-CSRFToken',    
+  withCredentials: true,       };
 
 const _axios = axios.create(config);
 

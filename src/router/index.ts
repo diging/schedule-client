@@ -1,22 +1,57 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import LoginView from '../views/auth/LoginView.vue';
-import SignUpView from '../views/auth/SignUpView.vue';
+import SigninView from '../views/auth/SigninView.vue';
+import createAccountView from '../views/auth/createAccountView.vue';
+import adminHome from '../views/auth/adminHomeView.vue';
+import userHome from '../views/auth/userHomeView.vue';
+import leaveRequests from '../views/auth/leaveRequestsView.vue';
+import employees from '../views/auth/employeesView.vue';
+import workerRequests from '../views/auth/workerRequestsView.vue'
+import userAvailability from '../views/auth/userAvailabilityView.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/login',
-    name: 'login',
-    component: LoginView,
+    path: '/',
+    name: 'Signin',
+    component: SigninView,
   },
   {
-    path: '/signup',
-    name: 'signup',
-    component: SignUpView,
+    path: '/createaccount',
+    name: 'createAccount',
+    component: createAccountView,
+  },
+  {
+    path: '/adminHome',
+    name: 'adminHome',
+    component: adminHome,
+  },
+  {
+    path: '/userHome',
+    name: 'userHome',
+    component: userHome,
+  },
+  {
+    path: '/leaveRequests',
+    name: 'leaveRequests',
+    component: leaveRequests,
+  },
+  {
+    path: '/employees',
+    name: 'employees',
+    component: employees,
+  },
+  {
+    path: '/workerRequests',
+    name: 'workerRequests',
+    component: workerRequests,
+  },
+  {
+    path: '/user/availability',
+    name: 'userAvailability',
+    component: userAvailability,
   }
-
 ]
 
 const router = new VueRouter({
