@@ -36,7 +36,7 @@
                         v-col(cols="6" v-show="this.type=='Time off'")
                             v-checkbox(v-model="allDay" label="All Day" color="#F2594B")
                         v-col(cols="12")
-                            v-textarea(outlined name="request description" label="Description")
+                            v-textarea(v-model="desc" outlined name="request description" label="Description")
             v-card-actions
                 v-spacer
                 v-btn(color="grey" text @click="dialog = false") Cancel
@@ -65,18 +65,23 @@ export default class requestForm extends Vue{
     private dialog: boolean=false;
 	private type: string = '';
 	private allDay: boolean = false;
+    private desc: string = '';
 
 	submit(){
-this.$axios.post('/schedules/availability/create', {
-
-		})
-		.then(function (response: any) {
-			console.log(response);
-		})
-		.catch(function (error: any) {
-			console.log(error);
-		})
-	}
+        this.$axios.post('', {
+            type: this.type,
+            dateFrom: this.dateFrom,
+            dateTo: this.dateTo,
+            allDay: this.allDay,
+            description: this.desc,
+        })
+        .then(function (response: any) {
+            console.log(response);
+        })
+        .catch(function (error: any) {
+            console.log(error);
+        })
+    }
     
 }
 </script>
