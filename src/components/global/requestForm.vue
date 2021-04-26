@@ -40,7 +40,7 @@
             v-card-actions
                 v-spacer
                 v-btn(color="grey" text @click="dialog = false") Cancel
-                v-btn(color="#F2594B" medium class="white--text" @click="dialog = false && submit()") Submit
+                v-btn(color="#F2594B" medium class="white--text" @click="submit()") Submit
 
 </template>
 
@@ -68,15 +68,16 @@ export default class requestForm extends Vue{
     private desc: string = '';
 
 	submit(){
-        this.$axios.post('', {
-            type: this.type,
-            dateFrom: this.dateFrom,
-            dateTo: this.dateTo,
+        this.$axios.post('/timeoff/create/', {
+            timeoff_type: this.type,
+            from_date: this.dateFrom,
+            to_date: this.dateTo,
             allDay: this.allDay,
             description: this.desc,
         })
-        .then(function (response: any) {
+        .then( (response: any) => {
             console.log(response);
+            this.dialog = false;
         })
         .catch(function (error: any) {
             console.log(error);

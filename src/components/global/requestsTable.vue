@@ -1,25 +1,8 @@
 <template lang="pug">
     div()
         v-data-table.mt-10(:headers="headers" :items="requests" :items-per-page="5" show-select class="elevation-1" :single-select="singleSelect1")
-            template(slot="items" slot-scope="props" v-if="")
-                td 
-                    v-btn(fab small color="")
-                        v-icon mdi-checkbox
-                td
-                    div(class="text-center")
-                        v-dialog(v-model="dialog" width="400")
-                            template(v-slot:activator="{ on, attrs }")
-                                v-btn(icon small)
-                                    v-icon mdi-times   
-                            v-card
-                                v-card-title Reason for declining?
-                                v-textarea(outlined label="reason" value="Type here....")
-                                v-divider
-                                v-card-actions 
-                                    v-spacer
-                                    v-btn(text) Cancel
-                                    v-btn(color="") Decline
-
+            template(v-slot:item.status="{ item }")
+                v-chip(dark :color="getColor(item.status)") {{ item.status }}
 </template>
 
 <script lang="ts">
@@ -39,22 +22,19 @@ export default class requestsTable extends Vue{
         return {
             singleSelect1: false,
             selected: [],
-            headers: [       
-                { text: 'Applicant', value: 'name' },    
-                { text: 'Submitted on', value: 'submitted' },
-                { text: 'Request type', value: 'type' },
+            headers: [ 
+                { text: 'Request type', value: 'timeoff_type' },
                 { text: 'From', value: 'from_date' },
                 { text: 'To', value: 'to_date' },
                 { text: 'Reason', value: 'description' },
                 { text: 'STATUS', value: 'status' },
-                { text: 'Action', value: '' },
             ],
         }
     }
 
 
     created() {
-        this.$axios.get('', {
+        this.$axios.get('/timeoff/user/', {
 			params: {
 
 			}
@@ -69,6 +49,12 @@ export default class requestsTable extends Vue{
 		.then(function () {
 			// always executed
 		}); 
+    }
+
+    getColor (status: string) {
+        if (status == 'pending') return 'grey'
+        else if (status == 'Approved') return 'green darken-2'
+        else return 'red lighten-1'
     }
 }
 </script>
