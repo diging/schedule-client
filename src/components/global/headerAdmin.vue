@@ -33,7 +33,7 @@ export default Vue.extend({
 		return {
 			items: [
 				{ title: 'Worker Schedule', icon: 'mdi-calendar-clock', path: '/adminHome'},
-				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/leaveRequests'},
+				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/adminLeaveRequests'},
 				{ title: 'Employees', icon: 'mdi-account-group', path: '/employees'},
 			]			
 		};

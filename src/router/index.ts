@@ -4,9 +4,9 @@ import SigninView from '../views/auth/SigninView.vue';
 import createAccountView from '../views/auth/createAccountView.vue';
 import adminHome from '../views/auth/adminHomeView.vue';
 import userHome from '../views/auth/userHomeView.vue';
-import leaveRequests from '../views/auth/leaveRequestsView.vue';
+import adminLeaveRequests from '../views/auth/adminLeaveRequestsView.vue';
 import employees from '../views/auth/employeesView.vue';
-import workerRequests from '../views/auth/workerRequestsView.vue'
+import userLeaveRequests from '../views/auth/userLeaveRequestsView.vue'
 import userAvailability from '../views/auth/userAvailabilityView.vue'
 
 Vue.use(VueRouter)
@@ -33,9 +33,9 @@ const routes = [
     component: userHome,
   },
   {
-    path: '/leaveRequests',
-    name: 'leaveRequests',
-    component: leaveRequests,
+    path: '/adminLeaveRequests',
+    name: 'adminLeaveRequests',
+    component: adminLeaveRequests,
   },
   {
     path: '/employees',
@@ -43,9 +43,9 @@ const routes = [
     component: employees,
   },
   {
-    path: '/workerRequests',
-    name: 'workerRequests',
-    component: workerRequests,
+    path: '/userLeaveRequests',
+    name: 'userLeaveRequests',
+    component: userLeaveRequests,
   },
   {
     path: '/user/availability',
