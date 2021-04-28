@@ -1,10 +1,12 @@
 <template lang="pug">
     div()
         v-data-table.mt-10(:headers="headers" :items="requests" :items-per-page="5" show-select class="elevation-1" :single-select="singleSelect1")
+            template(v-slot:item.submission_date="{ item }")
+                td {{ formattedDate(item) }}
             template(v-slot:item.status="{ item }")
                 v-chip(dark :color="getColor(item.status)") {{ item.status }}
             template(v-slot:item.action="{ item }")
-                v-btn.mr-2(fab small dark color="green darken-2" @click="submit('Approved')")
+                v-btn.mr-2(fab small dark color="green darken-2" @click="submit('Approved', item)")
                     v-icon mdi-check
                 v-dialog(v-model="dialog" width="400")
                     template(v-slot:activator="{ on, attrs }") 
@@ -17,7 +19,7 @@
                         v-card-actions
                             v-spacer
                             v-btn(text @click="dialog=false") Cancel
-                            v-btn(color="#F2594B" dark @click="submit('Declined')") Decline 
+                            v-btn(color="#F2594B" dark @click="submit('Declined', item)") Decline 
                         
 </template>
 
@@ -41,18 +43,18 @@ export default class requestsTable extends Vue{
     private dialog: boolean = false;
     private declineReason: string= '';
 
-    // submit(status: string) {
-    //     this.$axios.post('', {
-    //         status: status,
-    //         reason: this.declineReason,
-    //     })
-    //     .then(function (response: any) {
-	// 		console.log(response);
-	// 	})
-	// 	.catch(function (error: any) {
-	// 		console.log(error);
-	// 	})
-    // }
+    submit(status: string, item: any) {
+        this.$axios.patch('/timeoff/'+item.id+'/review_user_timeoff_request/', {
+            status: status,
+            reason: this.declineReason,
+        })
+        .then(function (response: any) {
+			console.log(response);
+		})
+		.catch(function (error: any) {
+			console.log(error);
+		})
+    }
 
     created() {
         if(this.$route.path == '/userLeaveRequests') {
@@ -97,9 +99,10 @@ export default class requestsTable extends Vue{
             .then(function () {
                 // always executed
             });
+
             this.headers = [ 
                 { text: 'Applicant', value: 'user' },
-                { text: 'Submitted on', value: moment('submission_date').format('MM/DD/YYYY') },
+                { text: 'Submitted on', value: 'submission_date' },
                 { text: 'Request type', value: 'timeoff_type' },
                 { text: 'From', value: 'from_date' },
                 { text: 'To', value: 'to_date' },
@@ -108,6 +111,12 @@ export default class requestsTable extends Vue{
                 { text: 'Action', value: 'action' },
             ]
         }
+    }
+
+    formattedDate(item: any) {
+        var date = moment(item.submission_date);
+        var dateComponent = date.utc().format('MM/DD/YYYY');
+        return dateComponent;
     }
 
     getColor (status: string) {
