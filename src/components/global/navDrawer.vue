@@ -8,7 +8,7 @@
 			v-divider
 
 			v-list(dense nav)
-				v-list-item(v-for="item in items" :key="item.title" :to="item.path" link)
+				v-list-item(v-for="item in navDrawer" :key="item.title" :to="item.path" link)
 					v-list-item-icon
 						v-icon {{ item.icon }}
 					v-list-item-content
@@ -23,28 +23,36 @@
 <script lang="ts">
 import Vue from 'vue';
 import '@mdi/font/css/materialdesignicons.css'
+import Component from 'vue-class-component';
 
-export default Vue.extend({
-	name: 'Header',
-	props: {
-		msg: String,
-	},
-	data() {
-		return {
-			items: [
+@Component({
+	name: 'navDrawer',
+})
+
+export default class navDrawer extends Vue{
+	private navDrawer: any = [];
+
+	created() {
+		if(false) {
+			this.navDrawer = [
+				{ title: 'Worker Schedule', icon: 'mdi-calendar-clock', path: '/adminHome'},
+				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/adminLeaveRequests'},
+				{ title: 'Employees', icon: 'mdi-account-group', path: '/employees'},
+			];
+		}
+		else if(true) {
+			this.navDrawer = [
 				{ title: 'Worker Schedule', icon: 'mdi-calendar-clock', path: '/userHome'},
 				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/userLeaveRequests'},
 				{ title: 'Availability', icon: 'mdi-clock-time-five-outline', path: '/user/availability'},
-			]			
-		};
-  	},
-	methods: {
-
-	},
-});
+			];
+		}
+	}
+				
+	
+}
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
 </style>
