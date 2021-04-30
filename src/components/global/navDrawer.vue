@@ -31,22 +31,40 @@ import Component from 'vue-class-component';
 
 export default class navDrawer extends Vue{
 	private navDrawer: any = [];
+	private users: any = [];
 
 	created() {
-		if(false) {
-			this.navDrawer = [
-				{ title: 'Worker Schedule', icon: 'mdi-calendar-clock', path: '/adminHome'},
-				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/adminLeaveRequests'},
-				{ title: 'Employees', icon: 'mdi-account-group', path: '/employees'},
-			];
-		}
-		else if(true) {
-			this.navDrawer = [
-				{ title: 'Worker Schedule', icon: 'mdi-calendar-clock', path: '/userHome'},
-				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/userLeaveRequests'},
-				{ title: 'Availability', icon: 'mdi-clock-time-five-outline', path: '/user/availability'},
-			];
-		}
+		this.$axios.get('accounts/users/get_current_user',{
+			params: {
+
+			}
+		})
+		.then(response => {
+			this.users=response.data;
+			console.log(this.users);
+
+			if(this.users['is_staff']==true) {
+				this.navDrawer = [
+					{ title: 'Worker Schedule', icon: 'mdi-calendar-clock', path: '/adminHome'},
+					{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/adminLeaveRequests'},
+					{ title: 'Employees', icon: 'mdi-account-group', path: '/employees'},
+				];
+			}
+			else if(this.users['is_staff']==false) {
+				this.navDrawer = [
+					{ title: 'Worker Schedule', icon: 'mdi-calendar-clock', path: '/userHome'},
+					{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/userLeaveRequests'},
+					{ title: 'Availability', icon: 'mdi-clock-time-five-outline', path: '/user/availability'},
+				];
+			}
+			})
+		.catch(function (error: any) {
+			console.log(error);
+		})
+		.then(function () {
+			// always executed
+		}); 
+		
 	}
 				
 	
