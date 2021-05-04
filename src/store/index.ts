@@ -2,8 +2,13 @@ import Vue from 'vue'
 import Vuex, { MutationTree } from 'vuex';
 import { timePickerType, time } from '@/interfaces/timePickerTypes'
 import { RootState } from '@/interfaces/GlobalTypes'
+import  timeStore  from '@/store/timeStore'
+
+
 
 Vue.use(Vuex)
+
+
 
 const initialState: RootState = {
   schedule: {
@@ -34,5 +39,8 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
+    timeStore
   }
+
 })
+

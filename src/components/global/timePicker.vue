@@ -20,6 +20,7 @@ export default class timePicker extends Vue{
 	private time: string = '';
 	@Prop() day!: string;
 	@Prop() index!: string;
+	@Prop() check!: string;
 	private localDay: string = this.day
 	private localIndex: string = this.index
 
@@ -30,7 +31,10 @@ export default class timePicker extends Vue{
 			'name': this.localIndex,
 			'time': this.time
 		}
-		this.$store.commit('setTime', data)
+		if(this.check=='startTime'){this.$store.commit('setStartTimeInstance', data)}
+		else if(this.check=='endTime'){this.$store.commit('setEndTimeInstance', data)}
+		else {this.$store.commit('setTime', data)}
+
 	}
   
 

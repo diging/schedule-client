@@ -45,3 +45,13 @@ export interface schedule {
 	fri: string;
 	max_hours: string;
 }
+
+export interface timeInstance {
+    start_time: string;
+	end_time: string;
+}
+
+export interface timeInstanceRootState {
+	start_time: string;
+	end_time: string;
+}

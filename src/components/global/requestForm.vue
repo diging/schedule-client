@@ -29,10 +29,10 @@
                                     v-spacer
                                     v-btn(text color="grey" @click="menuTo = false") Cancel
                                     v-btn(text color="#F2594B" @click="$refs.menuTo.save(dateTo)") OK
-                        v-col(cols="6" v-show="this.type=='Time off' && this.allDay!=true")
-                            timePicker
-                        v-col(cols="6" v-show="this.type=='Time off' && this.allDay!=true")
-                            timePicker
+                        v-col(cols="6" v-model="this.startTime" v-show="this.type=='Time off' && this.allDay!=true")
+                            timePicker(:check='checkStartTime')
+                        v-col(cols="6" v-model="this.endTime" v-show="this.type=='Time off' && this.allDay!=true")
+                            timePicker(:check='checkEndTime')
                         v-col(cols="6" v-show="this.type=='Time off'")
                             v-checkbox(v-model="allDay" label="All Day" color="#F2594B")
                         v-col(cols="12")
@@ -48,6 +48,7 @@
 import Vue from 'vue'
 import '@mdi/font/css/materialdesignicons.css'
 import Component from 'vue-class-component';
+import store from '@/store';
 import timePicker from '@/components/global/timePicker.vue'
 
 @Component({
@@ -66,14 +67,27 @@ export default class requestForm extends Vue{
 	private type: string = '';
 	private allDay: boolean = false;
     private desc: string = '';
+    private startTime: string = '';
+	private endTime: string = '';
+    private check: string = '';
+    private checkStartTime: string = 'startTime';
+    private checkEndTime: string = 'endTime';
 
 	submit(){
+        this.startTime = store.getters.timeInstance.start_time
+        this.endTime = store.getters.timeInstance.end_time
+        console.log(store.getters.timeInstance)
+        if(this.type == 'Time off')
+        {
         this.$axios.post('/timeoff/create/', {
             timeoff_type: this.type,
             from_date: this.dateFrom,
             to_date: this.dateTo,
             allDay: this.allDay,
             description: this.desc,
+            start_time: this.startTime,
+            end_time: this.endTime
+
         })
         .then( (response: any) => {
             console.log(response);
@@ -82,6 +96,27 @@ export default class requestForm extends Vue{
         .catch(function (error: any) {
             console.log(error);
         })
+        }
+        else
+        {
+           this.$axios.post('/timeoff/create/', {
+            timeoff_type: this.type,
+            from_date: this.dateFrom,
+            to_date: this.dateTo,
+            allDay: this.allDay,
+            description: this.desc,
+            start_time: this.startTime,
+            end_time: this.endTime
+
+        })
+        .then( (response: any) => {
+            console.log(response);
+            this.dialog = false;
+        })
+        .catch(function (error: any) {
+            console.log(error);
+        })
+        }
     }
     
 }
