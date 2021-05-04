@@ -65,6 +65,7 @@ export default class requestsTable extends Vue{
             }) 
             .then(response => {
                 this.requests=response.data;
+
                 console.log(this.requests);
             })
             .catch(function (error: any) {
@@ -91,6 +92,12 @@ export default class requestsTable extends Vue{
             }) 
             .then(response => {
                 this.requests=response.data;
+                for(request of this.requests){
+                    if(request.start_time){
+                        from_date = formattedDateTime(request.from_date, request.start_time)
+                        to_date = formattedDateTime(request.to_date, request.end_time)
+                    }
+                }
                 console.log(this.requests);
             })
             .catch(function (error: any) {
@@ -117,6 +124,11 @@ export default class requestsTable extends Vue{
         var date = moment(item.submission_date);
         var dateComponent = date.utc().format('MM/DD/YYYY');
         return dateComponent;
+    }
+
+    formattedDateTime(current_date: any, current_time:any) {
+        var dateComponent = moment(current_date + ' ' + current_time, 'DD/MM/YYYY HH:mm')
+        return dateComponent
     }
 
     getColor (status: string) {
