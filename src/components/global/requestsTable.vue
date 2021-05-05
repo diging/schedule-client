@@ -27,6 +27,7 @@
 import Vue from 'vue'
 import Component from 'vue-class-component';
 import '@mdi/font/css/materialdesignicons.css';
+import { timeoffRequest } from '@/interfaces/timePickerTypes';
 import moment from 'moment';
 
 @Component({
@@ -42,6 +43,7 @@ export default class requestsTable extends Vue{
     private headers: any = [];
     private dialog: boolean = false;
     private declineReason: string= '';
+    private modifiedRequests: any = [];
 
     submit(status: string, item: any) {
         this.$axios.patch('/timeoff/'+item.id+'/review_user_timeoff_request/', {
@@ -65,8 +67,7 @@ export default class requestsTable extends Vue{
             }) 
             .then(response => {
                 this.requests=response.data;
-
-                console.log(this.requests);
+                this.requests.map((request: timeoffRequest) => this.formattedDateTime(request) );
             })
             .catch(function (error: any) {
                 console.log(error);
@@ -92,12 +93,6 @@ export default class requestsTable extends Vue{
             }) 
             .then(response => {
                 this.requests=response.data;
-                for(request of this.requests){
-                    if(request.start_time){
-                        from_date = formattedDateTime(request.from_date, request.start_time)
-                        to_date = formattedDateTime(request.to_date, request.end_time)
-                    }
-                }
                 console.log(this.requests);
             })
             .catch(function (error: any) {
@@ -126,10 +121,16 @@ export default class requestsTable extends Vue{
         return dateComponent;
     }
 
-    formattedDateTime(current_date: any, current_time:any) {
-        var dateComponent = moment(current_date + ' ' + current_time, 'DD/MM/YYYY HH:mm')
-        return dateComponent
+    formattedDateTime(item: timeoffRequest) {
+        if(item.start_time){let start_datetime = moment(item.from_date + " " + item.start_time);
+        let end_datetime = moment(item.to_date + " " + item.end_time);
+        item.from_date = start_datetime.format('YYYY-MM-DD hh:mm a');
+        item.to_date = end_datetime.format('YYYY-MM-DD hh:mm a');
+        }
+        console.log("item values", item.from_date, item.to_date)
+        return item
     }
+
 
     getColor (status: string) {
         if (status == 'pending') return 'grey'
