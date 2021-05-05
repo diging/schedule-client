@@ -122,12 +122,12 @@ export default class requestsTable extends Vue{
     }
 
     formattedDateTime(item: timeoffRequest) {
-        if(item.start_time){let start_datetime = moment(item.from_date + " " + item.start_time);
-        let end_datetime = moment(item.to_date + " " + item.end_time);
-        item.from_date = start_datetime.format('YYYY-MM-DD hh:mm a');
-        item.to_date = end_datetime.format('YYYY-MM-DD hh:mm a');
+        if(item.start_time) {
+            let start_datetime = moment(item.from_date + " " + item.start_time);
+            let end_datetime = moment(item.to_date + " " + item.end_time);
+            item.from_date = start_datetime.format('YYYY-MM-DD hh:mm a');
+            item.to_date = end_datetime.format('YYYY-MM-DD hh:mm a');
         }
-        console.log("item values", item.from_date, item.to_date)
         return item
     }
 

@@ -33,7 +33,6 @@ export interface RootState {
 	schedule: {
         [key: string] : time
     };
-
 }
 
 export interface schedule {

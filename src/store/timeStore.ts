@@ -18,13 +18,9 @@ export default ({
   },
   mutations: {
     setStartTimeInstance(state: timeInstanceRootState,  timePickerType: timePickerType) {
-        console.log("entered here", timePickerType)
-        console.log("timepicker time", timePickerType['time'])
         state.start_time = timePickerType['time'];
     },
     setEndTimeInstance(state: timeInstanceRootState,  timePickerType: timePickerType) {
-        console.log("entered here", timePickerType)
-        console.log("timepicker time", timePickerType['time'])
         state.end_time = timePickerType['time'];
     }
   },

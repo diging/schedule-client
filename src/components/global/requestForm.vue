@@ -29,9 +29,9 @@
                                     v-spacer
                                     v-btn(text color="grey" @click="menuTo = false") Cancel
                                     v-btn(text color="#F2594B" @click="$refs.menuTo.save(dateTo)") OK
-                        v-col(cols="6" v-model="this.startTime" v-show="this.type=='Time off' && this.allDay!=true")
+                        v-col(cols="6" v-show="this.type=='Time off' && this.allDay!=true")
                             timePicker(:check='checkStartTime')
-                        v-col(cols="6" v-model="this.endTime" v-show="this.type=='Time off' && this.allDay!=true")
+                        v-col(cols="6" v-show="this.type=='Time off' && this.allDay!=true")
                             timePicker(:check='checkEndTime')
                         v-col(cols="6" v-show="this.type=='Time off'")
                             v-checkbox(v-model="allDay" label="All Day" color="#F2594B")
@@ -76,7 +76,6 @@ export default class requestForm extends Vue{
 	submit(){
         this.startTime = store.getters.timeInstance.start_time
         this.endTime = store.getters.timeInstance.end_time
-        console.log(store.getters.timeInstance)
         if(this.type == 'Time off')
         {
         this.$axios.post('/timeoff/create/', {

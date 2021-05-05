@@ -4,11 +4,7 @@ import { timePickerType, time } from '@/interfaces/timePickerTypes'
 import { RootState } from '@/interfaces/GlobalTypes'
 import  timeStore  from '@/store/timeStore'
 
-
-
 Vue.use(Vuex)
-
-
 
 const initialState: RootState = {
   schedule: {
@@ -17,13 +13,13 @@ const initialState: RootState = {
     Wednesday: { startTime1: '00:00', endTime1: '00:00', startTime2: '00:00', endTime2: '00:00'},
     Thursday: { startTime1: '00:00', endTime1: '00:00', startTime2: '00:00', endTime2: '00:00'},
     Friday: { startTime1: '00:00', endTime1: '00:00', startTime2: '00:00', endTime2: '00:00'}
-  },
+  }
 }
 
 const mutations: MutationTree<RootState> = {
-  setTime(state: RootState, timePickerValue: timePickerType ) {
-    console.log('HIt')
-    state.schedule[timePickerValue['day']][timePickerValue['name'] as 'startTime1' | 'startTime2'| 'endTime1' | 'endTime2'] = timePickerValue['time'];
+setTime(state: RootState, timePickerValue: timePickerType ) {
+  console.log('HIt')
+  state.schedule[timePickerValue['day']][timePickerValue['name'] as 'startTime1' | 'startTime2'| 'endTime1' | 'endTime2'] = timePickerValue['time'];
   },
 }
 
@@ -41,6 +37,4 @@ export default new Vuex.Store({
   modules: {
     timeStore
   }
-
 })
-
