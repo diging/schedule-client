@@ -16,6 +16,7 @@
 import Vue from 'vue';
 import '@mdi/font/css/materialdesignicons.css'
 import Component from 'vue-class-component';
+import jwt_decode from "jwt-decode";
 
 @Component({
 	name: 'Signin',
@@ -36,6 +37,16 @@ export default class Signin extends Vue{
 	private email: string='';
 	private password: string='';
 
+	setUserInfo() {
+		this.$axios.get('/accounts/user/info/')
+		.then( (result) => {
+			Vue.prototype.$user = result.data
+		})
+		.catch(function (error: any) {
+			console.log(error);
+		})
+	}
+
 	login() {
 		if(this.email != "" && this.password != "") {
 			this.$axios.post('/token/', {
@@ -45,6 +56,7 @@ export default class Signin extends Vue{
 			.then( (result) => {
 				localStorage.setItem('token', result.data.access);
 				Vue.$axios.defaults.headers.common.Authorization = `Bearer ${result.data.access}`;
+				this.setUserInfo()
 				if(this.email=='admin') {
 					this.$router.push({name: 'adminHome'});
 				} else {

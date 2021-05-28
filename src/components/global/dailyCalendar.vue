@@ -34,6 +34,11 @@ export default class dailyCalendar extends Vue{
             categories: ['John Smith', 'Tori Walker'],
         };
     }
+
+	created () {
+		console.log("here")
+		console.log(Vue.prototype.$user)
+	}
     
 }
 </script>
