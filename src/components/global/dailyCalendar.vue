@@ -36,8 +36,6 @@ export default class dailyCalendar extends Vue{
     }
 
 	created () {
-		console.log("here")
-		console.log(Vue.prototype.$user)
 	}
     
 }

@@ -37,10 +37,15 @@ export default class Signin extends Vue{
 	private email: string='';
 	private password: string='';
 
-	setUserInfo() {
-		this.$axios.get('/accounts/user/info/')
+	async setUserInfo() {
+		await this.$axios.get('/accounts/user/info/')
 		.then( (result) => {
 			Vue.prototype.$user = result.data
+			if(Vue.prototype.$user.is_superuser) {
+				this.$router.push({name: 'adminHome'});
+			} else {
+				this.$router.push({name: 'userHome'});
+			}
 		})
 		.catch(function (error: any) {
 			console.log(error);
@@ -57,11 +62,6 @@ export default class Signin extends Vue{
 				localStorage.setItem('token', result.data.access);
 				Vue.$axios.defaults.headers.common.Authorization = `Bearer ${result.data.access}`;
 				this.setUserInfo()
-				if(this.email=='admin') {
-					this.$router.push({name: 'adminHome'});
-				} else {
-					this.$router.push({name: 'userHome'});
-				}
 			})
 			.catch(function (error: any) {
 				console.log(error);
