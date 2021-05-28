@@ -16,6 +16,7 @@
     "core-js": "^3.3.2",
     "esutils": "^2.0.3",
     "jsesc": "^2.5.2",
+    "jwt-decode": "^3.1.2",
     "material-design-icons-iconfont": "^5.0.1",
     "moment": "^2.29.1",
     "vue": "^2.6.10",
