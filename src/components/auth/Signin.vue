@@ -20,27 +20,25 @@ import jwt_decode from "jwt-decode";
 
 @Component({
 	name: 'Signin',
-    data() {
-        return {
-            show1: false,
-            password: '',
-            rules: {
-                required: (value: any) => !!value || 'Required.',
-                min: (v: string|any[]) => v.length >= 8 || 'Min 8 characters',
-                emailMatch: () => (`The email and password you entered don't match`),
-            }
-        }
-    }
 })
 
-export default class Signin extends Vue{
+export default class Signin extends Vue {
+
 	private email: string='';
 	private password: string='';
+	private show1: boolean = false;
+	rules = {
+		required: (value: any) => !!value || 'Required.',
+		min: (v: string|any[]) => v.length >= 8 || 'Min 8 characters',
+		emailMatch: () => (`The email and password you entered don't match`),
+	}
 
 	async setUserInfo() {
-		await this.$axios.get('/accounts/user/info/')
+		 this.$axios.get('/accounts/user/info/')
 		.then( (result) => {
 			Vue.prototype.$user = result.data
+		})
+		.then(() => {
 			if(Vue.prototype.$user.is_superuser) {
 				this.$router.push({name: 'adminHome'});
 			} else {

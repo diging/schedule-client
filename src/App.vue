@@ -1,8 +1,7 @@
 <template lang="pug">
 	v-app(d-flex flex-row color="primary")
 		v-main(d-flex flex-row)
-			headerAdmin.flex-column.justify-start(v-if="username='admin' && this.$route.path != '/' && this.$route.path != '/createAccount'")
-			headerUser.flex-column.justify-start(v-if="username='user' && this.$route.path != '/' && this.$route.path != '/createAccount'")
+			SideNav.flex-column.justify-start(v-if="this.$route.path != '/' && this.$route.path != '/createAccount'")
 			v-container.flex-column(fill-height)
 				router-view
 </template>
@@ -12,8 +11,7 @@ import router from '@/router';
 import Vue from 'vue';
 import Vuetify from 'vuetify/lib'
 import '@mdi/font/css/materialdesignicons.css'
-import headerUser from './components/global/headerUser.vue';
-import headerAdmin from './components/global/headerAdmin.vue';
+import SideNav from './components/global/SideNav.vue';
 import Signin from './components/auth/Signin.vue';
 
 Vue.use(Vuetify)
@@ -34,10 +32,7 @@ const vuetify = new Vuetify({
 export default Vue.extend({
 	name: 'App',
 	components: {
-		headerUser,
-		headerAdmin,
-		Signin,
-		//Footer,
+		SideNav
 	},
 	data: () => ({
 	}),
