@@ -33,7 +33,7 @@
 				v-btn(color="#F2594B" medium class="white--text" @click="postSched()") Submit
 
 		h3.mb-5 Previous Schedules
-		v-data-table(:headers="headers" :items="schedules" :items-per-page="5" item-key='created' class="elevation-1" :single-select="singleSelect")
+		v-data-table(:headers="headers" :items="schedules" :items-per-page="5" item-key='created' class="elevation-1" :single-select="singleSelect" :loading='loading' :loading-text="loadingText")
 			template(v-slot:item.actions="{ item }")
 				v-icon(@click="deleteAvail(item.id)") mdi-delete
 </template>
@@ -67,6 +67,8 @@ export default class editSchedule extends Vue{
 	private endTime2: string = 'endTime2'
 	private maxHours: string = '0.0'
 	private singleSelect: boolean = false;
+	private loading: boolean = false;
+	private loadingText: string = 'The sched-o-matic is working hard on your request'
 	
 	private schedules: schedule[] = [];
 
@@ -80,7 +82,8 @@ export default class editSchedule extends Vue{
 		{text: 'Friday', value: 'fri'},
 		{text: 'Max Hours', value: 'max_hours'},
 		{text: 'Delete', value: 'actions'},
-		{text: 'Id', value: 'id', align: ' d-none'} //d-none must have leading space in string to work. Hide from table but id is still attached
+		//d-none must have leading space in string to work. Hide from table but id is still attached
+		{text: 'Id', value: 'id', align: ' d-none'} 
 	];
 
 	parseStatus(status) {
@@ -96,8 +99,8 @@ export default class editSchedule extends Vue{
 		}
 	}
 
-	timeFormat() {
-		this.schedule.forEach((schedule: { [x: string]: string; }) => {
+	timeFormat(schedules) {
+		schedules.forEach((schedule: { [x: string]: string; }) => {
 			let formattedSchedule = {
 				'created': moment(schedule['created']).format('MM/DD/YYYY'),
 				'mon': moment(schedule['mon_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['mon_end_1'], 'HH:mm:ss').format('h:mm A'),
@@ -109,15 +112,23 @@ export default class editSchedule extends Vue{
 				'status': this.parseStatus(schedule['status']),
 				'id': schedule.id
 			}
+			for (const [key, value] of Object.entries(formattedSchedule)) {
+				if(value === '12:00 AM - 12:00 AM') {
+					formattedSchedule[key] = 'OFF'
+				}
+				console.log(`${key}: ${value}`);
+			}
 			this.schedules.push(formattedSchedule)
 		});
+		
 	}
 
 	created() {
+		this.loading = true;
 		this.$axios.get('/schedules/user/availability') 
 		.then(response => {
-			this.schedule=response.data;
-			this.timeFormat()
+			this.timeFormat(response.data)
+			this.loading = false;
 		})
 		.catch(function (error: any) {
 			console.log(error);
@@ -154,7 +165,11 @@ export default class editSchedule extends Vue{
 			schedule: store.getters.timeValues,
 			maxHours: maxHoursDecimal
 		})
-		.then(function (response: any) {
+		.then((response: any) => {
+			let schedule = store.getters.timeValues
+			schedule['maxhours'] = maxHoursDecimal
+			let x = [schedule]
+			this.timeFormat(x)
 		})
 		.catch(function (error: any) {
 			console.log(error);
