@@ -27,6 +27,7 @@ export default class Signin extends Vue {
 	private email: string='';
 	private password: string='';
 	private show1: boolean = false;
+	
 	rules = {
 		required: (value: any) => !!value || 'Required.',
 		min: (v: string|any[]) => v.length >= 8 || 'Min 8 characters',
