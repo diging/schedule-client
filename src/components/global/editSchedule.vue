@@ -33,7 +33,17 @@
 				v-btn(color="#F2594B" medium class="white--text" @click="postSched()") Submit
 
 		h3.mb-5 Previous Schedules
-		v-data-table(:headers="headers" :items="schedules" :items-per-page="5" item-key='created' class="elevation-1" :single-select="singleSelect" :loading='loading' :loading-text="loadingText")
+		v-data-table(:headers="headers" 
+			:items="schedules" 
+			:items-per-page="5" 
+			item-key='id' 
+			class="elevation-1" 
+			:single-select="singleSelect" 
+			:loading='loading' 
+			:loading-text="loadingText"
+			:sort-by="['created']"
+			:sort-desc="[true]"
+		)
 			template(v-slot:item.actions="{ item }")
 				v-icon(@click="deleteAvail(item.id)") mdi-delete
 </template>
@@ -59,7 +69,6 @@ const axios = require('axios')
 export default class editSchedule extends Vue{
 	private isHidden: boolean=false;
 	private dialog: boolean=false;
-	private schedule: any = [];
 	days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 	private startTime1: string = 'startTime1'
 	private endTime1: string = 'endTime1'
@@ -73,7 +82,7 @@ export default class editSchedule extends Vue{
 	private schedules: schedule[] = [];
 
 	headers = [
-		{text: 'Created on', value: 'created'},
+		{text: 'Submitted', value: 'created'},
 		{text: 'STATUS', value: 'status'},
 		{text: 'Monday', value: 'mon'},
 		{text: 'Tuesday', value: 'tue'},
@@ -99,35 +108,33 @@ export default class editSchedule extends Vue{
 		}
 	}
 
-	timeFormat(schedules) {
-		schedules.forEach((schedule: { [x: string]: string; }) => {
-			let formattedSchedule = {
-				'created': moment(schedule['created']).format('MM/DD/YYYY'),
-				'mon': moment(schedule['mon_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['mon_end_1'], 'HH:mm:ss').format('h:mm A'),
-				'tue': moment(schedule['tue_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['tue_end_1'], 'HH:mm:ss').format('h:mm A'),
-				'wed': moment(schedule['wed_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['wed_end_1'], 'HH:mm:ss').format('h:mm A'),
-				'thu': moment(schedule['thur_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['thur_end_1'], 'HH:mm:ss').format('h:mm A'),
-				'fri': moment(schedule['fri_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['fri_end_1'], 'HH:mm:ss').format('h:mm A'),
-				'max_hours': schedule['max_hours'],
-				'status': this.parseStatus(schedule['status']),
-				'id': schedule.id
+	timeFormat(schedule) {
+		let formattedSchedule = {
+			'created': moment(schedule['created']).format('MM/DD/YYYY'),
+			'mon': moment(schedule['mon_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['mon_end_1'], 'HH:mm:ss').format('h:mm A'),
+			'tue': moment(schedule['tue_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['tue_end_1'], 'HH:mm:ss').format('h:mm A'),
+			'wed': moment(schedule['wed_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['wed_end_1'], 'HH:mm:ss').format('h:mm A'),
+			'thu': moment(schedule['thur_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['thur_end_1'], 'HH:mm:ss').format('h:mm A'),
+			'fri': moment(schedule['fri_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['fri_end_1'], 'HH:mm:ss').format('h:mm A'),
+			'max_hours': schedule['max_hours'],
+			'status': this.parseStatus(schedule['status']),
+			'id': schedule.id
+		}
+		for (const [key, value] of Object.entries(formattedSchedule)) {
+			if(value === '12:00 AM - 12:00 AM') {
+				formattedSchedule[key] = 'OFF'
 			}
-			for (const [key, value] of Object.entries(formattedSchedule)) {
-				if(value === '12:00 AM - 12:00 AM') {
-					formattedSchedule[key] = 'OFF'
-				}
-				console.log(`${key}: ${value}`);
-			}
-			this.schedules.push(formattedSchedule)
-		});
-		
+		}
+		this.schedules.push(formattedSchedule)
 	}
 
 	created() {
 		this.loading = true;
 		this.$axios.get('/schedules/user/availability') 
 		.then(response => {
-			this.timeFormat(response.data)
+			response.data.forEach((schedule: { [x: string]: string; }) => {
+				this.timeFormat(schedule)
+			});
 			this.loading = false;
 		})
 		.catch(function (error: any) {
@@ -166,10 +173,7 @@ export default class editSchedule extends Vue{
 			maxHours: maxHoursDecimal
 		})
 		.then((response: any) => {
-			let schedule = store.getters.timeValues
-			schedule['maxhours'] = maxHoursDecimal
-			let x = [schedule]
-			this.timeFormat(x)
+			this.timeFormat(response.data)
 		})
 		.catch(function (error: any) {
 			console.log(error);
