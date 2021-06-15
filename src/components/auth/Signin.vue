@@ -37,10 +37,10 @@ export default class Signin extends Vue {
 	async setUserInfo() {
 		 this.$axios.get('/accounts/user/info/')
 		.then( (result) => {
-			Vue.prototype.$user = result.data
+			this.$store.commit('setUser', result.data)
 		})
 		.then(() => {
-			if(Vue.prototype.$user.is_superuser) {
+			if(this.$store.getters.getUser.is_superuser) {
 				this.$router.push({name: 'adminHome'});
 			} else {
 				this.$router.push({name: 'userHome'});

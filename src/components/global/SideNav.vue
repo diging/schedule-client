@@ -29,12 +29,12 @@ import '@mdi/font/css/materialdesignicons.css'
 export default class SideNav extends Vue {
 	
 
-	items: [
-
+	private items: [
+		{ title: '', path: ''},
 	]
 
 	created() {
-		if(this.$user.is_superuser) {
+		if(this.$store.getters.getUser.is_superuser) {
 			this.items = [
 				{ title: 'Schedules', icon: 'mdi-calendar-clock', path: '/userHome'},
 				{ title: 'Requests', icon: 'mdi-checkbox-multiple-marked', path: '/workerRequests'},

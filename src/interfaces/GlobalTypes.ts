@@ -32,7 +32,10 @@ export interface time {
 export interface RootState {
 	schedule: {
         [key: string] : time
-    };
+    },
+	user: {
+		[key: string] : string
+	}
 }
 
 export interface schedule {

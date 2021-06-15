@@ -69,7 +69,7 @@ const axios = require('axios')
 export default class editSchedule extends Vue{
 	private isHidden: boolean=false;
 	private dialog: boolean=false;
-	days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+	private days: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 	private startTime1: string = 'startTime1'
 	private endTime1: string = 'endTime1'
 	private startTime2: string = 'startTime2'
