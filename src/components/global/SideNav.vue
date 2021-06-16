@@ -38,7 +38,7 @@ export default class SideNav extends Vue {
 			this.items = [
 				{ title: 'Schedules', icon: 'mdi-calendar-clock', path: '/userHome'},
 				{ title: 'Requests', icon: 'mdi-checkbox-multiple-marked', path: '/workerRequests'},
-				{ title: 'Availabilities', icon: 'mdi-clock-time-five-outline', path: '/user/availability'},
+				{ title: 'Availabilities', icon: 'mdi-clock-time-five-outline', path: '/admin/availability'},
 			]
 		} else {
 			this.items = [
@@ -51,8 +51,8 @@ export default class SideNav extends Vue {
 	
 	signout() {
 		localStorage.removeItem('token');
+		sessionStorage.clear();
 		this.$router.push({name: 'Signin'});
-		Vue.prototype.$user = ''
 	}
 
 }

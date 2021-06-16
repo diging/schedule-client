@@ -1,41 +1,9 @@
 <template lang="pug">
 	div
-		v-card(class="pa-5 mb-10")
-			h4(class="text-center") Edit your schedule.
-			v-container
-				p(class="body-2 mb-10") Lab hours are from 9:00 AM to 4:30 PM.
-				div(v-for="day in days" :key="day")
-					v-row
-						v-col(cols='3')
-							p(class="font-weight-medium body-2") {{day}}
-						v-col(cols='4')
-							timePicker(:index = 'startTime1' :day='day')
-						v-col(cols='4') 
-							timePicker(:index = 'endTime1' :day='day')
-						v-col(cols='1')
-							v-btn(icon color="#F2594B"  v-on:click="isHidden=true") 
-								v-icon mdi-plus-circle-outline
-					v-row(class="mt-n6 mb-4" v-if="isHidden")
-						v-col(cols='3')
-						v-col(cols='4')
-							timePicker(:index = 'startTime2' :day='day')
-						v-col(cols='4') 
-							timePicker(:index = 'endTime2' :day='day')
-						v-col(cols='1')
-				v-row
-					v-col.pt-4(cols='3')
-						p.pt-3(class="font-weight-medium body-2") Max Hours
-					v-col(cols='3')
-						v-text-field(v-model="maxHours" @input='formatMaxHours()' outlined dense)
-			v-card-actions
-				v-spacer
-				v-btn(color="grey" text @click="dialog = false") Cancel
-				v-btn(color="#F2594B" medium class="white--text" @click="postSched()") Submit
-
-		h3.mb-5 Previous Schedules
+		h3.mb-5 Availabilites
 		v-data-table(:headers="headers" 
 			:items="schedules" 
-			:items-per-page="5" 
+			:items-per-page="itemsPerRow" 
 			item-key='id' 
 			class="elevation-1" 
 			:single-select="singleSelect" 
@@ -45,7 +13,18 @@
 			:sort-desc="[true]"
 		)
 			template(v-slot:item.actions="{ item }")
-				v-icon(@click="deleteAvail(item.id)") mdi-delete
+				v-dialog(v-model="dialog" width="500")
+					template(v-slot:activator="{ on, attrs }")
+						v-icon(@click="setStatus('Approved')" color="green" v-bind="attrs" v-on="on") mdi-check
+						v-icon(@click="setStatus('Deny')" color="red") mdi-cancel
+					v-card
+						v-card-title(class="text-h5 grey lighten-2") Reason
+						v-card-text
+							v-textarea.mt-5(v-model="reason" outlined)
+						v-divider
+						v-card-actions
+							v-spacer
+							v-btn(color="primary" text @click="approve(item.id)") Submit
 </template>
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
@@ -59,14 +38,14 @@ import moment from 'moment'
 const axios = require('axios')
 
 @Component({
-	name: 'editSchedule',
+	name: 'AvailabilityAdmin',
 	components: {
 		timePicker,
 	},
 
 })
 
-export default class editSchedule extends Vue{
+export default class AvailabilityAdmin extends Vue{
 	private isHidden: boolean=false;
 	private dialog: boolean=false;
 	private days: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
@@ -78,19 +57,24 @@ export default class editSchedule extends Vue{
 	private singleSelect: boolean = false;
 	private loading: boolean = false;
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
+	private itemsPerRow: number = 10
+	private reason: string = ""
+	private status: string = ""
+
 	
 	private schedules: schedule[] = [];
 
 	headers = [
 		{text: 'Submitted', value: 'created'},
 		{text: 'STATUS', value: 'status'},
+		{text: 'Name', value: 'name'},
 		{text: 'Monday', value: 'mon'},
 		{text: 'Tuesday', value: 'tue'},
 		{text: 'Wednesday', value: 'wed'},
 		{text: 'Thursday', value: 'thu'},
 		{text: 'Friday', value: 'fri'},
 		{text: 'Max Hours', value: 'max_hours'},
-		{text: 'Delete', value: 'actions'},
+		{text: 'Approve/Deny', value: 'actions'},
 		//d-none must have leading space in string to work. Hide from table but id is still attached
 		{text: 'Id', value: 'id', align: ' d-none'} 
 	];
@@ -108,6 +92,10 @@ export default class editSchedule extends Vue{
 		}
 	}
 
+	setStatus(status) {
+		this.status = status
+	}
+
 	timeFormat(schedule) {
 		let formattedSchedule = {
 			'created': moment(schedule['created']).format('MM/DD/YYYY'),
@@ -118,7 +106,8 @@ export default class editSchedule extends Vue{
 			'fri': moment(schedule['fri_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['fri_end_1'], 'HH:mm:ss').format('h:mm A'),
 			'max_hours': schedule['max_hours'],
 			'status': this.parseStatus(schedule['status']),
-			'id': schedule.id
+			'id': schedule.id,
+			'name' : schedule['user']['full_name']
 		}
 		for (const [key, value] of Object.entries(formattedSchedule)) {
 			if(value === '12:00 AM - 12:00 AM') {
@@ -130,7 +119,7 @@ export default class editSchedule extends Vue{
 
 	created() {
 		this.loading = true;
-		this.$axios.get('/schedules/user/availability') 
+		this.$axios.get('schedules/availability/list') 
 		.then(response => {
 			response.data.forEach((schedule: { [x: string]: string; }) => {
 				this.timeFormat(schedule)
@@ -142,7 +131,7 @@ export default class editSchedule extends Vue{
 		})
 		.then(function () {
 			// always executed
-		}); 
+		})
 	}
 
 	formatMaxHours() {
@@ -180,18 +169,22 @@ export default class editSchedule extends Vue{
 		})
 	}
 
-	deleteAvail(id) {
-		this.$axios.delete('/schedules/availability/delete/' + id)
+	approve(id) {
+		this.dialog = false
+		this.$axios.patch('/schedules/availability/update/' + id, {
+			'status': this.status,
+			'reason': this.reason
+		})
 		.then((response: any) => {
 			var removeIndex = this.schedules.map(item => item.id).indexOf(id);
-			~removeIndex && this.schedules.splice(removeIndex, 1);
+			this.schedules[removeIndex]['status'] = this.status
+			this.status = ''
+			this.reason = ''
 		})
 		.catch(function (error: any) {
 			console.log(error);
 		})
 	}
-
-	
 }
 </script>
 

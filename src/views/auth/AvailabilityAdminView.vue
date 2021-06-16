@@ -1,16 +1,16 @@
 <template lang="pug">
     div
-        Availability
+        AvailabilityAdmin
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import Availability from '@/components/global/Availability.vue'
+import AvailabilityAdmin from '@/components/global/AvailabilityAdmin.vue'
 
 export default Vue.extend({
-    name: 'userAvailabilityView',
+    name: 'AvailabilityAdminView',
     components: {
-        Availability,
+        AvailabilityAdmin,
     }
 })
 </script>
