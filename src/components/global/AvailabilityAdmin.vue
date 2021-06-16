@@ -13,18 +13,17 @@
 			:sort-desc="[true]"
 		)
 			template(v-slot:item.actions="{ item }")
-				v-dialog(v-model="dialog" width="500")
-					template(v-slot:activator="{ on, attrs }")
-						v-icon(@click="setStatus('Approved')" color="green" v-bind="attrs" v-on="on") mdi-check
-						v-icon(@click="setStatus('Deny')" color="red") mdi-cancel
-					v-card
-						v-card-title(class="text-h5 grey lighten-2") Reason
-						v-card-text
-							v-textarea.mt-5(v-model="reason" outlined)
-						v-divider
-						v-card-actions
-							v-spacer
-							v-btn(color="primary" text @click="approve(item.id)") Submit
+				v-icon(@click="triggerDialog(item.id, 1)" color="green") mdi-check
+				v-icon(@click="setStatus('Deny')" color="red") mdi-cancel
+		v-dialog(v-model="dialog" width="500")
+			v-card
+				v-card-title(class="text-h5 grey lighten-2") Reason
+				v-card-text
+					v-textarea.mt-5(v-model="reason" outlined)
+				v-divider
+				v-card-actions
+					v-spacer
+					v-btn(color="primary" text @click="approve()") Submit
 </template>
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
@@ -59,7 +58,8 @@ export default class AvailabilityAdmin extends Vue{
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
 	private itemsPerRow: number = 10
 	private reason: string = ""
-	private status: string = ""
+	private status: number = 0
+	private id: number = 0
 
 	
 	private schedules: schedule[] = [];
@@ -106,7 +106,7 @@ export default class AvailabilityAdmin extends Vue{
 			'fri': moment(schedule['fri_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['fri_end_1'], 'HH:mm:ss').format('h:mm A'),
 			'max_hours': schedule['max_hours'],
 			'status': this.parseStatus(schedule['status']),
-			'id': schedule.id,
+			'id': schedule['id'],
 			'name' : schedule['user']['full_name']
 		}
 		for (const [key, value] of Object.entries(formattedSchedule)) {
@@ -168,18 +168,23 @@ export default class AvailabilityAdmin extends Vue{
 			console.log(error);
 		})
 	}
-
-	approve(id) {
+	triggerDialog(id, status) {
+		this.dialog = true
+		this.id = id
+		this.status = status
+	}
+	approve() {
 		this.dialog = false
-		this.$axios.patch('/schedules/availability/update/' + id, {
+		this.$axios.patch('/schedules/availability/update/' + this.id, {
 			'status': this.status,
 			'reason': this.reason
 		})
 		.then((response: any) => {
-			var removeIndex = this.schedules.map(item => item.id).indexOf(id);
-			this.schedules[removeIndex]['status'] = this.status
-			this.status = ''
+			var removeIndex = this.schedules.map(item => item.id).indexOf(this.id);
+			this.schedules[removeIndex]['status'] = this.parseStatus(this.status)
+			this.status = 0
 			this.reason = ''
+			this.id = 0
 		})
 		.catch(function (error: any) {
 			console.log(error);
