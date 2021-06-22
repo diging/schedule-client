@@ -5,7 +5,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import Availability from '@/components/global/Availability.vue'
+import Availability from '@/components/employee/Availability.vue'
 
 export default Vue.extend({
     name: 'userAvailabilityView',

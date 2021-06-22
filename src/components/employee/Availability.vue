@@ -1,9 +1,41 @@
 <template lang="pug">
 	div
-		h3.mb-5 Availabilites
+		v-card(class="pa-5 mb-10")
+			h4(class="text-center") Edit your schedule.
+			v-container
+				p(class="body-2 mb-10") Lab hours are from 9:00 AM to 4:30 PM.
+				div(v-for="day in days" :key="day")
+					v-row
+						v-col(cols='3')
+							p(class="font-weight-medium body-2") {{day}}
+						v-col(cols='4')
+							timePicker(:index = 'startTime1' :day='day')
+						v-col(cols='4') 
+							timePicker(:index = 'endTime1' :day='day')
+						v-col(cols='1')
+							v-btn(icon color="#F2594B"  v-on:click="isHidden=true") 
+								v-icon mdi-plus-circle-outline
+					v-row(class="mt-n6 mb-4" v-if="isHidden")
+						v-col(cols='3')
+						v-col(cols='4')
+							timePicker(:index = 'startTime2' :day='day')
+						v-col(cols='4') 
+							timePicker(:index = 'endTime2' :day='day')
+						v-col(cols='1')
+				v-row
+					v-col.pt-4(cols='3')
+						p.pt-3(class="font-weight-medium body-2") Max Hours
+					v-col(cols='3')
+						v-text-field(v-model="maxHours" @input='formatMaxHours()' outlined dense)
+			v-card-actions
+				v-spacer
+				v-btn(color="grey" text @click="dialog = false") Cancel
+				v-btn(color="#F2594B" medium class="white--text" @click="postSched()") Submit
+
+		h3.mb-5 Previous Schedules
 		v-data-table(:headers="headers" 
 			:items="schedules" 
-			:items-per-page="itemsPerRow" 
+			:items-per-page="5" 
 			item-key='id' 
 			class="elevation-1" 
 			:single-select="singleSelect" 
@@ -13,38 +45,30 @@
 			:sort-desc="[true]"
 		)
 			template(v-slot:item.actions="{ item }")
-				v-icon(@click="triggerDialog(item.id, 1)" color="green") mdi-check
-				v-icon(@click="setStatus('Deny')" color="red") mdi-cancel
-		v-dialog(v-model="dialog" width="500")
-			v-card
-				v-card-title(class="text-h5 grey lighten-2") Reason
-				v-card-text
-					v-textarea.mt-5(v-model="reason" outlined)
-				v-divider
-				v-card-actions
-					v-spacer
-					v-btn(color="primary" text @click="approve()") Submit
+				v-icon(@click="deleteAvail(item.id)") mdi-delete
 </template>
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { mixins } from 'vue-class-component'
 import Vuex from 'vuex';
 import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';
 import {schedule} from '@/interfaces/GlobalTypes'
 import moment from 'moment'
+import { ScheduleMixin } from '@/utils/utils'
 
 const axios = require('axios')
 
 @Component({
-	name: 'AvailabilityAdmin',
+	name: 'Availability',
 	components: {
 		timePicker,
 	},
 
 })
 
-export default class AvailabilityAdmin extends Vue{
+export default class Availability extends mixins(ScheduleMixin){
 	private isHidden: boolean=false;
 	private dialog: boolean=false;
 	private days: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
@@ -56,47 +80,26 @@ export default class AvailabilityAdmin extends Vue{
 	private singleSelect: boolean = false;
 	private loading: boolean = false;
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
-	private itemsPerRow: number = 10
-	private reason: string = ""
-	private status: number = 0
-	private id: number = 0
-
 	
 	private schedules: schedule[] = [];
 
 	headers = [
 		{text: 'Submitted', value: 'created'},
 		{text: 'STATUS', value: 'status'},
-		{text: 'Name', value: 'name'},
 		{text: 'Monday', value: 'mon'},
 		{text: 'Tuesday', value: 'tue'},
 		{text: 'Wednesday', value: 'wed'},
 		{text: 'Thursday', value: 'thu'},
 		{text: 'Friday', value: 'fri'},
 		{text: 'Max Hours', value: 'max_hours'},
-		{text: 'Approve/Deny', value: 'actions'},
+		{text: 'Delete', value: 'actions'},
 		//d-none must have leading space in string to work. Hide from table but id is still attached
 		{text: 'Id', value: 'id', align: ' d-none'} 
 	];
 
-	parseStatus(status) {
-		switch(status) {
-			case 0:
-				return 'Pending';
-			case 1:
-				return 'Approved';
-			case 2:
-				return 'Denied'
-			default:
-				console.log("Nothing")
-		}
-	}
 
-	setStatus(status) {
-		this.status = status
-	}
 
-	timeFormat(schedule) {
+	timeFormat(schedule: schedule) {
 		let formattedSchedule = {
 			'created': moment(schedule['created']).format('MM/DD/YYYY'),
 			'mon': moment(schedule['mon_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['mon_end_1'], 'HH:mm:ss').format('h:mm A'),
@@ -105,9 +108,9 @@ export default class AvailabilityAdmin extends Vue{
 			'thu': moment(schedule['thur_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['thur_end_1'], 'HH:mm:ss').format('h:mm A'),
 			'fri': moment(schedule['fri_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['fri_end_1'], 'HH:mm:ss').format('h:mm A'),
 			'max_hours': schedule['max_hours'],
+			// this works but vueter doesn't recognize it.
 			'status': this.parseStatus(schedule['status']),
-			'id': schedule['id'],
-			'name' : schedule['user']['full_name']
+			'id': schedule.id
 		}
 		for (const [key, value] of Object.entries(formattedSchedule)) {
 			if(value === '12:00 AM - 12:00 AM') {
@@ -119,7 +122,7 @@ export default class AvailabilityAdmin extends Vue{
 
 	created() {
 		this.loading = true;
-		this.$axios.get('schedules/availability/list') 
+		this.$axios.get('/schedules/user/availability') 
 		.then(response => {
 			response.data.forEach((schedule: { [x: string]: string; }) => {
 				this.timeFormat(schedule)
@@ -131,7 +134,7 @@ export default class AvailabilityAdmin extends Vue{
 		})
 		.then(function () {
 			// always executed
-		})
+		}); 
 	}
 
 	formatMaxHours() {
@@ -168,28 +171,19 @@ export default class AvailabilityAdmin extends Vue{
 			console.log(error);
 		})
 	}
-	triggerDialog(id, status) {
-		this.dialog = true
-		this.id = id
-		this.status = status
-	}
-	approve() {
-		this.dialog = false
-		this.$axios.patch('/schedules/availability/update/' + this.id, {
-			'status': this.status,
-			'reason': this.reason
-		})
+
+	deleteAvail(id: number) {
+		this.$axios.delete('/schedules/availability/delete/' + id)
 		.then((response: any) => {
-			var removeIndex = this.schedules.map(item => item.id).indexOf(this.id);
-			this.schedules[removeIndex]['status'] = this.parseStatus(this.status)
-			this.status = 0
-			this.reason = ''
-			this.id = 0
+			var removeIndex = this.schedules.map(item => item.id).indexOf(id);
+			~removeIndex && this.schedules.splice(removeIndex, 1);
 		})
 		.catch(function (error: any) {
 			console.log(error);
 		})
 	}
+
+	
 }
 </script>
 
