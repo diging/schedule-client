@@ -45,7 +45,7 @@
 			:sort-desc="[true]"
 		)
 			template(v-slot:item.actions="{ item }")
-				v-icon(@click="deleteAvail(item.id)") mdi-delete
+				v-icon(v-if="item.status == 'Pending'" @click="deleteAvail(item.id)") mdi-delete
 </template>
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
@@ -55,7 +55,7 @@ import Vuex from 'vuex';
 import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';
 import {schedule} from '@/interfaces/GlobalTypes'
-import moment from 'moment'
+
 import { ScheduleMixin } from '@/utils/utils'
 
 const axios = require('axios')
@@ -76,7 +76,7 @@ export default class Availability extends mixins(ScheduleMixin){
 	private endTime1: string = 'endTime1'
 	private startTime2: string = 'startTime2'
 	private endTime2: string = 'endTime2'
-	private maxHours: string = '0.0'
+	
 	private singleSelect: boolean = false;
 	private loading: boolean = false;
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
@@ -99,33 +99,14 @@ export default class Availability extends mixins(ScheduleMixin){
 
 
 
-	timeFormat(schedule: schedule) {
-		let formattedSchedule = {
-			'created': moment(schedule['created']).format('MM/DD/YYYY'),
-			'mon': moment(schedule['mon_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['mon_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'tue': moment(schedule['tue_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['tue_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'wed': moment(schedule['wed_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['wed_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'thu': moment(schedule['thur_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['thur_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'fri': moment(schedule['fri_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['fri_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'max_hours': schedule['max_hours'],
-			// this works but vueter doesn't recognize it.
-			'status': this.parseStatus(schedule['status']),
-			'id': schedule.id
-		}
-		for (const [key, value] of Object.entries(formattedSchedule)) {
-			if(value === '12:00 AM - 12:00 AM') {
-				formattedSchedule[key] = 'OFF'
-			}
-		}
-		this.schedules.push(formattedSchedule)
-	}
+
 
 	created() {
 		this.loading = true;
 		this.$axios.get('/schedules/user/availability') 
 		.then(response => {
 			response.data.forEach((schedule: { [x: string]: string; }) => {
-				this.timeFormat(schedule)
+				this.timeFormat(schedule, this.schedules)
 			});
 			this.loading = false;
 		})
@@ -137,26 +118,7 @@ export default class Availability extends mixins(ScheduleMixin){
 		}); 
 	}
 
-	formatMaxHours() {
-		if(!this.maxHours.includes('.')) {
-			if(this.maxHours.length > 2) {
-				let last = this.maxHours.slice(-2)
-				let rest = this.maxHours.slice(0, -2)
-				this.maxHours = rest + "." + last
-			} else {
-				this.maxHours = '.' + this.maxHours
-			}
-		} else {
-			let split = this.maxHours.split('.').join("");
-			if(split.length > 2) {
-				let last = split.slice(-2)
-				let rest = split.slice(0, -2)
-				this.maxHours = rest + "." + last
-			} else {
-				this.maxHours = '.' + split
-			}
-		}
-	}
+
 
 	postSched() {
 		let maxHoursDecimal = Number.parseFloat(this.maxHours).toFixed(2);

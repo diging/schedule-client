@@ -85,27 +85,6 @@ export default class Availability extends mixins(ScheduleMixin){
 		this.status = status
 	}
 
-	timeFormat(schedule) {
-		let formattedSchedule = {
-			'created': moment(schedule['created']).format('MM/DD/YYYY'),
-			'mon': moment(schedule['mon_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['mon_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'tue': moment(schedule['tue_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['tue_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'wed': moment(schedule['wed_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['wed_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'thu': moment(schedule['thur_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['thur_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'fri': moment(schedule['fri_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['fri_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'max_hours': schedule['max_hours'],
-			// this works but vueter does not recognize it.
-			'status': this.parseStatus(schedule['status']),
-			'id': schedule['id'],
-			'name' : schedule['user']['full_name']
-		}
-		for (const [key, value] of Object.entries(formattedSchedule)) {
-			if(value === '12:00 AM - 12:00 AM') {
-				formattedSchedule[key] = 'OFF'
-			}
-		}
-		this.schedules.push(formattedSchedule)
-	}
 
 	created() {
 		this.loading = true;
