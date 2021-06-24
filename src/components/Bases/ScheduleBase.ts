@@ -5,7 +5,7 @@ import Component from 'vue-class-component'
 import {schedule} from '@/interfaces/GlobalTypes'
 import moment from 'moment'
 @Component
-export class ScheduleMixin extends Vue {
+export class ScheduleBase extends Vue {
 
 
 	private maxHours: string = '0.0'

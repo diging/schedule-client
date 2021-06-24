@@ -56,7 +56,7 @@ import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';
 import {schedule} from '@/interfaces/GlobalTypes'
 
-import { ScheduleMixin } from '@/utils/utils'
+import { ScheduleBase }  from '@/components/Bases/ScheduleBase'
 
 const axios = require('axios')
 
@@ -68,14 +68,7 @@ const axios = require('axios')
 
 })
 
-export default class Availability extends mixins(ScheduleMixin){
-	private isHidden: boolean=false;
-	private dialog: boolean=false;
-	private days: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-	private startTime1: string = 'startTime1'
-	private endTime1: string = 'endTime1'
-	private startTime2: string = 'startTime2'
-	private endTime2: string = 'endTime2'
+export default class Availability extends ScheduleBase {
 	
 	private singleSelect: boolean = false;
 	private loading: boolean = false;
