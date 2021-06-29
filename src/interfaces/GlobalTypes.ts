@@ -71,5 +71,5 @@ export interface schedule {
 }
 
 export interface SideNavItem {
-    id: number; label: string; key: any
+    title: string; icon: string; path: string
 }

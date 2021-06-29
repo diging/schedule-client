@@ -22,6 +22,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component'
 import '@mdi/font/css/materialdesignicons.css'
+import { SideNavItem } from '@/interfaces/GlobalTypes'
 
 @Component({
     name: 'SideNav',
@@ -29,7 +30,7 @@ import '@mdi/font/css/materialdesignicons.css'
 export default class SideNav extends Vue {
 	
 
-	private items: Array<> = [
+	private items: Array<SideNavItem> = [
 		{ title: '',icon: '', path: ''},
 	]
 

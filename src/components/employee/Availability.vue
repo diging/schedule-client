@@ -56,7 +56,7 @@ import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';
 import {schedule} from '@/interfaces/GlobalTypes'
 
-import { ScheduleBase }  from '@/components/Bases/ScheduleBase.vue'
+import { ScheduleBase }  from '@/components/Bases/ScheduleBase'
 
 const axios = require('axios')
 
@@ -122,7 +122,7 @@ export default class Availability extends ScheduleBase {
 			maxHours: maxHoursDecimal
 		})
 		.then((response: any) => {
-			this.timeFormat(response.data)
+			this.timeFormat(response.data,this.schedules)
 		})
 		.catch(function (error: any) {
 			console.log(error);

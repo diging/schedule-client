@@ -1,5 +1,4 @@
 
-<script lang='ts'>
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import {schedule} from '@/interfaces/GlobalTypes'
@@ -67,5 +66,3 @@ export class ScheduleBase extends Vue {
 		}
 	}
 }
-
-</script>
