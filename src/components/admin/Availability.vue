@@ -14,7 +14,7 @@
 		)
 			template(v-slot:item.actions="{ item }")
 				v-icon(@click="triggerDialog(item.id, 1)" color="green") mdi-check
-				v-icon(@click="setStatus('Deny')" color="red") mdi-cancel
+				v-icon(@click="setStatus(2)" color="red") mdi-cancel
 		v-dialog(v-model="dialog" width="500")
 			v-card
 				v-card-title(class="text-h5 grey lighten-2") Reason
@@ -33,7 +33,7 @@ import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';
 import {schedule} from '@/interfaces/GlobalTypes'
 import moment from 'moment'
-import { ScheduleBase } from '@/components/Bases/ScheduleBase'
+import {ScheduleBase}  from '@/components/Bases/ScheduleBase.vue'
 
 const axios = require('axios')
 
@@ -42,12 +42,12 @@ const axios = require('axios')
 	components: {
 		timePicker,
 	},
-
+	extends: ScheduleBase
 })
 
 export default class Availability extends ScheduleBase {
 
-	private maxHours: string = '0.0'
+
 	private singleSelect: boolean = false;
 	private loading: boolean = false;
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
@@ -55,6 +55,7 @@ export default class Availability extends ScheduleBase {
 	private reason: string = ""
 	private status: number = 0
 	private id: number = 0
+	private dialog: boolean = false
 
 	
 	private schedules: schedule[] = [];
@@ -74,7 +75,11 @@ export default class Availability extends ScheduleBase {
 		{text: 'Id', value: 'id', align: ' d-none'} 
 	];
 
-	setStatus(status) {
+	constructor() {
+        super();
+    }
+
+	setStatus(status: number) {
 		this.status = status
 	}
 
@@ -130,7 +135,7 @@ export default class Availability extends ScheduleBase {
 			console.log(error);
 		})
 	}
-	triggerDialog(id, status) {
+	triggerDialog(id: number, status: number) {
 		this.dialog = true
 		this.id = id
 		this.status = status

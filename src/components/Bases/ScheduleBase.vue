@@ -1,5 +1,5 @@
 
-
+<script lang='ts'>
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import {schedule} from '@/interfaces/GlobalTypes'
@@ -8,7 +8,8 @@ import moment from 'moment'
 export class ScheduleBase extends Vue {
 
 
-	private maxHours: string = '0.0'
+	protected maxHours: string = '0.0'
+
 
 	parseStatus(status: number) {
 		switch(status) {
@@ -66,3 +67,5 @@ export class ScheduleBase extends Vue {
 		}
 	}
 }
+
+</script>

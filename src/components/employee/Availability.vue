@@ -56,7 +56,7 @@ import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';
 import {schedule} from '@/interfaces/GlobalTypes'
 
-import { ScheduleBase }  from '@/components/Bases/ScheduleBase'
+import { ScheduleBase }  from '@/components/Bases/ScheduleBase.vue'
 
 const axios = require('axios')
 
@@ -65,7 +65,7 @@ const axios = require('axios')
 	components: {
 		timePicker,
 	},
-
+	extends: ScheduleBase
 })
 
 export default class Availability extends ScheduleBase {
@@ -73,7 +73,7 @@ export default class Availability extends ScheduleBase {
 	private singleSelect: boolean = false;
 	private loading: boolean = false;
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
-	
+	private dialog: boolean = false
 	private schedules: schedule[] = [];
 
 	headers = [
@@ -91,7 +91,9 @@ export default class Availability extends ScheduleBase {
 	];
 
 
-
+	constructor() {
+        super();
+    }
 
 
 	created() {

@@ -69,3 +69,7 @@ export interface schedule {
 	wed_start_1: string
 	wed_start_2: string
 }
+
+export interface SideNavItem {
+    id: number; label: string; key: any
+}
