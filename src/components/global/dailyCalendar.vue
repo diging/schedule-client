@@ -40,16 +40,15 @@ export default class dailyCalendar extends Vue{
         })
         .then(response => {
             this.schedules=response.data;
-            console.log(this.schedules);
         })
         .catch(function (error: any) {
-            console.log(error);
         })
         .then(function () {
             // always executed
         });
     }
-    
+
+	
 }
 </script>
 

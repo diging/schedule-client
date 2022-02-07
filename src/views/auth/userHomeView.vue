@@ -1,7 +1,6 @@
 <template lang="pug">
     div(class="pa-10")
         h1  {{ moment().format('DD MMMM YYYY') }}
-        p(class="mb-10") {{ }} 4 people working today.
         dailyCalendar
 </template>
 

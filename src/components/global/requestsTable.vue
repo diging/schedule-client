@@ -51,10 +51,8 @@ export default class requestsTable extends Vue{
             reason: this.declineReason,
         })
         .then(function (response: any) {
-			console.log(response);
 		})
 		.catch(function (error: any) {
-			console.log(error);
 		})
     }
 
@@ -70,7 +68,6 @@ export default class requestsTable extends Vue{
                 this.requests.map((request: timeoffRequest) => this.formattedDateTime(request) );
             })
             .catch(function (error: any) {
-                console.log(error);
             })
             .then(function () {
                 // always executed
@@ -93,10 +90,8 @@ export default class requestsTable extends Vue{
             }) 
             .then(response => {
                 this.requests=response.data;
-                console.log(this.requests);
             })
             .catch(function (error: any) {
-                console.log(error);
             })
             .then(function () {
                 // always executed
@@ -130,7 +125,6 @@ export default class requestsTable extends Vue{
         }
         return item
     }
-
 
     getColor (status: string) {
         if (status == 'pending') return 'grey'

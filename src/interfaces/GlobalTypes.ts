@@ -10,8 +10,12 @@ export interface PaginatedResult<T> {
 }
 
 export interface User {
-	id: number;
-	username: string;
+	email: string
+	first_name: string
+	full_name: string
+	id: number
+	is_superuser: boolean
+	last_name: string
 }
 
 export interface TokenDto {
@@ -32,7 +36,10 @@ export interface time {
 export interface RootState {
 	schedule: {
         [key: string] : time
-    };
+    },
+	user: {
+		[key: string] : string
+	}
 }
 
 export interface schedule {
@@ -53,4 +60,33 @@ export interface timeInstance {
 export interface timeInstanceRootState {
 	start_time: string;
 	end_time: string;
+	created: string
+	fri_end_1: string
+	fri_end_2: string
+	fri_start_1: string
+	fri_start_2: string
+	id: number
+	max_hours: string
+	mon_end_1: string
+	mon_end_2: string
+	mon_start_1: string
+	mon_start_2: string
+	status: number
+	thur_end_1: string
+	thur_end_2: string
+	thur_start_1: string
+	thur_start_2: string
+	tue_end_1: string
+	tue_end_2: string
+	tue_start_1: string
+	tue_start_2: string
+	user: User
+	wed_end_1: string
+	wed_end_2: string
+	wed_start_1: string
+	wed_start_2: string
+}
+
+export interface SideNavItem {
+    id: number; label: string; key: any
 }

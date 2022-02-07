@@ -41,8 +41,6 @@ export default class navDrawer extends Vue{
 		})
 		.then(response => {
 			this.users=response.data;
-			console.log(this.users);
-
 			if(this.users['is_staff']==true) {
 				this.navDrawer = [
 					{ title: 'Worker Schedule', icon: 'mdi-calendar-clock', path: '/adminHome'},
@@ -59,7 +57,6 @@ export default class navDrawer extends Vue{
 			}
 			})
 		.catch(function (error: any) {
-			console.log(error);
 		})
 		.then(function () {
 			// always executed

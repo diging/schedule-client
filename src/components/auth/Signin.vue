@@ -16,25 +16,40 @@
 import Vue from 'vue';
 import '@mdi/font/css/materialdesignicons.css'
 import Component from 'vue-class-component';
+import jwt_decode from "jwt-decode";
 
 @Component({
 	name: 'Signin',
-    data() {
-        return {
-            show1: false,
-            password: '',
-            rules: {
-                required: (value: any) => !!value || 'Required.',
-                min: (v: string|any[]) => v.length >= 8 || 'Min 8 characters',
-                emailMatch: () => (`The email and password you entered don't match`),
-            }
-        }
-    }
 })
 
-export default class Signin extends Vue{
+export default class Signin extends Vue {
+
 	private email: string='';
 	private password: string='';
+	private show1: boolean = false;
+	
+	rules = {
+		required: (value: any) => !!value || 'Required.',
+		min: (v: string|any[]) => v.length >= 8 || 'Min 8 characters',
+		emailMatch: () => (`The email and password you entered don't match`),
+	}
+
+	async setUserInfo() {
+		 this.$axios.get('/accounts/user/info/')
+		.then( (result) => {
+			this.$store.commit('setUser', result.data)
+		})
+		.then(() => {
+			if(this.$store.getters.getUser.is_superuser) {
+				this.$router.push({name: 'adminHome'});
+			} else {
+				this.$router.push({name: 'userHome'});
+			}
+		})
+		.catch(function (error: any) {
+			console.log(error);
+		})
+	}
 
 	login() {
 		if(this.email != "" && this.password != "") {
@@ -45,11 +60,7 @@ export default class Signin extends Vue{
 			.then( (result) => {
 				localStorage.setItem('token', result.data.access);
 				Vue.$axios.defaults.headers.common.Authorization = `Bearer ${result.data.access}`;
-				if(this.email=='admin') {
-					this.$router.push({name: 'adminHome'});
-				} else {
-					this.$router.push({name: 'userHome'});
-				}
+				this.setUserInfo()
 			})
 			.catch(function (error: any) {
 				console.log(error);

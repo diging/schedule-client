@@ -78,7 +78,7 @@ export default class requestForm extends Vue{
         this.endTime = store.getters.timeInstance.end_time
         if(this.type == 'Time off')
         {
-        this.$axios.post('/timeoff/create/', {
+            this.$axios.post('/timeoff/create/', {
             timeoff_type: this.type,
             from_date: this.dateFrom,
             to_date: this.dateTo,
@@ -86,18 +86,15 @@ export default class requestForm extends Vue{
             description: this.desc,
             start_time: this.startTime,
             end_time: this.endTime
-
-        })
+            })
         .then( (response: any) => {
-            console.log(response);
             this.dialog = false;
         })
         .catch(function (error: any) {
-            console.log(error);
+
         })
         }
-        else
-        {
+        else {
            this.$axios.post('/timeoff/create/', {
             timeoff_type: this.type,
             from_date: this.dateFrom,
@@ -109,11 +106,9 @@ export default class requestForm extends Vue{
 
         })
         .then( (response: any) => {
-            console.log(response);
             this.dialog = false;
         })
         .catch(function (error: any) {
-            console.log(error);
         })
         }
     }
