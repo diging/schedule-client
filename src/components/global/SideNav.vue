@@ -29,7 +29,7 @@ import '@mdi/font/css/materialdesignicons.css'
 export default class SideNav extends Vue {
 	
 
-	private items: Array<> = [
+	private items: Array<any> = [
 		{ title: '',icon: '', path: ''},
 	]
 

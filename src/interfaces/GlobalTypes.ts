@@ -43,23 +43,6 @@ export interface RootState {
 }
 
 export interface schedule {
-	created: string;
-	mon: string;
-	tue: string;
-	wed: string;
-	thu: string;
-	fri: string;
-	max_hours: string;
-}
-
-export interface timeInstance {
-    start_time: string;
-	end_time: string;
-}
-
-export interface timeInstanceRootState {
-	start_time: string;
-	end_time: string;
 	created: string
 	fri_end_1: string
 	fri_end_2: string
@@ -85,6 +68,41 @@ export interface timeInstanceRootState {
 	wed_end_2: string
 	wed_start_1: string
 	wed_start_2: string
+}
+
+export interface timeInstance {
+    start_time: string;
+	end_time: string;
+}
+
+export interface timeInstanceRootState {
+	start_time: string;
+	end_time: string;
+	// created: string
+	// fri_end_1: string
+	// fri_end_2: string
+	// fri_start_1: string
+	// fri_start_2: string
+	// id: number
+	// max_hours: string
+	// mon_end_1: string
+	// mon_end_2: string
+	// mon_start_1: string
+	// mon_start_2: string
+	// status: number
+	// thur_end_1: string
+	// thur_end_2: string
+	// thur_start_1: string
+	// thur_start_2: string
+	// tue_end_1: string
+	// tue_end_2: string
+	// tue_start_1: string
+	// tue_start_2: string
+	// user: User
+	// wed_end_1: string
+	// wed_end_2: string
+	// wed_start_1: string
+	// wed_start_2: string
 }
 
 export interface SideNavItem {
