@@ -37,12 +37,12 @@ export class ScheduleBase extends Vue {
 			'status': this.parseStatus(schedule['status']),
 			'id': schedule.id
 		}
-		for (const [key, value] of Object.entries(formattedSchedule)) {
-			if(value === '12:00 AM - 12:00 AM') {
-				formattedSchedule[key] = 'OFF'
-			}
-		}
-		schedules.push(formattedSchedule)
+		// for (const [key, value] of Object.entries(formattedSchedule)) {
+		// 	if(value === '12:00 AM - 12:00 AM') {
+		// 		formattedSchedule[key] = 'OFF'
+		// 	}
+		// }
+		// schedules.push(formattedSchedule)
 	}
 
 

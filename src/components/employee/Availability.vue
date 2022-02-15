@@ -100,7 +100,7 @@ export default class Availability extends ScheduleBase {
 		this.loading = true;
 		this.$axios.get('/schedules/user/availability') 
 		.then(response => {
-			response.data.forEach((schedule: { [x: string]: string; }) => this.timeFormat(schedule));
+			response.data.forEach((schedule: any) => this.timeFormat(schedule, this.schedules));
 			this.loading = false;
 		})
 		.catch(function (error: any) {
