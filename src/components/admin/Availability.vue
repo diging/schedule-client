@@ -148,7 +148,7 @@ export default class Availability extends ScheduleBase {
 		})
 		.then((response: any) => {
 			var removeIndex = this.schedules.map(item => item.id).indexOf(this.id);
-			// this.schedules[removeIndex]['status'] = this.parseStatus(this.status)
+			this.schedules[removeIndex]['status'] = this.parseStatus(this.status)
 			this.status = 0
 			this.reason = ''
 			this.id = 0

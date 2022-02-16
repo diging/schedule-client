@@ -27,22 +27,22 @@ export class ScheduleBase extends Vue {
 	timeFormat(schedule: schedule, schedules: schedule[]) {
 		let formattedSchedule = {
 			'created': moment(schedule['created']).format('MM/DD/YYYY'),
-			'mon': moment(schedule['mon_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['mon_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'tue': moment(schedule['tue_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['tue_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'wed': moment(schedule['wed_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['wed_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'thu': moment(schedule['thur_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['thur_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'fri': moment(schedule['fri_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['fri_end_1'], 'HH:mm:ss').format('h:mm A'),
+			'mon_start_1': moment(schedule['mon_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['mon_end_1'], 'HH:mm:ss').format('h:mm A'),
+			'tue_start_1': moment(schedule['tue_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['tue_end_1'], 'HH:mm:ss').format('h:mm A'),
+			'wed_start_1': moment(schedule['wed_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['wed_end_1'], 'HH:mm:ss').format('h:mm A'),
+			'thu_start_1': moment(schedule['thur_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['thur_end_1'], 'HH:mm:ss').format('h:mm A'),
+			'fri_start_1': moment(schedule['fri_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['fri_end_1'], 'HH:mm:ss').format('h:mm A'),
 			'max_hours': schedule['max_hours'],
 			// this works but vueter doesn't recognize it.
 			'status': this.parseStatus(schedule['status']),
 			'id': schedule.id
 		}
-		// for (const [key, value] of Object.entries(formattedSchedule)) {
-		// 	if(value === '12:00 AM - 12:00 AM') {
-		// 		formattedSchedule[key] = 'OFF'
-		// 	}
-		// }
-		// schedules.push(formattedSchedule)
+		for (const [key, value] of Object.entries(formattedSchedule)) {
+			if(value === '12:00 AM - 12:00 AM') {
+				formattedSchedule[key] = 'OFF'
+			}
+		}
+		schedules.push(formattedSchedule)
 	}
 
 
