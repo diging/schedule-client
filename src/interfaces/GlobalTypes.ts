@@ -106,5 +106,17 @@ export interface timeInstanceRootState {
 }
 
 export interface SideNavItem {
-    id: number; label: string; key: any
+    title: string; icon: string; path: string
+}
+
+export interface formattedSchedule {
+	created: string
+	mon: string
+	tue: string
+	wed: string
+	thu: string
+	fri: string
+	max_hours: string
+	status: string | undefined
+	id: number
 }

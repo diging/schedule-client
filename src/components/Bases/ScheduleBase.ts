@@ -1,8 +1,7 @@
 
-<script lang='ts'>
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import {schedule} from '@/interfaces/GlobalTypes'
+import {schedule, formattedSchedule} from '@/interfaces/GlobalTypes'
 import moment from 'moment'
 @Component
 export class ScheduleBase extends Vue {
@@ -25,7 +24,7 @@ export class ScheduleBase extends Vue {
 	}
 
 	timeFormat(schedule: schedule, schedules: schedule[]) {
-		let formattedSchedule = {
+		let formattedSchedule: formattedSchedule = {
 			'created': moment(schedule['created']).format('MM/DD/YYYY'),
 			'mon_start_1': moment(schedule['mon_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['mon_end_1'], 'HH:mm:ss').format('h:mm A'),
 			'tue_start_1': moment(schedule['tue_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['tue_end_1'], 'HH:mm:ss').format('h:mm A'),
@@ -67,5 +66,3 @@ export class ScheduleBase extends Vue {
 		}
 	}
 }
-
-</script>

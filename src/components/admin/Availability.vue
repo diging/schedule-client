@@ -33,7 +33,7 @@ import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';
 import {schedule} from '@/interfaces/GlobalTypes'
 import moment from 'moment'
-import {ScheduleBase}  from '@/components/Bases/ScheduleBase.vue'
+import {ScheduleBase}  from '@/components/Bases/ScheduleBase'
 
 const axios = require('axios')
 
