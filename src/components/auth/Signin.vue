@@ -1,6 +1,11 @@
 <template lang="pug">
     v-card(class="pa-10 ma-auto text-center" width="300")
         h2(class="mb-8") Welcome.
+        <div v-if="errorMessage">
+            <v-alert color="red">
+                type="Oops error logging in"
+            </v-alert>
+        </div>
         v-form(ref="form")
             v-text-field(v-model="email" label="ASU Email" required)
             v-text-field(class="mb-5" v-model="password" label="Password" required
@@ -27,7 +32,9 @@ export default class Signin extends Vue {
 	private email: string='';
 	private password: string='';
 	private show1: boolean = false;
+	private errorMessage: boolean=false;
 	
+
 	rules = {
 		required: (value: any) => !!value || 'Required.',
 		min: (v: string|any[]) => v.length >= 8 || 'Min 8 characters',
@@ -52,19 +59,21 @@ export default class Signin extends Vue {
 	}
 
 	login() {
+		let catchCallback = function() {
+			this.errorMessage = true;
+		};
+		catchCallback = catchCallback.bind(this);
 		if(this.email != "" && this.password != "") {
 			this.$axios.post('/token/', {
 				email: this.email,
 				password: this.password,
 			})
-			.then( (result) => {
+			.then((result) => {
 				localStorage.setItem('token', result.data.access);
 				Vue.$axios.defaults.headers.common.Authorization = `Bearer ${result.data.access}`;
 				this.setUserInfo()
 			})
-			.catch(function (error: any) {
-				console.log(error);
-			})
+			.catch(catchCallback);
 		} else {
 			console.log("A username and password must be present");
 		}
