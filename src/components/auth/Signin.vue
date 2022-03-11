@@ -2,7 +2,7 @@
     v-card(class="pa-10 ma-auto text-center" width="300")
         h2(class="mb-8") Welcome.
         <div v-if="errorMessage">
-            <v-alert color="red">
+            <v-alert color="error">
                 type="Oops error logging in"
             </v-alert>
         </div>
