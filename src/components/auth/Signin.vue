@@ -59,10 +59,6 @@ export default class Signin extends Vue {
 	}
 
 	login() {
-		let catchCallback = function() {
-			this.errorMessage = true;
-		};
-		catchCallback = catchCallback.bind(this);
 		if(this.email != "" && this.password != "") {
 			this.$axios.post('/token/', {
 				email: this.email,
@@ -73,7 +69,10 @@ export default class Signin extends Vue {
 				Vue.$axios.defaults.headers.common.Authorization = `Bearer ${result.data.access}`;
 				this.setUserInfo()
 			})
-			.catch(catchCallback);
+			.catch((error) => {
+				console.log(error);
+				this.errorMessage = true;
+			});
 		} else {
 			console.log("A username and password must be present");
 		}
