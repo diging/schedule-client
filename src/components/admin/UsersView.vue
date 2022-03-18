@@ -22,7 +22,6 @@ div
 import "@mdi/font/css/materialdesignicons.css";
 import { Component, Vue } from "vue-property-decorator";
 import { User } from "@/interfaces/GlobalTypes";
-// import {ScheduleBase}  from '@/components/Bases/ScheduleBase'
 
 const axios = require("axios");
 
@@ -98,8 +97,6 @@ export default class UserView extends Vue {
 	}
 
   updateSearchData() {
-    debugger;
-    // let tempUsers: User[] = [];
     this.filteredUsers = this.users.filter((itm) => {
       return (itm.first_name.includes(this.search) || itm.last_name.includes(this.search) || itm.full_name.includes(this.search) || itm.email.includes(this.search));
     });
