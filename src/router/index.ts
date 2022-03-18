@@ -9,6 +9,7 @@ import employees from '../views/auth/employeesView.vue';
 import workerRequests from '../views/auth/workerRequestsView.vue'
 import userAvailability from '../views/auth/userAvailabilityView.vue'
 import AvailabilityAdminView from '../views/auth/AvailabilityAdminView.vue'
+import Users from '../components/admin/UsersView.vue'
 
 Vue.use(VueRouter)
 
@@ -57,6 +58,11 @@ const routes = [
     path: '/admin/availability',
     name: 'AvailabilityAdmin',
     component: AvailabilityAdminView,
+  },
+  {
+    path: '/users',
+    name: 'Users',
+    component: Users,
   }
 ]
 
