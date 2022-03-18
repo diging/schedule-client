@@ -66,7 +66,7 @@ export default class UserView extends Vue {
         this.loading = false;
         console.log(this.loading);
       })
-      .catch(function (error: any) {
+      .catch((error: any) => {
         console.log(error);
       })
   }
@@ -91,7 +91,7 @@ export default class UserView extends Vue {
 			var updateUser = this.users.findIndex(x => x.id ===item.id);
 			this.users[updateUser]['is_superuser'] = is_super;
 		})
-		.catch(function (error: any) {
+		.catch((error: any) => {
 			console.log(error);
 		})
 	}
