@@ -2,8 +2,8 @@
     v-card(class="pa-10 ma-auto text-center" width="300")
         h2(class="mb-8") Welcome.
         v-form(ref="form")
-            v-text-field(v-model="email" label="ASU Email" required)
-            v-text-field(class="mb-5" v-model="password" label="Password" required
+            v-text-field(v-model="email" label="ASU Email" required @keydown.enter="login()")
+            v-text-field(class="mb-5" v-model="password" label="Password" required @keydown.enter="login()"
                 :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" @click:append="show1 = !show1"
                 :rules="[rules.required, rules.min]" counter
                 :type="show1 ? 'text' : 'password'")
