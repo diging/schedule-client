@@ -23,7 +23,7 @@ export class ScheduleBase extends Vue {
 		}
 	}
 
-	timeFormat(schedule: schedule, schedules: schedule[]) {
+	timeFormat(schedule: schedule, schedules: formattedSchedule[]) {
 		let formattedSchedule: formattedSchedule = {
 			'created': moment(schedule['created']).format('MM/DD/YYYY'),
 			'mon': moment(schedule['mon_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['mon_end_1'], 'HH:mm:ss').format('h:mm A'),
@@ -38,12 +38,13 @@ export class ScheduleBase extends Vue {
 		}
 		for (const [key, value] of Object.entries(formattedSchedule)) {
 			if(value === '12:00 AM - 12:00 AM') {
-				formattedSchedule[key] = 'OFF'
+				if(key == 'mon' || key == 'tue' || key == 'wed' || key == 'thu' || key == 'fri') {
+				formattedSchedule[key]  = 'OFF'
+				}
 			}
-		}
 		schedules.push(formattedSchedule)
+		}
 	}
-
 
 	formatMaxHours() {
 		if(!this.maxHours.includes('.')) {
