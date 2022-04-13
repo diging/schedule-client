@@ -6,9 +6,7 @@ import moment from 'moment'
 @Component
 export class ScheduleBase extends Vue {
 
-
 	protected maxHours: string = '0.0'
-
 
 	parseStatus(status: number) {
 		switch(status) {
@@ -23,27 +21,29 @@ export class ScheduleBase extends Vue {
 		}
 	}
 
-	timeFormat(schedule: schedule, schedules: formattedSchedule[]) {
+	parseTime(key: string, schedule: any) {
+		let data = moment(schedule[`${key}_start_1`], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule[`${key}_end_1`], 'HH:mm:ss').format('h:mm A');
+		if(data === '12:00 AM - 12:00 AM'){
+			return 'OFF';
+		} else {
+			return data;
+		}
+	}
+
+	timeFormat(schedule: any, schedules: any) {
 		let formattedSchedule: formattedSchedule = {
 			'created': moment(schedule['created']).format('MM/DD/YYYY'),
-			'mon': moment(schedule['mon_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['mon_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'tue': moment(schedule['tue_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['tue_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'wed': moment(schedule['wed_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['wed_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'thu': moment(schedule['thur_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['thur_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'fri': moment(schedule['fri_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['fri_end_1'], 'HH:mm:ss').format('h:mm A'),
+			'mon': this.parseTime("mon", schedule),
+			'tue': this.parseTime("tue", schedule),
+			'wed': this.parseTime("wed", schedule),
+			'thu': this.parseTime("thur", schedule),
+			'fri': this.parseTime("fri", schedule),
 			'max_hours': schedule['max_hours'],
 			// this works but vueter doesn't recognize it.
 			'status': this.parseStatus(schedule['status']),
 			'id': schedule.id
 		}
-		for (const [key, value] of Object.entries(formattedSchedule)) {
-			if(value === '12:00 AM - 12:00 AM') {
-				if(key == 'mon' || key == 'tue' || key == 'wed' || key == 'thu' || key == 'fri') {
-				formattedSchedule[key]  = 'OFF'
-				}
-			}
 		schedules.push(formattedSchedule)
-		}
 	}
 
 	formatMaxHours() {
