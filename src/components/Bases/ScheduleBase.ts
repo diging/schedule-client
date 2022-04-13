@@ -43,7 +43,7 @@ export class ScheduleBase extends Vue {
 			'status': this.parseStatus(schedule['status']),
 			'id': schedule.id
 		}
-		schedules.push(formattedSchedule)
+		schedules.push(formattedSchedule);
 	}
 
 	formatMaxHours() {

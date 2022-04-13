@@ -5,16 +5,29 @@
 			v-container
 				p(class="body-2 mb-10") Lab hours are from 9:00 AM to 4:30 PM.
 				div(v-for="day in days" :key="day")
-					v-row
-						v-col(cols='3')
-							p(class="font-weight-medium body-2") {{day}}
-						v-col(cols='4')
-							timePicker(:index = 'startTime1' :day='day')
-						v-col(cols='4') 
-							timePicker(:index = 'endTime1' :day='day')
-						v-col(cols='1')
-							v-btn(icon color="#F2594B"  v-on:click="isHidden=true") 
-								v-icon mdi-plus-circle-outline
+					div(v-if="availabilityTimes[day].length===0")
+						v-row
+							v-col(cols='3')
+								p(class="font-weight-medium body-2") {{day}}
+							v-col(cols='4')
+								timePicker(:index = 'startTime1' :day='day')
+							v-col(cols='4') 
+								timePicker(:index = 'endTime1' :day='day')
+							v-col(cols='1')
+								v-btn(icon color="#F2594B"  v-on:click="updateAvailability()") 
+									v-icon mdi-plus-circle-outline
+					div(v-else)
+						div(v-for="(avItem, avIndex) in availabilityTimes[day]" :key="day + avIndex.toString()")
+							v-row
+							v-col(cols='3')
+								p(class="font-weight-medium body-2") {{day}}
+							v-col(cols='4')
+								timePicker(:index = 'startTime1' :day='day')
+							v-col(cols='4') 
+								timePicker(:index = 'endTime1' :day='day')
+							v-col(cols='1')
+								v-btn(icon color="#F2594B"  v-on:click="updateAvailability()") 
+									v-icon mdi-plus-circle-outline
 					v-row(class="mt-n6 mb-4" v-if="isHidden")
 						v-col(cols='3')
 						v-col(cols='4')
@@ -75,6 +88,13 @@ export default class Availability extends ScheduleBase {
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
 	private dialog: boolean = false
 	private schedules: schedule[] = [];
+	private startTime1: any;
+	private endTime1: any;
+	private startTime2: any;
+	private endTime2: any;
+	private isHidden: boolean = false;
+	private availabilityTimes: { [x: string]: any[]; } = {};
+	private days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 	headers = [
 		{text: 'Submitted', value: 'created'},
@@ -97,10 +117,15 @@ export default class Availability extends ScheduleBase {
 
 
 	created() {
+		for (var day of this.days) {
+			this.availabilityTimes[day] = [];
+		}
 		this.loading = true;
 		this.$axios.get('/schedules/user/availability') 
 		.then(response => {
 			response.data.forEach((schedule: { [x: string]: string; }) => {
+				console.log("vishnu");
+				console.log(schedule);
 				this.timeFormat(schedule, this.schedules)
 			});
 			this.loading = false;
