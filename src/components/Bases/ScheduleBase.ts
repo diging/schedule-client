@@ -31,6 +31,7 @@ export class ScheduleBase extends Vue {
 	}
 
 	timeFormat(schedule: any, schedules: any) {
+		debugger;
 		let formattedSchedule: formattedSchedule = {
 			'created': moment(schedule['created']).format('MM/DD/YYYY'),
 			'mon': this.parseTime("mon", schedule),
