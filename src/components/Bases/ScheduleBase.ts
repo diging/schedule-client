@@ -1,14 +1,13 @@
 
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import {schedule, formattedSchedule} from '@/interfaces/GlobalTypes'
+import { formattedSchedule } from '@/interfaces/GlobalTypes'
+import { schedule } from '@/interfaces/GlobalTypes'
 import moment from 'moment'
 @Component
 export class ScheduleBase extends Vue {
 
-
 	protected maxHours: string = '0.0'
-
 
 	parseStatus(status: number) {
 		switch(status) {
@@ -23,18 +22,18 @@ export class ScheduleBase extends Vue {
 		}
 	}
 
-	timeFormat(schedule: schedule, schedules: schedule[]) {
+	timeFormat(schedule: schedule, schedules: formattedSchedule[]) {
 		let formattedSchedule: formattedSchedule = {
-			'created': moment(schedule['created']).format('MM/DD/YYYY'),
-			'mon_start_1': moment(schedule['mon_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['mon_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'tue_start_1': moment(schedule['tue_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['tue_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'wed_start_1': moment(schedule['wed_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['wed_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'thu_start_1': moment(schedule['thur_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['thur_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'fri_start_1': moment(schedule['fri_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['fri_end_1'], 'HH:mm:ss').format('h:mm A'),
-			'max_hours': schedule['max_hours'],
+			created: moment(schedule['created']).format('MM/DD/YYYY'),
+			mon: moment(schedule['mon_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['mon_end_1'], 'HH:mm:ss').format('h:mm A'),
+			tue: moment(schedule['tue_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['tue_end_1'], 'HH:mm:ss').format('h:mm A'),
+			wed: moment(schedule['wed_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['wed_end_1'], 'HH:mm:ss').format('h:mm A'),
+			thu: moment(schedule['thur_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['thur_end_1'], 'HH:mm:ss').format('h:mm A'),
+			fri: moment(schedule['fri_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['fri_end_1'], 'HH:mm:ss').format('h:mm A'),
+			max_hours: schedule['max_hours'],
 			// this works but vueter doesn't recognize it.
-			'status': this.parseStatus(schedule['status']),
-			'id': schedule.id
+			status: this.parseStatus(schedule['status']),
+			id: schedule.id
 		}
 		for (const [key, value] of Object.entries(formattedSchedule)) {
 			if(value === '12:00 AM - 12:00 AM') {

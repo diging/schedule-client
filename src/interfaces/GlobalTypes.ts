@@ -110,6 +110,7 @@ export interface SideNavItem {
 }
 
 export interface formattedSchedule {
+	[key:string]: string | number | undefined
 	created: string
 	mon: string
 	tue: string

@@ -10,7 +10,6 @@ const initialState: timeInstanceRootState = {
     end_time: '00:00',
   }
 
-
 export default ({
 
   state: {
