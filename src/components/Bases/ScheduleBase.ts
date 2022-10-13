@@ -1,9 +1,8 @@
-
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import { formattedSchedule } from '@/interfaces/GlobalTypes'
-import { schedule } from '@/interfaces/GlobalTypes'
+import { schedule, formattedSchedule } from '@/interfaces/GlobalTypes'
 import moment from 'moment'
+
 @Component
 export class ScheduleBase extends Vue {
 
@@ -31,7 +30,6 @@ export class ScheduleBase extends Vue {
 			thu: moment(schedule['thur_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['thur_end_1'], 'HH:mm:ss').format('h:mm A'),
 			fri: moment(schedule['fri_start_1'], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule['fri_end_1'], 'HH:mm:ss').format('h:mm A'),
 			max_hours: schedule['max_hours'],
-			// this works but vueter doesn't recognize it.
 			status: this.parseStatus(schedule['status']),
 			id: schedule.id
 		}
@@ -42,7 +40,6 @@ export class ScheduleBase extends Vue {
 		}
 		schedules.push(formattedSchedule)
 	}
-
 
 	formatMaxHours() {
 		if(!this.maxHours.includes('.')) {

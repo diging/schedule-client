@@ -14,15 +14,15 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 	name: 'timePicker',
 })
 
-export default class timePicker extends Vue{
+export default class timePicker extends Vue {
 	private menu2: string = '';
-
 	private time: string = '';
 	@Prop() day!: string;
 	@Prop() index!: string;
 	@Prop() check!: string;
 	private localDay: string = this.day
 	private localIndex: string = this.index
+	private days: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
 	@Watch('time')
 	watchTime(value: string, oldValue: string) {

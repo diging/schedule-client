@@ -10,16 +10,16 @@
 							p(class="font-weight-medium body-2") {{day}}
 						v-col(cols='4')
 							timePicker(:index = 'startTime1' :day='day')
-						v-col(cols='4') 
+						v-col(cols='4')
 							timePicker(:index = 'endTime1' :day='day')
 						v-col(cols='1')
-							v-btn(icon color="#F2594B"  v-on:click="isHidden=true") 
+							v-btn(icon color="#F2594B"  v-on:click="isHidden=true")
 								v-icon mdi-plus-circle-outline
 					v-row(class="mt-n6 mb-4" v-if="isHidden")
 						v-col(cols='3')
 						v-col(cols='4')
 							timePicker(:index = 'startTime2' :day='day')
-						v-col(cols='4') 
+						v-col(cols='4')
 							timePicker(:index = 'endTime2' :day='day')
 						v-col(cols='1')
 				v-row
@@ -30,16 +30,16 @@
 			v-card-actions
 				v-spacer
 				v-btn(color="grey" text @click="dialog = false") Cancel
-				v-btn(color="#F2594B" medium class="white--text" @click="postSched()") Submit
+				v-btn(color="#F2594B" medium class="white--text" @click='postSched()') Submit
 
 		h3.mb-5 Previous Schedules
-		v-data-table(:headers="headers" 
-			:items="schedules" 
-			:items-per-page="5" 
-			item-key='id' 
-			class="elevation-1" 
-			:single-select="singleSelect" 
-			:loading='loading' 
+		v-data-table(:headers="headers"
+			:items="schedules"
+			:items-per-page="5"
+			item-key='id'
+			class="elevation-1"
+			:single-select="singleSelect"
+			:loading="loading"
 			:loading-text="loadingText"
 			:sort-by="['created']"
 			:sort-desc="[true]"
@@ -54,8 +54,7 @@ import { mixins } from 'vue-class-component'
 import Vuex from 'vuex';
 import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';
-import {schedule} from '@/interfaces/GlobalTypes'
-
+import { schedule, formattedSchedule } from '@/interfaces/GlobalTypes'
 import { ScheduleBase }  from '@/components/Bases/ScheduleBase'
 
 const axios = require('axios')
@@ -74,7 +73,7 @@ export default class Availability extends ScheduleBase {
 	private loading: boolean = false;
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
 	private dialog: boolean = false
-	private schedules: schedule[] = [];
+	private schedules: formattedSchedule[] = [];
 
 	headers = [
 		{text: 'Submitted', value: 'created'},
@@ -87,7 +86,7 @@ export default class Availability extends ScheduleBase {
 		{text: 'Max Hours', value: 'max_hours'},
 		{text: 'Delete', value: 'actions'},
 		//d-none must have leading space in string to work. Hide from table but id is still attached
-		{text: 'Id', value: 'id', align: ' d-none'} 
+		{text: 'Id', value: 'id', align: ' d-none'}
 	];
 
 
@@ -98,7 +97,7 @@ export default class Availability extends ScheduleBase {
 
 	created() {
 		this.loading = true;
-		this.$axios.get('/schedules/user/availability') 
+		this.$axios.get('/schedules/user/availability')
 		.then(response => {
 			response.data.forEach((schedule: any) => this.timeFormat(schedule, this.schedules));
 			this.loading = false;
@@ -107,7 +106,7 @@ export default class Availability extends ScheduleBase {
 		})
 		.then(function () {
 			// always executed
-		}); 
+		});
 	}
 
 

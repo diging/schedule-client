@@ -11,7 +11,7 @@ import requestForm from '@/components/global/requestForm.vue'
 import requestsTable from '@/components/global/requestsTable.vue'
 
 export default Vue.extend({
-    name: 'workerRequestsView',
+    name: 'userLeaveRequestsView',
     components: {
         requestForm,
         requestsTable,
