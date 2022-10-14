@@ -4,7 +4,7 @@
 			h4(class="text-center") Edit your schedule.
 			v-container
 				p(class="body-2 mb-10") Lab hours are from 9:00 AM to 4:30 PM.
-				timePicker(v-for="day in days" :key="day")
+				timePicker(v-for="day in days" :key='day')
 					v-row
 						v-col(cols='3')
 							p(class="font-weight-medium body-2") {{ day }}
@@ -49,7 +49,9 @@
 </template>
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import Component from 'vue-class-component';
+import Vue from 'vue'
+import { Prop, Watch } from 'vue-property-decorator';
 import { mixins } from 'vue-class-component'
 import Vuex from 'vuex';
 import timePicker from '@/components/global/timePicker.vue'

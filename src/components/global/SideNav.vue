@@ -38,13 +38,13 @@ export default class SideNav extends Vue {
 		if(this.$store.getters.getUser.is_superuser) {
 			this.items = [
 				{ title: 'Schedules', icon: 'mdi-calendar-clock', path: '/userHome'},
-				{ title: 'Requests', icon: 'mdi-checkbox-multiple-marked', path: '/workerRequests'},
+				{ title: 'Requests', icon: 'mdi-checkbox-multiple-marked', path: '/adminLeaveRequests'},
 				{ title: 'Availabilities', icon: 'mdi-clock-time-five-outline', path: '/admin/availability'},
 			]
 		} else {
 			this.items = [
 				{ title: 'My Schedule', icon: 'mdi-calendar-clock', path: '/userHome'},
-				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/workerRequests'},
+				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/userLeaveRequests'},
 				{ title: 'Submit Availability', icon: 'mdi-clock-time-five-outline', path: '/user/availability'},
 			]
 		}

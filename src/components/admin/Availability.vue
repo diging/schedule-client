@@ -28,7 +28,9 @@
 
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import Component from 'vue-class-component';
+import Vue from 'vue'
+import { Prop, Watch } from 'vue-property-decorator';
 import Vuex from 'vuex';
 import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';

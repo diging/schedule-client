@@ -18,7 +18,6 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 export default class timePicker extends Vue {
 	private menu2: string = '';
 	private time: string = '';
-	@Prop() days!: string[];
 	@Prop() day!: string;
 	@Prop() index!: string;
 	@Prop() check!: string;
@@ -28,14 +27,13 @@ export default class timePicker extends Vue {
 	@Watch('time')
 	watchTime(value: string, oldValue: string) {
 		let data = {
-			'day': this.localDay,
-			'name': this.localIndex,
-			'time': this.time
+			day: this.localDay,
+			name: this.localIndex,
+			time: this.time
 		}
 		if(this.check=='startTime') this.$store.commit('setStartTimeInstance', data)
 		else if(this.check=='endTime') this.$store.commit('setEndTimeInstance', data)
 		else this.$store.commit('setTime', data)
-
 	}
   
 
