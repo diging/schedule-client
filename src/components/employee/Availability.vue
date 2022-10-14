@@ -4,10 +4,10 @@
 			h4(class="text-center") Edit your schedule.
 			v-container
 				p(class="body-2 mb-10") Lab hours are from 9:00 AM to 4:30 PM.
-				div(v-for="day in days" :key="day")
+				timePicker(v-for="day in days" :key="day")
 					v-row
 						v-col(cols='3')
-							p(class="font-weight-medium body-2") {{day}}
+							p(class="font-weight-medium body-2") {{ day }}
 						v-col(cols='4')
 							timePicker(:index = 'startTime1' :day='day')
 						v-col(cols='4')
@@ -74,6 +74,7 @@ export default class Availability extends ScheduleBase {
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
 	private dialog: boolean = false
 	private schedules: formattedSchedule[] = [];
+	days: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
 	headers = [
 		{text: 'Submitted', value: 'created'},
