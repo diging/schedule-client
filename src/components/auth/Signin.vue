@@ -34,16 +34,14 @@ export default class Signin extends Vue {
 	private show1: boolean = false;
 	private errorMessage: boolean=false;
 	
-
 	rules = {
 		required: (value: any) => !!value || 'Required.',
 		min: (v: string|any[]) => v.length >= 8 || 'Min 8 characters',
-		emailMatch: () => (`The email and password you entered don't match`),
 	}
 
 	async setUserInfo() {
 		 this.$axios.get('/accounts/user/info/')
-		.then( (result) => {
+		.then((result) => {
 			this.$store.commit('setUser', result.data)
 		})
 		.then(() => {
