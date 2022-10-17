@@ -39,7 +39,7 @@ export class ScheduleBase extends Vue {
 		for (const [key, value] of Object.entries(formattedSchedule)) {
 			if(value === '12:00 AM - 12:00 AM') {
 				if(key == 'mon' || key == 'tue' || key == 'wed' || key == 'thu' || key == 'fri') {
-				formattedSchedule[key]  = 'OFF'
+					formattedSchedule[key]  = 'OFF'
 				}
 			}
 		schedules.push(formattedSchedule)
