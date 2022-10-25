@@ -10,7 +10,7 @@ export class ScheduleBase extends Vue {
 	protected maxHours: string = '0.0'
 
 
-	parseStatus(status: number) {
+	parseStatus(status: number | string | undefined) {
 		switch(status) {
 			case 0:
 				return 'Pending';
@@ -32,7 +32,8 @@ export class ScheduleBase extends Vue {
 		}
 	}
 
-	timeFormat(schedule: any, schedules: any) {
+
+	timeFormat(schedule: schedule, schedules: formattedSchedule[]) {
 		let formattedSchedule: formattedSchedule = {
 			'created': moment(schedule['created']).format('MM/DD/YYYY'),
 			'mon': this.parseTime("mon", schedule),

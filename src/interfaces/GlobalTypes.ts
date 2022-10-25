@@ -24,7 +24,7 @@ export interface TokenDto {
 	jti: string;
 	user_id: number;
 	github_token: boolean;
-  }
+}
 
 export interface time {
     startTime1: string;
