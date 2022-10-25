@@ -1,51 +1,51 @@
 <template lang="pug">
-	div
-		v-card(class="pa-5 mb-10")
-			h4(class="text-center") Edit your schedule.
-			v-container
-				p(class="body-2 mb-10") Lab hours are from 9:00 AM to 4:30 PM.
-				div(v-for="day in days" :key="day")
-					v-row
-						v-col(cols='3')
-							p(class="font-weight-medium body-2") {{day}}
-						v-col(cols='4')
-							timePicker(:index = 'startTime1' :day='day')
-						v-col(cols='4') 
-							timePicker(:index = 'endTime1' :day='day')
-						v-col(cols='1')
-							v-btn(icon color="#F2594B"  v-on:click="isHidden=true") 
-								v-icon mdi-plus-circle-outline
-					v-row(class="mt-n6 mb-4" v-if="isHidden")
-						v-col(cols='3')
-						v-col(cols='4')
-							timePicker(:index = 'startTime2' :day='day')
-						v-col(cols='4') 
-							timePicker(:index = 'endTime2' :day='day')
-						v-col(cols='1')
+div
+	v-card(class="pa-5 mb-10")
+		h4(class="text-center") Edit your schedule.
+		v-container
+			p(class="body-2 mb-10") Lab hours are from 9:00 AM to 4:30 PM.
+			div(v-for="day in days" :key="day")
 				v-row
-					v-col.pt-4(cols='3')
-						p.pt-3(class="font-weight-medium body-2") Max Hours
 					v-col(cols='3')
-						v-text-field(v-model="maxHours" @input='formatMaxHours()' outlined dense)
-			v-card-actions
-				v-spacer
-				v-btn(color="grey" text @click="dialog = false") Cancel
-				v-btn(color="#F2594B" medium class="white--text" @click="postSched()") Submit
+						p(class="font-weight-medium body-2") {{day}}
+					v-col(cols='4')
+						timePicker(:index = 'startTime1' :day='day')
+					v-col(cols='4') 
+						timePicker(:index = 'endTime1' :day='day')
+					v-col(cols='1')
+						v-btn(icon color="#F2594B"  v-on:click="isHidden=true") 
+							v-icon mdi-plus-circle-outline
+				v-row(class="mt-n6 mb-4" v-if="isHidden")
+					v-col(cols='3')
+					v-col(cols='4')
+						timePicker(:index = 'startTime2' :day='day')
+					v-col(cols='4') 
+						timePicker(:index = 'endTime2' :day='day')
+					v-col(cols='1')
+			v-row
+				v-col.pt-4(cols='3')
+					p.pt-3(class="font-weight-medium body-2") Max Hours
+				v-col(cols='3')
+					v-text-field(v-model="maxHours" @input='formatMaxHours()' outlined dense)
+		v-card-actions
+			v-spacer
+			v-btn(color="grey" text @click="dialog = false") Cancel
+			v-btn(color="#F2594B" medium class="white--text" @click="postSched()") Submit
 
-		h3.mb-5 Previous Schedules
-		v-data-table(:headers="headers" 
-			:items="schedules" 
-			:items-per-page="5" 
-			item-key='id' 
-			class="elevation-1" 
-			:single-select="singleSelect" 
-			:loading='loading' 
-			:loading-text="loadingText"
-			:sort-by="['created']"
-			:sort-desc="[true]"
-		)
-			template(v-slot:item.actions="{ item }")
-				v-icon(v-if="item.status == 'Pending'" @click="deleteAvail(item.id)") mdi-delete
+	h3.mb-5 Previous Schedules
+	v-data-table(:headers="headers" 
+		:items="schedules" 
+		:items-per-page="5" 
+		item-key='id' 
+		class="elevation-1" 
+		:single-select="singleSelect" 
+		:loading='loading' 
+		:loading-text="loadingText"
+		:sort-by="['created']"
+		:sort-desc="[true]"
+	)
+		template(v-slot:item.actions="{ item }")
+			v-icon(v-if="item.status == 'Pending'" @click="deleteAvail(item.id)") mdi-delete
 </template>
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
@@ -54,7 +54,8 @@ import { mixins } from 'vue-class-component'
 import Vuex from 'vuex';
 import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';
-import {schedule, formattedSchedule} from '@/interfaces/GlobalTypes'
+import {formattedSchedule, schedule} from '@/interfaces/GlobalTypes'
+
 import { ScheduleBase }  from '@/components/Bases/ScheduleBase'
 
 const axios = require('axios')

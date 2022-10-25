@@ -1,29 +1,29 @@
 <template lang="pug">
-	div
-		h3.mb-5 Availabilites
-		v-data-table(:headers="headers" 
-			:items="schedules" 
-			:items-per-page="itemsPerRow" 
-			item-key='id' 
-			class="elevation-1" 
-			:single-select="singleSelect" 
-			:loading='loading' 
-			:loading-text="loadingText"
-			:sort-by="['created']"
-			:sort-desc="[true]"
-		)
-			template(v-slot:item.actions="{ item }")
-				v-icon(@click="triggerDialog(item.id, 1)" color="green") mdi-check
-				v-icon(@click="setStatus(2)" color="red") mdi-cancel
-		v-dialog(v-model="dialog" width="500")
-			v-card
-				v-card-title(class="text-h5 grey lighten-2") Reason
-				v-card-text
-					v-textarea.mt-5(v-model="reason" outlined)
-				v-divider
-				v-card-actions
-					v-spacer
-					v-btn(color="primary" text @click="approve()") Submit
+div
+	h3.mb-5 Availabilites
+	v-data-table(:headers="headers" 
+		:items="schedules" 
+		:items-per-page="itemsPerRow" 
+		item-key='id' 
+		class="elevation-1" 
+		:single-select="singleSelect" 
+		:loading='loading' 
+		:loading-text="loadingText"
+		:sort-by="['created']"
+		:sort-desc="[true]"
+	)
+		template(v-slot:item.actions="{ item }")
+			v-icon(@click="triggerDialog(item.id, 1)" color="green") mdi-check
+			v-icon(@click="setStatus(2)" color="red") mdi-cancel
+	v-dialog(v-model="dialog" width="500")
+		v-card
+			v-card-title(class="text-h5 grey lighten-2") Reason
+			v-card-text
+				v-textarea.mt-5(v-model="reason" outlined)
+			v-divider
+			v-card-actions
+				v-spacer
+				v-btn(color="primary" text @click="approve()") Submit
 </template>
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
@@ -31,7 +31,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import Vuex from 'vuex';
 import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';
-import {schedule, formattedSchedule} from '@/interfaces/GlobalTypes'
+import {formattedSchedule, schedule} from '@/interfaces/GlobalTypes'
 import moment from 'moment'
 import {ScheduleBase}  from '@/components/Bases/ScheduleBase'
 
@@ -99,27 +99,6 @@ export default class Availability extends ScheduleBase {
 		.then(function () {
 			// always executed
 		})
-	}
-
-	formatMaxHours() {
-		if(!this.maxHours.includes('.')) {
-			if(this.maxHours.length > 2) {
-				let last = this.maxHours.slice(-2)
-				let rest = this.maxHours.slice(0, -2)
-				this.maxHours = rest + "." + last
-			} else {
-				this.maxHours = '.' + this.maxHours
-			}
-		} else {
-			let split = this.maxHours.split('.').join("");
-			if(split.length > 2) {
-				let last = split.slice(-2)
-				let rest = split.slice(0, -2)
-				this.maxHours = rest + "." + last
-			} else {
-				this.maxHours = '.' + split
-			}
-		}
 	}
 
 	postSched() {
