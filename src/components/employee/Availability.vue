@@ -54,8 +54,7 @@ import { mixins } from 'vue-class-component'
 import Vuex from 'vuex';
 import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';
-import {schedule} from '@/interfaces/GlobalTypes'
-
+import {schedule, formattedSchedule} from '@/interfaces/GlobalTypes'
 import { ScheduleBase }  from '@/components/Bases/ScheduleBase'
 
 const axios = require('axios')
@@ -74,7 +73,7 @@ export default class Availability extends ScheduleBase {
 	private loading: boolean = false;
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
 	private dialog: boolean = false
-	private schedules: schedule[] = [];
+	private schedules: formattedSchedule[] = [];
 
 	headers = [
 		{text: 'Submitted', value: 'created'},
@@ -100,7 +99,7 @@ export default class Availability extends ScheduleBase {
 		this.loading = true;
 		this.$axios.get('/schedules/user/availability') 
 		.then(response => {
-			response.data.forEach((schedule: { [x: string]: string; }) => {
+			response.data.forEach((schedule: schedule) => {
 				this.timeFormat(schedule, this.schedules)
 			});
 			this.loading = false;

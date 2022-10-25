@@ -40,6 +40,7 @@ export default class SideNav extends Vue {
 				{ title: 'Schedules', icon: 'mdi-calendar-clock', path: '/userHome'},
 				{ title: 'Requests', icon: 'mdi-checkbox-multiple-marked', path: '/workerRequests'},
 				{ title: 'Availabilities', icon: 'mdi-clock-time-five-outline', path: '/admin/availability'},
+				{ title: 'Users', icon: 'mdi-account-multiple', path: '/users'},
 			]
 		} else {
 			this.items = [

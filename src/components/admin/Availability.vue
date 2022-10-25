@@ -31,7 +31,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import Vuex from 'vuex';
 import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';
-import {schedule} from '@/interfaces/GlobalTypes'
+import {schedule, formattedSchedule} from '@/interfaces/GlobalTypes'
 import moment from 'moment'
 import {ScheduleBase}  from '@/components/Bases/ScheduleBase'
 
@@ -58,7 +58,7 @@ export default class Availability extends ScheduleBase {
 	private dialog: boolean = false
 
 	
-	private schedules: schedule[] = [];
+	private schedules: formattedSchedule[] = [];
 
 	headers = [
 		{text: 'Submitted', value: 'created'},
@@ -87,8 +87,8 @@ export default class Availability extends ScheduleBase {
 	created() {
 		this.loading = true;
 		this.$axios.get('schedules/availability/list') 
-		.then(response => {
-			response.data.forEach((schedule: { [x: string]: string; }) => {
+		.then(response => {54
+			response.data.forEach((schedule: schedule) => {
 				this.timeFormat(schedule, this.schedules)
 			});
 			this.loading = false;
