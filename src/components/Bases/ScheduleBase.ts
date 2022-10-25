@@ -23,6 +23,7 @@ export class ScheduleBase extends Vue {
 		}
 	}
 
+
 	parseTime(key: string, schedule: any) {
 		let data = moment(schedule[`${key}_start_1`], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule[`${key}_end_1`], 'HH:mm:ss').format('h:mm A');
 		if(data === '12:00 AM - 12:00 AM'){
@@ -46,7 +47,7 @@ export class ScheduleBase extends Vue {
 			'status': this.parseStatus(schedule['status']),
 			'id': schedule.id
 		}
-		
+
 		schedules.push(formattedSchedule)
 	}
 
@@ -71,4 +72,3 @@ export class ScheduleBase extends Vue {
 			}
 		}
 	}
-}
