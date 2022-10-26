@@ -8,7 +8,8 @@ export class ScheduleBase extends Vue {
 
 	protected maxHours: string = '0.0'
 
-	parseStatus(status: number) {
+	parseStatus(status: number | string | undefined) {
+
 		switch(status) {
 			case 0:
 				return 'Pending';
@@ -21,6 +22,7 @@ export class ScheduleBase extends Vue {
 		}
 	}
 
+
 	parseTime(key: string, schedule: any) {
 		let data = moment(schedule[`${key}_start_1`], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule[`${key}_end_1`], 'HH:mm:ss').format('h:mm A');
 		if(data === '12:00 AM - 12:00 AM'){
@@ -30,8 +32,9 @@ export class ScheduleBase extends Vue {
 		}
 	}
 
-	timeFormat(schedule: any, schedules: any) {
-		debugger;
+
+	timeFormat(schedule: schedule, schedules: formattedSchedule[]) {
+    debugger;
 		let formattedSchedule: formattedSchedule = {
 			'created': moment(schedule['created']).format('MM/DD/YYYY'),
 			'mon': this.parseTime("mon", schedule),
@@ -44,8 +47,10 @@ export class ScheduleBase extends Vue {
 			'status': this.parseStatus(schedule['status']),
 			'id': schedule.id
 		}
-		schedules.push(formattedSchedule);
+    
+		schedules.push(formattedSchedule)
 	}
+
 
 	formatMaxHours() {
 		if(!this.maxHours.includes('.')) {

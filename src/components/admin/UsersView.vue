@@ -18,6 +18,7 @@ div
           v-btn(v-if="item.is_superuser" @click="updateUser(item, false)") De-Activate
           v-btn(v-if="item.is_superuser===false" @click="updateUser(item, true)") Activate
 </template>
+
 <script lang="ts">
 import "@mdi/font/css/materialdesignicons.css";
 import { Component, Vue } from "vue-property-decorator";
@@ -88,7 +89,7 @@ export default class UserView extends Vue {
 			'is_superuser': is_super,
 		})
 		.then((response: any) => {
-			var updateUser = this.users.findIndex(x => x.id ===item.id);
+			var updateUser = this.users.findIndex(x => x.id === item.id);
 			this.users[updateUser]['is_superuser'] = is_super;
 		})
 		.catch((error: any) => {

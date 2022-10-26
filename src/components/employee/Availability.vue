@@ -4,7 +4,7 @@
 			h4(class="text-center") Edit your schedule.
 			v-container
 				p(class="body-2 mb-10") Lab hours are from 9:00 AM to 4:30 PM.
-				div(v-for="day in days" :key="day")
+        div(v-for="day in days" :key="day")
 					div(v-if="availabilityTimes[day].length===0")
 						v-row
 							v-col(cols='3')
@@ -35,30 +35,32 @@
 						v-col(cols='4') 
 							timePicker(:index = 'endTime2' :day='day')
 						v-col(cols='1')
-				v-row
-					v-col.pt-4(cols='3')
-						p.pt-3(class="font-weight-medium body-2") Max Hours
-					v-col(cols='3')
-						v-text-field(v-model="maxHours" @input='formatMaxHours()' outlined dense)
-			v-card-actions
-				v-spacer
-				v-btn(color="grey" text @click="dialog = false") Cancel
-				v-btn(color="#F2594B" medium class="white--text" @click="postSched()") Submit
 
-		h3.mb-5 Previous Schedules
-		v-data-table(:headers="headers" 
-			:items="schedules" 
-			:items-per-page="5" 
-			item-key='id' 
-			class="elevation-1" 
-			:single-select="singleSelect" 
-			:loading='loading' 
-			:loading-text="loadingText"
-			:sort-by="['created']"
-			:sort-desc="[true]"
-		)
-			template(v-slot:item.actions="{ item }")
-				v-icon(v-if="item.status == 'Pending'" @click="deleteAvail(item.id)") mdi-delete
+        v-row
+          v-col.pt-4(cols='3')
+            p.pt-3(class="font-weight-medium body-2") Max Hours
+          v-col(cols='3')
+            v-text-field(v-model="maxHours" @input='formatMaxHours()' outlined dense)
+      v-card-actions
+        v-spacer
+        v-btn(color="grey" text @click="dialog = false") Cancel
+        v-btn(color="#F2594B" medium class="white--text" @click="postSched()") Submit
+
+    h3.mb-5 Previous Schedules
+    v-data-table(:headers="headers" 
+      :items="schedules" 
+      :items-per-page="5" 
+      item-key='id' 
+      class="elevation-1" 
+      :single-select="singleSelect" 
+      :loading='loading' 
+      :loading-text="loadingText"
+      :sort-by="['created']"
+      :sort-desc="[true]"
+    )
+      template(v-slot:item.actions="{ item }")
+        v-icon(v-if="item.status == 'Pending'" @click="deleteAvail(item.id)") mdi-delete
+        
 </template>
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
@@ -67,7 +69,7 @@ import { mixins } from 'vue-class-component'
 import Vuex from 'vuex';
 import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store';
-import {schedule} from '@/interfaces/GlobalTypes'
+import {formattedSchedule, schedule} from '@/interfaces/GlobalTypes'
 
 import { ScheduleBase }  from '@/components/Bases/ScheduleBase'
 
@@ -87,7 +89,6 @@ export default class Availability extends ScheduleBase {
 	private loading: boolean = false;
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
 	private dialog: boolean = false
-	private schedules: schedule[] = [];
 	private startTime1: any;
 	private endTime1: any;
 	private startTime2: any;
@@ -95,6 +96,7 @@ export default class Availability extends ScheduleBase {
 	private isHidden: boolean = false;
 	private availabilityTimes: { [x: string]: any[]; } = {};
 	private days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+	private schedules: formattedSchedule[] = [];
 
 	headers = [
 		{text: 'Submitted', value: 'created'},
@@ -123,8 +125,8 @@ export default class Availability extends ScheduleBase {
 		this.loading = true;
 		this.$axios.get('/schedules/user/availability') 
 		.then(response => {
-			response.data.forEach((schedule: { [x: string]: string; }) => {
-				console.log("vishnu");
+			response.data.forEach((schedule: schedule) => {
+        console.log("vishnu");
 				console.log(schedule);
 				this.timeFormat(schedule, this.schedules)
 			});
