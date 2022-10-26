@@ -1,20 +1,20 @@
 <template lang="pug">
-	v-card(class="pa-10 ma-auto text-center" width="300")
-		h2(class="mb-8") Welcome.
-		div(v-if="invalidLogin")
-			v-alert(color="error")
-				#{alertMessage}="Oops error logging in"
-		div(v-if="emptyField")
-			v-alert(color="error")
-				#{alertMessage}="A username and password must be present"
-		v-form(ref="form")
-			v-text-field(v-model="email" label="ASU Email" required)
-			v-text-field(class="mb-5" v-model="password" label="Password" required
-				:append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" @click:append="show1 = !show1"
-				:rules="[rules.required, rules.min]" counter
-				:alertMessage="show1 ? 'text' : 'password'")
-			v-btn(color="#F2594B" class="white--text mb-5" medium @click="login") Sign In
-			v-btn(plain medium to="createAccount") Create Account
+v-card(class="pa-10 ma-auto text-center" width="300")
+	h2(class="mb-8") Welcome.
+	div(v-if="invalidLogin")
+		v-alert(color="error")
+			#{alertMessage}="Oops error logging in"
+	div(v-if="emptyField")
+		v-alert(color="error")
+			#{alertMessage}="A username and password must be present"
+	v-form(ref="form")
+		v-text-field(v-model="email" label="ASU Email" required @keydown.enter="login()")
+		v-text-field(class="mb-5" v-model="password" label="Password" required @keydown.enter="login()"
+			:append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" @click:append="show1 = !show1"
+			:rules="[rules.required, rules.min]" counter
+			:alertMessage="show1 ? 'text' : 'password'")
+		v-btn(color="#F2594B" class="white--text mb-5" medium @click="login") Sign In
+		v-btn(plain medium to="createAccount") Create Account
 </template>
 
 <script lang="ts">
