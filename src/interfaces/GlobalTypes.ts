@@ -24,7 +24,7 @@ export interface TokenDto {
 	jti: string;
 	user_id: number;
 	github_token: boolean;
-  }
+}
 
 export interface time {
     startTime1: string;
@@ -54,7 +54,7 @@ export interface schedule {
 	mon_end_2: string
 	mon_start_1: string
 	mon_start_2: string
-	status: number
+	status: number | string | undefined
 	thur_end_1: string
 	thur_end_2: string
 	thur_start_1: string
