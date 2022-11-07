@@ -54,7 +54,7 @@ export interface schedule {
 	mon_end_2: string
 	mon_start_1: string
 	mon_start_2: string
-	status: number | string | undefined
+	status: number | undefined
 	thur_end_1: string
 	thur_end_2: string
 	thur_start_1: string
@@ -75,6 +75,7 @@ export interface SideNavItem {
 }
 
 export interface formattedSchedule {
+	[key: string]: string | undefined | number
 	created: string
 	mon: string
 	tue: string

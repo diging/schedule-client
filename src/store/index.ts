@@ -1,8 +1,8 @@
 import Vue from 'vue'
-import Vuex, { MutationTree } from 'vuex';
+import Vuex, { MutationTree } from 'vuex'
 import { timePickerType, time } from '@/interfaces/timePickerTypes'
 import { RootState } from '@/interfaces/GlobalTypes'
-import createPersistedState from "vuex-persistedstate";
+import createPersistedState from "vuex-persistedstate"
 
 Vue.use(Vuex)
 
@@ -19,7 +19,7 @@ const initialState: RootState = {
 
 const mutations: MutationTree<RootState> = {
 	setTime(state: RootState, timePickerValue: timePickerType ) {
-		state.schedule[timePickerValue['day']][timePickerValue['name'] as 'startTime1' | 'startTime2'| 'endTime1' | 'endTime2'] = timePickerValue['time'];
+		state.schedule[timePickerValue['day']][timePickerValue['name'] as 'startTime1' | 'startTime2' | 'endTime1' | 'endTime2'] = timePickerValue['time']
 	},
 	setUser(state: RootState, user) {
 		state.user = user
@@ -30,15 +30,18 @@ export default new Vuex.Store({
   plugins: [createPersistedState({
 	storage: window.sessionStorage,
 })],
-  state: initialState, 
+  state: initialState,
   mutations,
   getters: {
     timeValues: state => {
       return state.schedule
     },
-	getUser: state => {
-		return state.user
-	}
+    getUser: state => {
+      return state.user
+    },
+    getDaySched: (state) => (day: string) => {
+      return state.schedule[day]
+    }
   },
   actions: {
   },

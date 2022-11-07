@@ -1,28 +1,31 @@
 <template lang="pug">
-	v-menu(ref="menu" v-model="menu2" :close-on-content-click="false" :nudge-right="40" :return-value.sync="time"
-		transition="scale-transition" offset-y max-width="290px" min-width="290px")
-		template(v-slot:activator="{ on, attrs }")
-			v-text-field(dense v-model="time" label="" prepend-icon="mdi-clock-time-four-outline"
-					readonly v-bind="attrs" v-on="on")
-		v-time-picker(v-if="menu2" v-model="time" full-width @click:minute="$refs.menu.save(time)" format="ampm")
+v-menu(ref="menu" v-model="menu2" :close-on-content-click="false" :nudge-right="40" :return-value.sync="time"
+	transition="scale-transition" offset-y max-width="290px" min-width="290px")
+	template(v-slot:activator="{ on, attrs }")
+		v-text-field(dense v-model="time" label="" prepend-icon="mdi-clock-time-four-outline"
+				readonly v-bind="attrs" v-on="on")
+	v-time-picker(v-if="menu2" v-model="time" full-width @click:minute="$refs.menu.save(time)" format="ampm")
+	v-btn(@click="")
 </template>
 
 <script lang="ts">
+import 'reflect-metadata'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 @Component({
 	name: 'timePicker',
 })
 
-export default class timePicker extends Vue{
-	private menu2: string = '';
+export default class timePicker extends Vue {
+	private menu2: string = ''
 
-	private time: string = '';
-	@Prop() day!: string;
-	@Prop() index!: string;
-	@Prop() start!: Boolean;
+	private time: string = ''
+	@Prop() day!: string
+	@Prop() index!: string
+	@Prop() start!: Boolean
 	private localDay: string = this.day
 	private localIndex: string = this.index
+	private localStart: Boolean = this.start
 
 	@Watch('time')
 	watchTime(value: string, oldValue: string) {
@@ -30,14 +33,12 @@ export default class timePicker extends Vue{
 			'day': this.localDay,
 			'name': this.localIndex,
 			'time': this.time,
-			'start': this.start
+			'start': this.localStart
 		}
 		this.$store.commit('setTime', data)
-		this.$emit('update-time', data)
 	}
-  
-
 }
+
 </script>
 
 <style scoped>

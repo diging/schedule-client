@@ -7,18 +7,20 @@
     "importHelpers": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-	"strictFunctionTypes": false,
+	  "strictFunctionTypes": false,
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
-	  "webpack-env",
-	  "vuetify"
+      "webpack-env",
+      "vuetify"
     ],
     "paths": {
       "@/*": [
-        "src/*"
+        "src/*",
+        "./*"
       ]
     },
     "lib": [
