@@ -89,7 +89,7 @@ export default class Availability extends ScheduleBase {
 		this.$axios.get('schedules/availability/list') 
 		.then(response => {
 			response.data.forEach((schedule: schedule) => {
-				this.timeFormat(schedule, this.schedules)
+				this.formatScheduleTime(schedule, this.schedules)
 			});
 			this.loading = false;
 		})
@@ -108,7 +108,7 @@ export default class Availability extends ScheduleBase {
 			maxHours: maxHoursDecimal
 		})
 		.then((response: any) => {
-			this.timeFormat(response.data, this.schedules)
+			this.formatScheduleTime(response.data, this.schedules)
 		})
 		.catch(function (error: any) {
 			console.log(error);
