@@ -55,6 +55,15 @@ export class ScheduleBase extends Vue {
 		}
 	}
 
+	workerHours(schedule: any, hours: any[]) {
+		for (const key in schedule) {
+			const value = schedule[key]
+			if (key.indexOf('start') > -1 || key.indexOf('end') > -1) {
+				hours.push({[key]: value})
+			}
+		}
+	}
+
 	formatMaxHours() {
 		if(!this.maxHours.includes('.')) {
 			if(this.maxHours.length > 2) {

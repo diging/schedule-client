@@ -20,27 +20,27 @@ div
 </template>
 
 <script lang="ts">
-import "@mdi/font/css/materialdesignicons.css";
-import { Component, Vue } from "vue-property-decorator";
-import { User } from "@/interfaces/GlobalTypes";
+import "@mdi/font/css/materialdesignicons.css"
+import { Component, Vue } from "vue-property-decorator"
+import { User } from "@/interfaces/GlobalTypes"
 
-const axios = require("axios");
+const axios = require("axios")
 
 @Component({
   name: "UserView",
 })
+
 export default class UserView extends Vue {
-  private singleSelect: boolean = false;
-  private selected: User[] = [];
-  private loading: boolean = false;
-  private loadingText: string = "loading...";
+
+  private singleSelect: boolean = false
+  private selected: User[] = []
+  private loading: boolean = false
+  private loadingText: string = "loading..."
   private usersPerRow: number = 10;
-  private id: number = 0;
-  private search: string = "";
-
-  private users: User[] = [];
-
-  private filteredUsers: User[] = [];
+  private id: number = 0
+  private search: string = ""
+  private users: User[] = []
+  private filteredUsers: User[] = []
 
   headers = [
     { text: "First Name", value: "first_name" },
@@ -103,7 +103,9 @@ export default class UserView extends Vue {
     });
   }
 }
+
 </script>
 
 <style scoped>
+
 </style>

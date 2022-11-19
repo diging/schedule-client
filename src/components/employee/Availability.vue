@@ -126,9 +126,9 @@ export default class Availability extends ScheduleBase {
 		{text: 'Id', value: 'id', align: ' d-none'}
 	]
 
-	constructor() {
-        super()
-    }
+	// constructor() {
+    //     super()
+    // }
 
 	updateAvailability(day: string) {
 		this.day_time_strings = []

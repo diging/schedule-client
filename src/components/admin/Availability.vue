@@ -25,6 +25,7 @@ div
 				v-spacer
 				v-btn(color="primary" text @click="approve()") Submit
 </template>
+
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
@@ -47,7 +48,6 @@ const axios = require('axios')
 
 export default class Availability extends ScheduleBase {
 
-
 	private singleSelect: boolean = false;
 	private loading: boolean = false;
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
@@ -56,9 +56,7 @@ export default class Availability extends ScheduleBase {
 	private status: number = 0
 	private id: number = 0
 	private dialog: boolean = false
-
-	
-	private schedules: formattedSchedule[] = [];
+	private schedules: formattedSchedule[] = []
 
 	headers = [
 		{text: 'Submitted', value: 'created'},
@@ -72,7 +70,7 @@ export default class Availability extends ScheduleBase {
 		{text: 'Max Hours', value: 'max_hours'},
 		{text: 'Approve/Deny', value: 'actions'},
 		//d-none must have leading space in string to work. Hide from table but id is still attached
-		{text: 'Id', value: 'id', align: ' d-none'} 
+		{text: 'Id', value: 'id', align: ' d-none'}
 	];
 
 	constructor() {
@@ -83,18 +81,17 @@ export default class Availability extends ScheduleBase {
 		this.status = status
 	}
 
-
 	created() {
 		this.loading = true;
-		this.$axios.get('schedules/availability/list') 
+		this.$axios.get('schedules/availability/list')
 		.then(response => {
 			response.data.forEach((schedule: schedule) => {
 				this.formatScheduleTime(schedule, this.schedules)
-			});
+			})
 			this.loading = false;
 		})
 		.catch(function (error: any) {
-			console.log(error);
+			console.log(error)
 		})
 		.then(function () {
 			// always executed
@@ -114,14 +111,16 @@ export default class Availability extends ScheduleBase {
 			console.log(error);
 		})
 	}
+
 	triggerDialog(id: number, status: number) {
 		this.dialog = true
 		this.id = id
 		this.status = status
 	}
+
 	approve() {
 		this.dialog = false
-		this.$axios.patch('/schedules/availability/update/' + this.id, {
+		this.$axios.patch('/schedules/availability/approve/' + this.id, {
 			'status': this.status,
 			'reason': this.reason
 		})

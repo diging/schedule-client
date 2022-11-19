@@ -1,10 +1,10 @@
 <template lang="pug">
-    div(class="pa-10")
-        h1  {{ moment().format('DD MMMM YYYY') }}
-        dailyCalendar
+div(class="pa-10")
+    h1  {{ moment().format('DD MMMM YYYY') }}
+    dailyCalendar
 </template>
 
-<script>
+<script lang="ts">
     import Vue from 'vue';
     import '@mdi/font/css/materialdesignicons.css'
     import moment from 'moment'
