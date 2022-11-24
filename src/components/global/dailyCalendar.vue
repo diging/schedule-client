@@ -16,7 +16,7 @@ v-row(class="fill-height")
                 color="primary"
                 type="category"
                 category-show-all
-                :categories="categories"
+                :categories="student_workers"
                 :events="events"
                 :event-color="getEventColor"
                 @change="fetchEvents")
@@ -27,6 +27,7 @@ v-row(class="fill-height")
 import Vue from 'vue'
 import '@mdi/font/css/materialdesignicons.css'
 import Component from 'vue-class-component'
+import {schedule} from '@/interfaces/GlobalTypes'
 import {ScheduleBase}  from '@/components/Bases/ScheduleBase'
 
 @Component({
@@ -39,34 +40,45 @@ export default class dailyCalendar extends ScheduleBase {
     private focus: string = ''
     private events: { [key: string]: string | Date | boolean }[] = []
     private colors: string[] = ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1']
-    private names: string[] = ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party']
-    private categories: string[] = ['John Smith', 'Tori Walker']
-    private hours: {[key: string]: any}[] = []
+    //private names: string[] = ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party']
+    private student_workers: string[] = ['Tushar', 'Charishma', 'Prachi', 'Baishali', 'Swetalina', 'Vishnu', 'Pratik']
+   //private student_workers: string[] = []
+    private hours: { [key: string]: any } = {}
+    private schedules: schedule[] = []
+    private days = ['mon', 'tue', 'wed', 'thu', 'fri']
 
-	created() {
-		this.$axios.get('/schedules/test/')
-		.then(response => {
-            const schedule = JSON.parse(response.data)
-            this.workerHours(schedule, this.hours)
-            console.log(this.hours)
-            // this.$axios.post('/schedules/create2/', {
-            //     schedule: response.data
-            // })
-            // .then(response => {
-            //     //console.log(response.data)
-            // })
-		})
-		.catch(function (error: any) {
-			console.log(error)
-		})
-		.then(function () {
-			// always executed
-		})
-	}
+	// created() {
+	// 	this.$axios.get('/schedules/test/')
+	// 	.then(response => {
+    //         //console.log(response.data)
+    //         const schedule = JSON.parse(response.data)
+    //         this.schedules.push(schedule)
+    //         for (var sched of this.schedules) {
+    //             //console.log(sched)
+    //             this.workerHours(sched, this.hours)
+    //         }
+    //         console.log(this.hours.mon_start_1)
+    //         console.log(Object.keys(this.hours))
+    //         var date = new Date(this.hours.mon_start_1)
+    //         //console.log(date)
+    //         //console.log(typeof date)
+    //         // this.$axios.post('/schedules/create2/', {
+    //         //     schedule: response.data
+    //         // })
+    //         // .then(response => {
+    //         //     //console.log(response.data)
+    //         // })
+	// 	})
+	// 	.catch(function (error: any) {
+	// 		console.log(error)
+	// 	})
+	// 	.then(function () {
+	// 		// always executed
+	// 	})
+	// }
 
     mounted() {
         (this.$refs.calendar as Vue & {checkChange: () => void}).checkChange()
-
     }
 
     getEventColor(event: any) {
@@ -85,33 +97,42 @@ export default class dailyCalendar extends ScheduleBase {
         (this.$refs.calendar as Vue & {next: () => void}).next()
     }
 
+    //Working on rendering events correctly
+    //Detecting which weekday and selecting indexing appropriate day abbrev
     fetchEvents({ start, end }: any) {
         const events: any[] = []
+        this.$axios.get('/schedules/test/')
+		.then(response => {
+            const schedule: schedule = response.data
+            //const schedule: schedule = JSON.parse(response.data)
+            this.schedules.push(schedule)
+            for (var sched of this.schedules) {
+                this.workerHours(sched, this.hours)
+                for(var day in this.days) {
+                    console.log(start.weekday)
+                    console.log(end)
+                    events.push({
+                        start: new Date(start.date.toString().concat('T', this.hours[`${day}_start_1`])),                                                                                            
+                        end: new Date(end.date.toString().concat('T', this.hours[`${day}_end_1`])),
+                        color: this.colors[this.rnd(0, this.colors.length - 1)],
+                        timed: true,
+                        category: this.student_workers[0],
+                    })
+                }
+            }
 
-        const min = new Date(`${start.date}T00:00:00`)
-        const max = new Date(`${end.date}T23:59:59`)
-        const days = (max.getTime() - min.getTime()) / 86400000
-        const eventCount = this.rnd(days, days + 20)
+            this.events = events
+            //console.log(this.events)
+        })
+		.catch(function (error: any) {
+			console.log(error)
+		})
+		.then(function () {
+			// always executed
+            
+        })
 
-        for (let i = 0; i < eventCount; i++) {
-          const allDay = this.rnd(0, 3) === 0
-          const firstTimestamp = this.rnd(min.getTime(), max.getTime())
-          const first = new Date(firstTimestamp - (firstTimestamp % 900000))
-          const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
-          const second = new Date(first.getTime() + secondTimestamp)
-
-          events.push({
-            name: this.names[this.rnd(0, this.names.length - 1)],
-            start: first,
-            end: second,
-            color: this.colors[this.rnd(0, this.colors.length - 1)],
-            timed: !allDay,
-            category: this.categories[this.rnd(0, this.categories.length - 1)],
-          })
-        }
-
-        this.events = events
-        //console.log(this.events)
+        
     }
 
     rnd(a: number, b: number) {

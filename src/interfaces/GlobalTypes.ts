@@ -43,6 +43,7 @@ export interface RootState {
 }
 
 export interface schedule {
+	[key: string]: string | undefined | number | User
 	created: string
 	fri_end_1: string
 	fri_end_2: string
