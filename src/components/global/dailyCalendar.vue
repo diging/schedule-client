@@ -10,7 +10,7 @@ v-row(class="fill-height")
                     v-icon(small) mdi-chevron-right
                 v-toolbar-title(v-if="$refs.calendar") {{ $refs.calendar.title }}
         v-spacer
-        v-sheet(height="600")
+        v-sheet(height="1100")
             v-calendar(ref="calendar"
                 v-model="focus"
                 color="primary"
@@ -41,34 +41,13 @@ export default class dailyCalendar extends ScheduleBase {
     private events: { [key: string]: string | Date | boolean }[] = []
     private colors: string[] = ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1']
     //private names: string[] = ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party']
-    private student_workers: string[] = ['Tushar', 'Charishma', 'Prachi', 'Baishali', 'Swetalina', 'Vishnu', 'Pratik']
-   //private student_workers: string[] = []
+    private student_workers: string[] = []
     private hours: { [key: string]: any } = {}
-    private schedules: schedule[] = []
     private days = ['mon', 'tue', 'wed', 'thu', 'fri']
+
 
 	// created() {
 	// 	this.$axios.get('/schedules/test/')
-	// 	.then(response => {
-    //         //console.log(response.data)
-    //         const schedule = JSON.parse(response.data)
-    //         this.schedules.push(schedule)
-    //         for (var sched of this.schedules) {
-    //             //console.log(sched)
-    //             this.workerHours(sched, this.hours)
-    //         }
-    //         console.log(this.hours.mon_start_1)
-    //         console.log(Object.keys(this.hours))
-    //         var date = new Date(this.hours.mon_start_1)
-    //         //console.log(date)
-    //         //console.log(typeof date)
-    //         // this.$axios.post('/schedules/create2/', {
-    //         //     schedule: response.data
-    //         // })
-    //         // .then(response => {
-    //         //     //console.log(response.data)
-    //         // })
-	// 	})
 	// 	.catch(function (error: any) {
 	// 		console.log(error)
 	// 	})
@@ -82,7 +61,7 @@ export default class dailyCalendar extends ScheduleBase {
     }
 
     getEventColor(event: any) {
-        return event.color
+        return event.color                                                                                                                                
     }
 
     setToday() {
@@ -97,30 +76,25 @@ export default class dailyCalendar extends ScheduleBase {
         (this.$refs.calendar as Vue & {next: () => void}).next()
     }
 
-    //Working on rendering events correctly
-    //Detecting which weekday and selecting indexing appropriate day abbrev
     fetchEvents({ start, end }: any) {
         const events: any[] = []
-        this.$axios.get('/schedules/test/')
+        this.student_workers = []
+        this.$axios.get('/schedules/list/')
 		.then(response => {
-            const schedule: schedule = response.data
-            //const schedule: schedule = JSON.parse(response.data)
-            this.schedules.push(schedule)
-            for (var sched of this.schedules) {
-                this.workerHours(sched, this.hours)
-                for(var day in this.days) {
-                    console.log(start.weekday)
-                    console.log(end)
-                    events.push({
-                        start: new Date(start.date.toString().concat('T', this.hours[`${day}_start_1`])),                                                                                            
-                        end: new Date(end.date.toString().concat('T', this.hours[`${day}_end_1`])),
-                        color: this.colors[this.rnd(0, this.colors.length - 1)],
-                        timed: true,
-                        category: this.student_workers[0],
-                    })
+            response.data.forEach((schedule: schedule) => {
+                //console.log(typeof schedule.mon_start_1)
+                if (!this.student_workers.includes(schedule.user.full_name)) {
+                    this.student_workers.push(schedule.user.full_name)
                 }
-            }
-
+                this.workerHours(schedule, this.hours)
+                events.push({
+                    start: new Date(start.date.toString().concat('T', this.hours[`${this.days[start.weekday-1]}_start_1`])),
+                    end: new Date(start.date.toString().concat('T', this.hours[`${this.days[start.weekday-1]}_end_1`])),
+                    color: this.colors[this.rnd(0, this.colors.length - 1)],
+                    timed: true,
+                    category: schedule.user.full_name,
+                })
+            })
             this.events = events
             //console.log(this.events)
         })
@@ -128,11 +102,8 @@ export default class dailyCalendar extends ScheduleBase {
 			console.log(error)
 		})
 		.then(function () {
-			// always executed
-            
+			// always executed   
         })
-
-        
     }
 
     rnd(a: number, b: number) {

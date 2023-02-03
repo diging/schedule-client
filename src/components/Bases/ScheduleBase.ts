@@ -41,7 +41,8 @@ export class ScheduleBase extends Vue {
 			'max_hours': schedule['max_hours'],
 			// this works but vueter doesn't recognize it.
 			'status': this.parseStatus(schedule.status),
-			'id': schedule.id
+			'id': schedule.id,
+			'name': schedule.user["first_name"]
 		}
 		schedules.push(formattedSchedule)
 	}

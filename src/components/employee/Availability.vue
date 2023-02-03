@@ -45,7 +45,7 @@ div
 			v-btn(color="grey" text @click="dialog = false") Cancel
 			v-btn(color="#F2594B" medium class="white--text" @click="postSched()") Submit
 
-	h3.mb-5 Previous Schedules	
+	h3.mb-5 Previous Schedules
 	v-data-table(:headers="headers"
 		:items="schedules"
 		:items-per-page="5"
@@ -197,7 +197,7 @@ export default class Availability extends ScheduleBase {
 		.catch(function (error: any) {
 			console.log(error)
 		})
-	}	
+	}
 }
 
 </script>
