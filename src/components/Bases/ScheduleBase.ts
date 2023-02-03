@@ -41,7 +41,8 @@ export class ScheduleBase extends Vue {
 			'max_hours': schedule['max_hours'],
 			// this works but vueter doesn't recognize it.
 			'status': this.parseStatus(schedule.status),
-			'id': schedule.id
+			'id': schedule.id,
+			'name': schedule.user["first_name"]
 		}
 		schedules.push(formattedSchedule)
 	}
@@ -52,6 +53,15 @@ export class ScheduleBase extends Vue {
 			return 'OFF'
 		} else {
 			return formatted_day
+		}
+	}
+
+	workerHours(schedule: schedule, hours: {[key: string]: any }) {
+		for (const key in schedule) {
+			const value = schedule[key]
+			if (key.indexOf('start') > -1 || key.indexOf('end') > -1) {
+				hours[key] = value
+			}
 		}
 	}
 

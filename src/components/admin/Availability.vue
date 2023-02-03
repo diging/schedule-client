@@ -1,13 +1,13 @@
 <template lang="pug">
 div
 	h3.mb-5 Availabilites
-	v-data-table(:headers="headers" 
-		:items="schedules" 
-		:items-per-page="itemsPerRow" 
-		item-key='id' 
-		class="elevation-1" 
+	v-data-table(:headers="headers"
+		:items="schedules"
+		:items-per-page="itemsPerRow"
+		item-key='id'
+		class="elevation-1"
 		:single-select="singleSelect" 
-		:loading='loading' 
+		:loading='loading'
 		:loading-text="loadingText"
 		:sort-by="['created']"
 		:sort-desc="[true]"
@@ -24,15 +24,73 @@ div
 			v-card-actions
 				v-spacer
 				v-btn(color="primary" text @click="approve()") Submit
+	div(class="text-left")
+		v-menu(ref="menu" offset-y :close-on-content-click="false" :return-value.sync="time")
+			template(v-slot:activator="{ on, attrs }")
+				v-btn(color="primary" dark v-bind="attrs" v-on="on" @click="pickedDay = false") Set Team Meeting
+			v-list
+				v-list-item-group(v-model="selectedItem" color="primary")
+					v-list-item(v-for="(day, index) in days" :key="index")
+						v-list-item-title(@click="pickedDay = true") {{ day.title }}
+				v-time-picker(v-if="pickedDay" v-model="time" @click:minute="$refs.menu.save(time)" elevation="15" format="ampm")
+	template
+		v-row
+			v-col(class="pa-12")
+				v-range-slider(:tick-labels="tick_labels"
+					v-model="range"
+					:value="[0,1]"
+					:min="min"
+					:max="max"
+					ticks="always"
+					tick-size="4"
+				)
+					template(v-slot:prepend)
+						v-text-field(:value="window_times[range[0]]"
+							class="mt-0 pt-0"
+							hide-details
+							single-line
+							type="string"
+							style="width: 60px"
+							@change="$set(range, 0, $event)"
+						)
+					template(v-slot:append)
+						v-text-field(:value="window_times[range[1]]"
+							class="mt-0 pt-0"
+							hide-details
+							single-line
+							type="string"
+							style="width: 60px"
+							@change="$set(range, 1, $event)"
+						)
+				div(class="text-left")
+					v-btn(color="primary" v-model="best_meeting_times" @click="getBestMeetingTime(window_times[range[0]], window_times[range[1]])") Get Team Meeting Times
+		div(class="text-center")
+			v-row(no-gutters)
+				v-col
+					v-card(v-model="days" class="pa-2 text-center black white--text" outlined tile) {{ days[index].title }}
+			v-row(v-for="schedule in schedules" :key="schedule" no-gutters)
+				v-col(cols="1")
+					v-card(class="pa-2 grey lighten-1" outlined tile) {{ schedule['name'] }}
+				v-col(v-for="time in window_times" :key="time" v-model="best_meeting_times")
+					v-card(:color="best_meeting_times[index].includes(time) ? 'green' : 'red'" class="pa-2" outlined tile) {{ time }}
+		div(class="text-center")
+			v-pagination(
+				v-model="page"
+				:length="days.length"
+				@next="next"
+				@previous="prev"
+			)
+
 </template>
+
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import Vuex from 'vuex';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import Vuex from 'vuex'
 import timePicker from '@/components/global/timePicker.vue'
-import store from '@/store';
+import store from '@/store'
 import {formattedSchedule, schedule} from '@/interfaces/GlobalTypes'
-import moment from 'moment'
+import moment, { relativeTimeThreshold } from 'moment'
 import {ScheduleBase}  from '@/components/Bases/ScheduleBase'
 
 const axios = require('axios')
@@ -47,7 +105,6 @@ const axios = require('axios')
 
 export default class Availability extends ScheduleBase {
 
-
 	private singleSelect: boolean = false;
 	private loading: boolean = false;
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
@@ -55,10 +112,42 @@ export default class Availability extends ScheduleBase {
 	private reason: string = ""
 	private status: number = 0
 	private id: number = 0
+	private name: string = ""
 	private dialog: boolean = false
-
-	
-	private schedules: formattedSchedule[] = [];
+	private schedules: formattedSchedule[] = []
+	//private schedule: [] = []
+	private alertMessage: string = ''
+	private invalidLogin: boolean = false
+	private days: {}[] = [{title: 'Monday'}, {title: 'Tuesday'}, {title: 'Wednesday'}, {title: 'Thursday'}, {title: 'Friday'}]
+	private pickedDay: boolean = false
+	//private time: string = ""
+	private picker = null
+	private selectedItem: number = 1
+	private window_times: string[] = [
+		"9:00", "9:15", "9:30", "9:45", "10:00", "10:15", "10:30",
+		"10:45", "11:00", "11:15", "11:30", "11:45", "12:00", "12:15",
+		"12:30", "12:45", "13:00", "13:15", "13:30", "13:45", "14:00"
+	]
+	private tick_labels: string[] = [
+		"9:00", "", "", "", "10:00", "", "",
+		"", "11:00", "", "", "", "12:00", "",
+		"", "", "13:00", "", "", "", "14:00"
+	]
+	private range: number[] = [0, 20]
+	private min: number = 0
+	private max: number = 20
+	private time_binary_list: number[][] = new Array(10)
+	private page: number = 1
+	private index: number = 0
+	private best_times: string[][] = [
+		["9:00", "9:15", "9:30", "9:45", "10:00"], ["10:15", "10:30",
+		"10:45"], ["11:00", "11:15", "11:30", "11:45"], ["12:00", "12:15",
+		"12:30", "12:45"], ["13:00", "13:15", "13:30", "13:45", "14:00"]
+	]
+	private best_meeting_times: string[][] = [
+		["12:00"], ["12:00"], ["12:00"], ["12:00"], ["12:00"], 
+		["12:00"], ["12:00"], ["12:00"], ["12:00"], ["12:00"]
+	]
 
 	headers = [
 		{text: 'Submitted', value: 'created'},
@@ -72,29 +161,37 @@ export default class Availability extends ScheduleBase {
 		{text: 'Max Hours', value: 'max_hours'},
 		{text: 'Approve/Deny', value: 'actions'},
 		//d-none must have leading space in string to work. Hide from table but id is still attached
-		{text: 'Id', value: 'id', align: ' d-none'} 
+		{text: 'Id', value: 'id', align: ' d-none'}
 	];
 
 	constructor() {
         super();
     }
 
+	next() {
+		this.index = this.index + 1
+	}
+
+	prev() {
+		this.index = this.index - 1
+	}
+
 	setStatus(status: number) {
 		this.status = status
 	}
 
-
 	created() {
 		this.loading = true;
-		this.$axios.get('schedules/availability/list') 
+		this.$axios.get('schedules/availability/list')
 		.then(response => {
 			response.data.forEach((schedule: schedule) => {
+				//console.log(schedule)
 				this.formatScheduleTime(schedule, this.schedules)
-			});
+			})
 			this.loading = false;
 		})
 		.catch(function (error: any) {
-			console.log(error);
+			console.log(error)
 		})
 		.then(function () {
 			// always executed
@@ -102,7 +199,7 @@ export default class Availability extends ScheduleBase {
 	}
 
 	postSched() {
-		let maxHoursDecimal = Number.parseFloat(this.maxHours).toFixed(2);
+		let maxHoursDecimal = Number.parseFloat(this.maxHours).toFixed(2)
 		this.$axios.post('/schedules/availability/create', {
 			schedule: store.getters.timeValues,
 			maxHours: maxHoursDecimal
@@ -114,31 +211,172 @@ export default class Availability extends ScheduleBase {
 			console.log(error);
 		})
 	}
+
 	triggerDialog(id: number, status: number) {
 		this.dialog = true
 		this.id = id
 		this.status = status
 	}
+
 	approve() {
 		this.dialog = false
-		this.$axios.patch('/schedules/availability/update/' + this.id, {
+		this.$axios.patch('/schedules/availability/approve/' + this.id, {
 			'status': this.status,
 			'reason': this.reason
 		})
 		.then((response: any) => {
-			var removeIndex = this.schedules.map(item => item.id).indexOf(this.id);
+			var removeIndex = this.schedules.map(item => item.id).indexOf(this.id)
 			this.schedules[removeIndex]['status'] = this.parseStatus(this.status)
 			this.status = 0
 			this.reason = ''
 			this.id = 0
 		})
-		.catch(function (error: any) {
-			console.log(error);
+		.catch((error) => {
+			console.log(error)
 		})
 	}
+
+	getBestMeetingTime(range_start: string, range_end: string) {
+		this.time_binary_list = []
+		var meeting_times: string[][] = []
+		var range_start_str = range_start.split(':')
+		var range_start_units = Number((Number(range_start_str[0]) * 4) + (Number(range_start_str[1]) / 15))
+		var range_end_str = range_end.split(':')
+		var range_end_units = Number((Number(range_end_str[0]) * 4) + (Number(range_end_str[1]) / 15))
+		this.$axios.get('schedules/availability/list')
+		.then(response => {
+			response.data.forEach((availability: any) => {
+				var start_avail_units = 0
+				var end_avail_units = 0
+				//console.log(availability)
+				for (var key in availability) {
+					if (key.includes("start")) {
+						var time_str = availability[key]?.split(':')
+						start_avail_units = Number((Number(time_str[0]) * 4) + (Number(time_str[1]) / 15))
+					}
+					if (key.includes("end")) {
+						time_str = availability[key]?.split(':')
+						end_avail_units = Number((Number(time_str[0]) * 4) + (Number(time_str[1]) / 15))
+						this.time_binary_list.push(this.createTimeIncrementBinaries(start_avail_units, end_avail_units, range_start_units, range_end_units))
+					}
+				}
+				for (var i=0; i<this.time_binary_list.length; i++) {
+					//console.log("Time List: " + i + "=> " + this.time_binary_list[i])
+					var time_list: string[] = []
+					for (var j=0; j<this.time_binary_list[i].length; j++) {
+						if (this.time_binary_list[i][j] == 1 && this.time_binary_list[i][j+1] == 1 && this.time_binary_list[i][j+2] == 1 && this.time_binary_list[i][j+3] == 1) {
+							var hours = Math.floor((range_start_units + j) / 4)
+							var minutes = (((range_start_units + j) % 4) * 15).toLocaleString('en-US', {minimumIntegerDigits: 2})
+							var time = hours + ':' + minutes
+							time_list.push(time)
+						}
+					}
+					meeting_times.push(time_list)
+				}
+				this.time_binary_list.splice(0)
+			})
+			var monday_times1: string[][] = []
+			var monday_times2: string[][] = []
+			var tuesday_times1: string[][] = []
+			var tuesday_times2: string[][] = []
+			var wednesday_times1: string[][] = []
+			var wednesday_times2: string[][] = []
+			var thursday_times1: string[][] = []
+			var thursday_times2: string[][] = []
+			var friday_times1: string[][] = []
+			var friday_times2: string[][] = []
+			for (var i=0; i<meeting_times.length; i++) {
+				switch(i % 10) {
+					case 0:
+						monday_times1.push(meeting_times[i])
+						break
+					case 1:
+						monday_times2.push(meeting_times[i])
+						break
+					case 2:
+						tuesday_times1.push(meeting_times[i])
+						break
+					case 3:
+						tuesday_times2.push(meeting_times[i])
+						break
+					case 4:
+						wednesday_times1.push(meeting_times[i])
+						break
+					case 5:
+						wednesday_times2.push(meeting_times[i])
+						break
+					case 6:
+						thursday_times1.push(meeting_times[i])
+						break
+					case 7:
+						thursday_times2.push(meeting_times[i])
+						break
+					case 8:
+						friday_times1.push(meeting_times[i])
+						break
+					case 9:
+						friday_times2.push(meeting_times[i])
+						break
+				}
+			}
+			var day_lists = []
+			day_lists.push(monday_times1)
+			//day_lists.push(monday_times2)
+			day_lists.push(tuesday_times1)
+			//day_lists.push(tuesday_times2)
+			day_lists.push(wednesday_times1)
+			//day_lists.push(wednesday_times2)
+			day_lists.push(thursday_times1)
+			//day_lists.push(thursday_times2)
+			day_lists.push(friday_times1)
+			//day_lists.push(friday_times2)
+
+			var best_meeting_times = []
+			for (var list of day_lists) {
+				console.log("LIST: " + list)
+				best_meeting_times.push(list.shift()!.filter(function(v) {
+					return list.every(function(a) {
+						return a.indexOf(v) !== -1
+					})
+				}))
+				// if (!best_meeting_times?.length) {
+				// 	best_meeting_times
+				// }
+				//console.log("Best Meeting Times: " + best_meeting_times)
+			}
+			this.best_meeting_times = best_meeting_times
+			// for(var i=0; i<best_meeting_times.length; i++) {
+			// 	for(var j=0; j<best_meeting_times[i]!.length; j++) {
+			// 		console.log(i + ": " + best_meeting_times[i]![j])
+			// 		this.best_meeting_times[i][j] = best_meeting_times[i]![j]
+			// 	}
+			// }
+
+			console.log(this.best_meeting_times)
+			return this.best_meeting_times
+		})
+		.catch(function (error: any) {
+			console.log(error)
+		})
+		.then(function () {
+			// always executed
+		})
+	}
+
+	createTimeIncrementBinaries(start_avail: number, end_avail: number, start_range: number, end_range: number) {
+		var day_binaries = new Array(96).fill(0)
+		for (var i=start_avail; i<end_avail; i++) {
+			day_binaries[i] = 1
+		}
+		var time_binaries: number[] = day_binaries.slice(start_range, end_range)
+		return time_binaries
+	}
 }
+
 </script>
 
 <style scoped>
-
+	.green-card >>> .v-card {
+		color: green
+	}
 </style>

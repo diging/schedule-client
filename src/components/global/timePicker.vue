@@ -4,8 +4,7 @@ v-menu(ref="menu" v-model="menu2" :close-on-content-click="false" :nudge-right="
 	template(v-slot:activator="{ on, attrs }")
 		v-text-field(dense v-model="time" label="" prepend-icon="mdi-clock-time-four-outline"
 				readonly v-bind="attrs" v-on="on")
-	v-time-picker(v-if="menu2" v-model="time" full-width @click:minute="$refs.menu.save(time)" format="ampm")
-	v-btn(@click="")
+	v-time-picker(v-if="menu2" v-model="time" full-width @click:minute="$refs.menu.save(time)" format="ampm" :allowed-minutes="allowedStep")
 </template>
 
 <script lang="ts">
@@ -36,6 +35,10 @@ export default class timePicker extends Vue {
 			'start': this.localStart
 		}
 		this.$store.commit('setTime', data)
+	}
+	
+	allowedStep(minutes: number) {
+		return minutes % 15 === 0
 	}
 }
 
