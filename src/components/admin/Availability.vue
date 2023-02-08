@@ -2,19 +2,37 @@
 div
 	h3.mb-5 Availabilites
 	v-data-table(:headers="headers"
-		:items="schedules"
+		:items="availabilities"
 		:items-per-page="itemsPerRow"
 		item-key='id'
 		class="elevation-1"
-		:single-select="singleSelect" 
+		:single-select="singleSelect"
 		:loading='loading'
 		:loading-text="loadingText"
 		:sort-by="['created']"
 		:sort-desc="[true]"
+		:single-expand="singleExpand"
+    	:expanded.sync="expanded"
+		show-expand
 	)
+		template(v-slot:expanded-item="{ headers, item }")
+			td(:colspan="headers.length")
+				v-container
+					div(v-for="day in days1" :key="day")
+						v-row
+							v-col(cols='3')
+								p(class="font-weight-medium body-2") {{day}}
+							v-col(cols='4')
+								timePicker(:day='day' :index='startTime1')
+							v-col(cols='4')
+								timePicker(:day='day' :index='endTime1')
+							v-col(cols='1')
+								v-btn(icon color="#F2594B" @click="updateAvailability(day)")
+									v-icon mdi-plus-circle-outline
 		template(v-slot:item.actions="{ item }")
 			v-icon(@click="triggerDialog(item.id, 1)" color="green") mdi-check
 			v-icon(@click="setStatus(2)" color="red") mdi-cancel
+			v-menu(offset-y)
 	v-dialog(v-model="dialog" width="500")
 		v-card
 			v-card-title(class="text-h5 grey lighten-2") Reason
@@ -68,9 +86,9 @@ div
 			v-row(no-gutters)
 				v-col
 					v-card(v-model="days" class="pa-2 text-center black white--text" outlined tile) {{ days[index].title }}
-			v-row(v-for="schedule in schedules" :key="schedule" no-gutters)
+			v-row(v-for="avail in availabilities" :key="avail" no-gutters)
 				v-col(cols="1")
-					v-card(class="pa-2 grey lighten-1" outlined tile) {{ schedule['name'] }}
+					v-card(class="pa-2 grey lighten-1" outlined tile) {{ avail['name'] }}
 				v-col(v-for="time in window_times" :key="time" v-model="best_meeting_times")
 					v-card(:color="best_meeting_times[index].includes(time) ? 'green' : 'red'" class="pa-2" outlined tile) {{ time }}
 		div(class="text-center")
@@ -105,7 +123,11 @@ const axios = require('axios')
 
 export default class Availability extends ScheduleBase {
 
-	private singleSelect: boolean = false;
+	private singleSelect: boolean = false
+	private startTime1: string = "startTime1"
+	private endTime1: string = "endTime1"
+	private startTime2: string = "startTime2"
+	private endTime2: string = "endTime2"
 	private loading: boolean = false;
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
 	private itemsPerRow: number = 10
@@ -114,15 +136,16 @@ export default class Availability extends ScheduleBase {
 	private id: number = 0
 	private name: string = ""
 	private dialog: boolean = false
-	private schedules: formattedSchedule[] = []
-	//private schedule: [] = []
+	private availabilities: formattedSchedule[] = []
 	private alertMessage: string = ''
 	private invalidLogin: boolean = false
+	private days1 = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 	private days: {}[] = [{title: 'Monday'}, {title: 'Tuesday'}, {title: 'Wednesday'}, {title: 'Thursday'}, {title: 'Friday'}]
 	private pickedDay: boolean = false
-	//private time: string = ""
 	private picker = null
 	private selectedItem: number = 1
+	private day_time_strings: string[] = []
+	private time_suffixes = ['_start_1', '_start_2', '_end_1', '_end_2']
 	private window_times: string[] = [
 		"9:00", "9:15", "9:30", "9:45", "10:00", "10:15", "10:30",
 		"10:45", "11:00", "11:15", "11:30", "11:45", "12:00", "12:15",
@@ -148,7 +171,6 @@ export default class Availability extends ScheduleBase {
 		["12:00"], ["12:00"], ["12:00"], ["12:00"], ["12:00"], 
 		["12:00"], ["12:00"], ["12:00"], ["12:00"], ["12:00"]
 	]
-
 	headers = [
 		{text: 'Submitted', value: 'created'},
 		{text: 'STATUS', value: 'status'},
@@ -162,10 +184,10 @@ export default class Availability extends ScheduleBase {
 		{text: 'Approve/Deny', value: 'actions'},
 		//d-none must have leading space in string to work. Hide from table but id is still attached
 		{text: 'Id', value: 'id', align: ' d-none'}
-	];
+	]
 
 	constructor() {
-        super();
+        super()
     }
 
 	next() {
@@ -181,14 +203,13 @@ export default class Availability extends ScheduleBase {
 	}
 
 	created() {
-		this.loading = true;
+		this.loading = true
 		this.$axios.get('schedules/availability/list')
 		.then(response => {
-			response.data.forEach((schedule: schedule) => {
-				//console.log(schedule)
-				this.formatScheduleTime(schedule, this.schedules)
+			response.data.forEach((avail: schedule) => {
+				this.formatScheduleTime(avail, this.availabilities)
 			})
-			this.loading = false;
+			this.loading = false
 		})
 		.catch(function (error: any) {
 			console.log(error)
@@ -205,7 +226,7 @@ export default class Availability extends ScheduleBase {
 			maxHours: maxHoursDecimal
 		})
 		.then((response: any) => {
-			this.formatScheduleTime(response.data, this.schedules)
+			this.formatScheduleTime(response.data, this.availabilities)
 		})
 		.catch(function (error: any) {
 			console.log(error);
@@ -225,13 +246,37 @@ export default class Availability extends ScheduleBase {
 			'reason': this.reason
 		})
 		.then((response: any) => {
-			var removeIndex = this.schedules.map(item => item.id).indexOf(this.id)
-			this.schedules[removeIndex]['status'] = this.parseStatus(this.status)
+			var removeIndex = this.availabilities.map(item => item.id).indexOf(this.id)
+			this.availabilities[removeIndex]['status'] = this.parseStatus(this.status)
 			this.status = 0
 			this.reason = ''
 			this.id = 0
 		})
 		.catch((error) => {
+			console.log(error)
+		})
+	}
+
+	updateAvailability(day: string) {
+		this.day_time_strings = []
+		var day_abbrev = day.slice(0, 3).toLowerCase()
+		for (var time of this.time_suffixes) {
+			this.day_time_strings.push(day_abbrev + time)
+		}
+		this.$axios.patch('/schedules/availability/update', {
+			time_strings: this.day_time_strings,
+			sched_times: store.getters.getDaySched(day)
+		})
+		.then((response: any) => {
+			var updated_time = this.formatDayTime(response.data.day)
+			var selected_avail = this.availabilities.find((obj) => {
+				return obj.id === this.selectedItem
+			})
+			if (selected_avail !== undefined) {
+				selected_avail[day_abbrev] = updated_time
+			}
+		})
+		.catch(function (error: any) {
 			console.log(error)
 		})
 	}
@@ -248,7 +293,6 @@ export default class Availability extends ScheduleBase {
 			response.data.forEach((availability: any) => {
 				var start_avail_units = 0
 				var end_avail_units = 0
-				//console.log(availability)
 				for (var key in availability) {
 					if (key.includes("start")) {
 						var time_str = availability[key]?.split(':')
@@ -261,7 +305,6 @@ export default class Availability extends ScheduleBase {
 					}
 				}
 				for (var i=0; i<this.time_binary_list.length; i++) {
-					//console.log("Time List: " + i + "=> " + this.time_binary_list[i])
 					var time_list: string[] = []
 					for (var j=0; j<this.time_binary_list[i].length; j++) {
 						if (this.time_binary_list[i][j] == 1 && this.time_binary_list[i][j+1] == 1 && this.time_binary_list[i][j+2] == 1 && this.time_binary_list[i][j+3] == 1) {
@@ -333,24 +376,13 @@ export default class Availability extends ScheduleBase {
 
 			var best_meeting_times = []
 			for (var list of day_lists) {
-				console.log("LIST: " + list)
 				best_meeting_times.push(list.shift()!.filter(function(v) {
 					return list.every(function(a) {
 						return a.indexOf(v) !== -1
 					})
 				}))
-				// if (!best_meeting_times?.length) {
-				// 	best_meeting_times
-				// }
-				//console.log("Best Meeting Times: " + best_meeting_times)
 			}
 			this.best_meeting_times = best_meeting_times
-			// for(var i=0; i<best_meeting_times.length; i++) {
-			// 	for(var j=0; j<best_meeting_times[i]!.length; j++) {
-			// 		console.log(i + ": " + best_meeting_times[i]![j])
-			// 		this.best_meeting_times[i][j] = best_meeting_times[i]![j]
-			// 	}
-			// }
 
 			console.log(this.best_meeting_times)
 			return this.best_meeting_times

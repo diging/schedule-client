@@ -19,15 +19,15 @@ div
 				div(v-else)
 					div(v-for="(avItem, avIndex) in availabilityTimes[day]" :key="day + avIndex.toString()")
 						v-row
-						v-col(cols='3')
-							p(class="font-weight-medium body-2") {{day}}
-						v-col(cols='4')
-							timePicker(:day='day' :index='startTime1')
-						v-col(cols='4')
-							timePicker(:day='day' :index='endTime1')
-						v-col(cols='1')
-							v-btn(icon color="#F2594B" @click="updateAvailability(day)")
-								v-icon mdi-plus-circle-outline
+							v-col(cols='3')
+								p(class="font-weight-medium body-2") {{day}}
+							v-col(cols='4')
+								timePicker(:day='day' :index='startTime1')
+							v-col(cols='4')
+								timePicker(:day='day' :index='endTime1')
+							v-col(cols='1')
+								v-btn(icon color="#F2594B" @click="updateAvailability(day)")
+									v-icon mdi-plus-circle-outline
 				v-row(class="mt-n6 mb-4" v-if="isHidden")
 					v-col(cols='3')
 					v-col(cols='4')
@@ -45,7 +45,7 @@ div
 			v-btn(color="grey" text @click="dialog = false") Cancel
 			v-btn(color="#F2594B" medium class="white--text" @click="postSched()") Submit
 
-	h3.mb-5 Previous Schedules
+	h3.mb-5 Submitted Availabilities
 	v-data-table(:headers="headers"
 		:items="schedules"
 		:items-per-page="5"
@@ -57,7 +57,6 @@ div
 		:sort-by="['created']"
 		:sort-desc="[true]"
 	)
-
 		template(v-slot:body="{ items }")
 			tbody
 				tr(:class="item.id === selectedItem ? 'custom-highlight-row' : ''" v-for="item in items" :key="item.id" :active="selectedItem == item.id" @click="selectedItem = item.id")
@@ -206,5 +205,4 @@ export default class Availability extends ScheduleBase {
 	.custom-highlight-row {
 		background-color: pink
 	}
-
 </style>
