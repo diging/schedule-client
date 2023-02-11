@@ -14,20 +14,20 @@ div
 						v-col(cols='4')
 							timePicker(:day='day' :index='endTime1')
 						v-col(cols='1')
-							v-btn(icon color="#F2594B" @click="updateAvailability(day)")
+							v-btn(icon color="#F2594B" @click="updateAvailability(day, selectedItemID)")
 								v-icon mdi-plus-circle-outline
 				div(v-else)
 					div(v-for="(avItem, avIndex) in availabilityTimes[day]" :key="day + avIndex.toString()")
 						v-row
-						v-col(cols='3')
-							p(class="font-weight-medium body-2") {{day}}
-						v-col(cols='4')
-							timePicker(:day='day' :index='startTime1')
-						v-col(cols='4')
-							timePicker(:day='day' :index='endTime1')
-						v-col(cols='1')
-							v-btn(icon color="#F2594B" @click="updateAvailability(day)")
-								v-icon mdi-plus-circle-outline
+							v-col(cols='3')
+								p(class="font-weight-medium body-2") {{day}}
+							v-col(cols='4')
+								timePicker(:day='day' :index='startTime1')
+							v-col(cols='4')
+								timePicker(:day='day' :index='endTime1')
+							v-col(cols='1')
+								v-btn(icon color="#F2594B" @click="updateAvailability(day)")
+									v-icon mdi-plus-circle-outline
 				v-row(class="mt-n6 mb-4" v-if="isHidden")
 					v-col(cols='3')
 					v-col(cols='4')
@@ -45,7 +45,7 @@ div
 			v-btn(color="grey" text @click="dialog = false") Cancel
 			v-btn(color="#F2594B" medium class="white--text" @click="postSched()") Submit
 
-	h3.mb-5 Previous Schedules
+	h3.mb-5 Submitted Availabilities
 	v-data-table(:headers="headers"
 		:items="schedules"
 		:items-per-page="5"
@@ -57,10 +57,9 @@ div
 		:sort-by="['created']"
 		:sort-desc="[true]"
 	)
-
 		template(v-slot:body="{ items }")
 			tbody
-				tr(:class="item.id === selectedItem ? 'custom-highlight-row' : ''" v-for="item in items" :key="item.id" :active="selectedItem == item.id" @click="selectedItem = item.id")
+				tr(:class="item.id === selectedItemID ? 'custom-highlight-row' : ''" v-for="item in items" :key="item.id" :active="selectedItemID == item.id" @click="selectedItem = item.id")
 						td {{ item.created }}
 						td {{ item.status }}
 						td {{ item.mon }}
@@ -97,7 +96,7 @@ const axios = require('axios')
 export default class Availability extends ScheduleBase {
 
 	private singleSelect: boolean = false
-	private selectedItem: number = 0
+	private selectedItemID: number = 0
 	private loading: boolean = false
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
 	private dialog: boolean = false
@@ -130,20 +129,20 @@ export default class Availability extends ScheduleBase {
     //     super()
     // }
 
-	updateAvailability(day: string) {
+	updateAvailability(day: string, id: number) {
 		this.day_time_strings = []
 		var day_abbrev = day.slice(0, 3).toLowerCase()
 		for (var time of this.time_suffixes) {
 			this.day_time_strings.push(day_abbrev + time)
 		}
-		this.$axios.patch('/schedules/availability/update', {
+		this.$axios.patch('/schedules/availability/update/' + id, {
 			time_strings: this.day_time_strings,
 			sched_times: store.getters.getDaySched(day)
 		})
 		.then((response: any) => {
 			var updated_time = this.formatDayTime(response.data.day)
 			var selected_avail = this.schedules.find((obj) => {
-				return obj.id === this.selectedItem
+				return obj.id === this.selectedItemID
 			})
 			if (selected_avail !== undefined) {
 				selected_avail[day_abbrev] = updated_time
@@ -206,5 +205,4 @@ export default class Availability extends ScheduleBase {
 	.custom-highlight-row {
 		background-color: pink
 	}
-
 </style>
