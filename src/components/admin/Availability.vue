@@ -27,7 +27,7 @@ div
 							v-col(cols='4')
 								timePicker(:day='day' :index='endTime1')
 							v-col(cols='1')
-								v-btn(icon color="#F2594B" @click="updateAvailability(day)")
+								v-btn(icon color="#F2594B" @click="updateAvailability(day, item.id)")
 									v-icon mdi-plus-circle-outline
 		template(v-slot:item.actions="{ item }")
 			v-icon(@click="triggerDialog(item.id, 1)" color="green") mdi-check
@@ -47,7 +47,7 @@ div
 			template(v-slot:activator="{ on, attrs }")
 				v-btn(color="primary" dark v-bind="attrs" v-on="on" @click="pickedDay = false") Set Team Meeting
 			v-list
-				v-list-item-group(v-model="selectedItem" color="primary")
+				v-list-item-group(color="primary")
 					v-list-item(v-for="(day, index) in days" :key="index")
 						v-list-item-title(@click="pickedDay = true") {{ day.title }}
 				v-time-picker(v-if="pickedDay" v-model="time" @click:minute="$refs.menu.save(time)" elevation="15" format="ampm")
@@ -124,11 +124,13 @@ const axios = require('axios')
 export default class Availability extends ScheduleBase {
 
 	private singleSelect: boolean = false
+	private singleExpand: boolean = false
+	private expanded: [] = []
 	private startTime1: string = "startTime1"
 	private endTime1: string = "endTime1"
 	private startTime2: string = "startTime2"
 	private endTime2: string = "endTime2"
-	private loading: boolean = false;
+	private loading: boolean = false
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
 	private itemsPerRow: number = 10
 	private reason: string = ""
@@ -139,11 +141,11 @@ export default class Availability extends ScheduleBase {
 	private availabilities: formattedSchedule[] = []
 	private alertMessage: string = ''
 	private invalidLogin: boolean = false
+	private selectedItem: number = 1
 	private days1 = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 	private days: {}[] = [{title: 'Monday'}, {title: 'Tuesday'}, {title: 'Wednesday'}, {title: 'Thursday'}, {title: 'Friday'}]
 	private pickedDay: boolean = false
 	private picker = null
-	private selectedItem: number = 1
 	private day_time_strings: string[] = []
 	private time_suffixes = ['_start_1', '_start_2', '_end_1', '_end_2']
 	private window_times: string[] = [
@@ -168,7 +170,7 @@ export default class Availability extends ScheduleBase {
 		"12:30", "12:45"], ["13:00", "13:15", "13:30", "13:45", "14:00"]
 	]
 	private best_meeting_times: string[][] = [
-		["12:00"], ["12:00"], ["12:00"], ["12:00"], ["12:00"], 
+		["12:00"], ["12:00"], ["12:00"], ["12:00"], ["12:00"],
 		["12:00"], ["12:00"], ["12:00"], ["12:00"], ["12:00"]
 	]
 	headers = [
@@ -257,19 +259,20 @@ export default class Availability extends ScheduleBase {
 		})
 	}
 
-	updateAvailability(day: string) {
+	updateAvailability(day: string, id: number) {
 		this.day_time_strings = []
 		var day_abbrev = day.slice(0, 3).toLowerCase()
 		for (var time of this.time_suffixes) {
 			this.day_time_strings.push(day_abbrev + time)
 		}
-		this.$axios.patch('/schedules/availability/update', {
-			time_strings: this.day_time_strings,
+		this.$axios.patch('/schedules/availability/update/' + id, {
+  			time_strings: this.day_time_strings,
 			sched_times: store.getters.getDaySched(day)
 		})
 		.then((response: any) => {
 			var updated_time = this.formatDayTime(response.data.day)
 			var selected_avail = this.availabilities.find((obj) => {
+				console.log("NAME: " + obj.id)
 				return obj.id === this.selectedItem
 			})
 			if (selected_avail !== undefined) {
@@ -383,8 +386,7 @@ export default class Availability extends ScheduleBase {
 				}))
 			}
 			this.best_meeting_times = best_meeting_times
-
-			console.log(this.best_meeting_times)
+						
 			return this.best_meeting_times
 		})
 		.catch(function (error: any) {
