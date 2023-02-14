@@ -79,16 +79,15 @@ export interface schedule {
 	fri_start_1: string
 	fri_start_2: string
 	id: number
-	max_hours: string
 	mon_end_1: string
 	mon_end_2: string
 	mon_start_1: string
 	mon_start_2: string
-	status: number | undefined
 	thur_end_1: string
 	thur_end_2: string
 	thur_start_1: string
 	thur_start_2: string
+	total_hours: string
 	tue_end_1: string
 	tue_end_2: string
 	tue_start_1: string
@@ -104,7 +103,7 @@ export interface SideNavItem {
     title: string; icon: string; path: string
 }
 
-export interface formattedSchedule {
+export interface formattedAvailability {
 	[key: string]: string | undefined | number | User
 	created: string
 	mon: string
@@ -114,6 +113,19 @@ export interface formattedSchedule {
 	fri: string
 	max_hours: string
 	status: string | undefined
+	name: User["first_name"]
+	id: number
+}
+
+export interface formattedSchedule {
+	[key: string]: string | undefined | number | User
+	created: string
+	mon: string
+	tue: string
+	wed: string
+	thu: string
+	fri: string
+	total_hours: string
 	name: User["first_name"]
 	id: number
 }
