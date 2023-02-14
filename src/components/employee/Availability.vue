@@ -47,7 +47,7 @@ div
 
 	h3.mb-5 Submitted Availabilities
 	v-data-table(:headers="headers"
-		:items="schedules"
+		:items="availabilities"
 		:items-per-page="5"
 		item-key="id"
 		class="elevation-1"
@@ -80,7 +80,7 @@ import { mixins } from 'vue-class-component'
 import Vuex from 'vuex'
 import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store'
-import {formattedAvailability, schedule} from '@/interfaces/GlobalTypes'
+import {formattedAvailability, availability} from '@/interfaces/GlobalTypes'
 import { ScheduleBase }  from '@/components/Bases/ScheduleBase'
 
 const axios = require('axios')
@@ -109,7 +109,7 @@ export default class Availability extends ScheduleBase {
 	private days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 	private time_suffixes = ['_start_1', '_start_2', '_end_1', '_end_2']
 	private day_time_strings: string[] = []
-	private schedules: formattedAvailability[] = []
+	private availabilities: formattedAvailability[] = []
 
 	headers = [
 		{text: 'Submitted', value: 'created'},
@@ -141,7 +141,7 @@ export default class Availability extends ScheduleBase {
 		})
 		.then((response: any) => {
 			var updated_time = this.formatDayTime(response.data.day)
-			var selected_avail = this.schedules.find((obj) => {
+			var selected_avail = this.availabilities.find((obj) => {
 				return obj.id === this.selectedItemID
 			})
 			if (selected_avail !== undefined) {
@@ -160,8 +160,8 @@ export default class Availability extends ScheduleBase {
 		this.loading = true
 		this.$axios.get('/schedules/user/availability')
 		.then(response => {
-			response.data.forEach((schedule: schedule) => {
-				this.formatScheduleTime(schedule, this.schedules)
+			response.data.forEach((avail: availability) => {
+				this.formatAvailabilityTime(avail, this.availabilities)
 			})
 			this.loading = false
 		})
@@ -180,7 +180,7 @@ export default class Availability extends ScheduleBase {
 			maxHours: maxHoursDecimal
 		})
 		.then((response: any) => {
-			this.formatScheduleTime(response.data,this.schedules)
+			this.formatAvailabilityTime(response.data, this.availabilities)
 		})
 		.catch(function (error: any) {
 			console.log(error)
@@ -190,8 +190,8 @@ export default class Availability extends ScheduleBase {
 	deleteAvail(id: number) {
 		this.$axios.delete('/schedules/availability/delete/' + id)
 		.then((response: any) => {
-			var removeIndex = this.schedules.map(item => item.id).indexOf(id)
-			~removeIndex && this.schedules.splice(removeIndex, 1)
+			var removeIndex = this.availabilities.map(item => item.id).indexOf(id)
+			~removeIndex && this.availabilities.splice(removeIndex, 1)
 		})
 		.catch(function (error: any) {
 			console.log(error)
