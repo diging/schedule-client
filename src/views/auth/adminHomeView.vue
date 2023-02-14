@@ -5,7 +5,7 @@
         dailyCalendar
 </template>
 
-<script>
+<script lang="ts">
     import Vue from 'vue';
     import '@mdi/font/css/materialdesignicons.css'
     import moment from 'moment'

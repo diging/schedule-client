@@ -80,7 +80,7 @@ import { mixins } from 'vue-class-component'
 import Vuex from 'vuex'
 import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store'
-import {formattedSchedule, schedule} from '@/interfaces/GlobalTypes'
+import {formattedAvailability, schedule} from '@/interfaces/GlobalTypes'
 import { ScheduleBase }  from '@/components/Bases/ScheduleBase'
 
 const axios = require('axios')
@@ -109,7 +109,7 @@ export default class Availability extends ScheduleBase {
 	private days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 	private time_suffixes = ['_start_1', '_start_2', '_end_1', '_end_2']
 	private day_time_strings: string[] = []
-	private schedules: formattedSchedule[] = []
+	private schedules: formattedAvailability[] = []
 
 	headers = [
 		{text: 'Submitted', value: 'created'},

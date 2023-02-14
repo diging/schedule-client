@@ -1,14 +1,15 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import SigninView from '../views/auth/SigninView.vue';
-import createAccountView from '../views/auth/createAccountView.vue';
-import adminHome from '../views/auth/adminHomeView.vue';
-import userHome from '../views/auth/userHomeView.vue';
-import leaveRequests from '../views/auth/leaveRequestsView.vue';
-import employees from '../views/auth/employeesView.vue';
+import SigninView from '../views/auth/SigninView.vue'
+import createAccountView from '../views/auth/createAccountView.vue'
+import adminHome from '../views/auth/adminHomeView.vue'
+import userHome from '../views/auth/userHomeView.vue'
+import leaveRequests from '../views/auth/leaveRequestsView.vue'
+import employees from '../views/auth/employeesView.vue'
 import workerRequests from '../views/auth/workerRequestsView.vue'
 import userAvailability from '../views/auth/userAvailabilityView.vue'
 import AvailabilityAdminView from '../views/auth/AvailabilityAdminView.vue'
+import ScheduleAdminView from '../views/auth/ScheduleAdminView.vue'
 import Users from '../components/admin/UsersView.vue'
 
 Vue.use(VueRouter)
@@ -58,6 +59,11 @@ const routes = [
     path: '/admin/availability',
     name: 'AvailabilityAdmin',
     component: AvailabilityAdminView,
+  },
+  {
+    path: '/admin/schedule',
+    name: 'ScheduleAdmin',
+    component: ScheduleAdminView,
   },
   {
     path: '/users',

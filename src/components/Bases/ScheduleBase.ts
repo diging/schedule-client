@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import {schedule, formattedSchedule, time} from '@/interfaces/GlobalTypes'
+import {availability, formattedAvailability, formattedSchedule, time, schedule} from '@/interfaces/GlobalTypes'
 import moment from 'moment'
 
 @Component
@@ -21,8 +21,8 @@ export class ScheduleBase extends Vue {
 		}
 	}
 
-	parseTime(key: string, schedule: any) {
-		let data = moment(schedule[`${key}_start_1`], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(schedule[`${key}_end_1`], 'HH:mm:ss').format('h:mm A')
+	parseTime(key: string, avail: any) {
+		let data = moment(avail[`${key}_start_1`], 'HH:mm:ss').format('h:mm A') + ' - ' + moment(avail[`${key}_end_1`], 'HH:mm:ss').format('h:mm A')
 		if(data === '12:00 AM - 12:00 AM') {
 			return 'OFF'
 		} else {
@@ -30,21 +30,37 @@ export class ScheduleBase extends Vue {
 		}
 	}
 
-	formatScheduleTime(schedule: schedule, schedules: formattedSchedule[]) {
-		let formattedSchedule: formattedSchedule = {
-			'created': moment(schedule['created']).format('MM/DD/YYYY'),
-			'mon': this.parseTime("mon", schedule),
-			'tue': this.parseTime("tue", schedule),
-			'wed': this.parseTime("wed", schedule),
-			'thu': this.parseTime("thu", schedule),
-			'fri': this.parseTime("fri", schedule),
-			'max_hours': schedule['max_hours'],
+	formatAvailabilityTime(avail: availability, avails: formattedAvailability[]) {
+		let formattedAvail: formattedAvailability = {
+			'created': moment(avail['created']).format('MM/DD/YYYY'),
+			'mon': this.parseTime("mon", avail),
+			'tue': this.parseTime("tue", avail),
+			'wed': this.parseTime("wed", avail),
+			'thu': this.parseTime("thu", avail),
+			'fri': this.parseTime("fri", avail),
+			'max_hours': avail['max_hours'],
 			// this works but vueter doesn't recognize it.
-			'status': this.parseStatus(schedule.status),
-			'id': schedule.id,
-			'name': schedule.user["first_name"]
+			'status': this.parseStatus(avail.status),
+			'id': avail.id,
+			'name': avail.user["first_name"]
 		}
-		schedules.push(formattedSchedule)
+		avails.push(formattedAvail)
+	}
+
+	formatScheduleTime(sched: schedule, scheds: formattedSchedule[]) {
+		let formattedSched: formattedSchedule = {
+			'created': moment(sched['created']).format('MM/DD/YYYY'),
+			'mon': this.parseTime("mon", sched),
+			'tue': this.parseTime("tue", sched),
+			'wed': this.parseTime("wed", sched),
+			'thu': this.parseTime("thu", sched),
+			'fri': this.parseTime("fri", sched),
+			'total_hours': sched['total_hours'],
+			// this works but vueter doesn't recognize it.
+			'id': sched.id,
+			'name': sched.user["first_name"]
+		}
+		scheds.push(formattedSched)
 	}
 
 	formatDayTime(times: time) {
@@ -56,9 +72,9 @@ export class ScheduleBase extends Vue {
 		}
 	}
 
-	workerHours(schedule: schedule, hours: {[key: string]: any }) {
-		for (const key in schedule) {
-			const value = schedule[key]
+	workerHours(avail: availability, hours: {[key: string]: any }) {
+		for (const key in avail) {
+			const value = avail[key]
 			if (key.indexOf('start') > -1 || key.indexOf('end') > -1) {
 				hours[key] = value
 			}

@@ -107,7 +107,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import Vuex from 'vuex'
 import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store'
-import {formattedSchedule, schedule} from '@/interfaces/GlobalTypes'
+import {formattedAvailability, availability} from '@/interfaces/GlobalTypes'
 import moment, { relativeTimeThreshold } from 'moment'
 import {ScheduleBase}  from '@/components/Bases/ScheduleBase'
 
@@ -138,7 +138,7 @@ export default class Availability extends ScheduleBase {
 	private id: number = 0
 	private name: string = ""
 	private dialog: boolean = false
-	private availabilities: formattedSchedule[] = []
+	private availabilities: formattedAvailability[] = []
 	private alertMessage: string = ''
 	private invalidLogin: boolean = false
 	private selectedItem: number = 1
@@ -148,6 +148,7 @@ export default class Availability extends ScheduleBase {
 	private picker = null
 	private day_time_strings: string[] = []
 	private time_suffixes = ['_start_1', '_start_2', '_end_1', '_end_2']
+	private time: string = ""
 	private window_times: string[] = [
 		"9:00", "9:15", "9:30", "9:45", "10:00", "10:15", "10:30",
 		"10:45", "11:00", "11:15", "11:30", "11:45", "12:00", "12:15",
@@ -208,8 +209,8 @@ export default class Availability extends ScheduleBase {
 		this.loading = true
 		this.$axios.get('schedules/availability/list')
 		.then(response => {
-			response.data.forEach((avail: schedule) => {
-				this.formatScheduleTime(avail, this.availabilities)
+			response.data.forEach((avail: availability) => {
+				this.formatAvailabilityTime(avail, this.availabilities)
 			})
 			this.loading = false
 		})
@@ -228,7 +229,7 @@ export default class Availability extends ScheduleBase {
 			maxHours: maxHoursDecimal
 		})
 		.then((response: any) => {
-			this.formatScheduleTime(response.data, this.availabilities)
+			this.formatAvailabilityTime(response.data, this.availabilities)
 		})
 		.catch(function (error: any) {
 			console.log(error);
@@ -272,7 +273,6 @@ export default class Availability extends ScheduleBase {
 		.then((response: any) => {
 			var updated_time = this.formatDayTime(response.data.day)
 			var selected_avail = this.availabilities.find((obj) => {
-				console.log("NAME: " + obj.id)
 				return obj.id === this.selectedItem
 			})
 			if (selected_avail !== undefined) {
