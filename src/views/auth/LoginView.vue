@@ -1,6 +1,6 @@
 
 <template lang="pug">
-	LoginForm
+LoginForm
 </template>
 
 <script lang="ts">

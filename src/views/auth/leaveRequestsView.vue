@@ -1,6 +1,6 @@
 <template lang="pug">
-    div
-        requestsTable
+div
+    requestsTable
 </template>
 
 <script lang="ts">

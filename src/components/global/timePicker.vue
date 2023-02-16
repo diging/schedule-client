@@ -9,7 +9,7 @@ v-menu(ref="menu" v-model="menu2" :close-on-content-click="false" :nudge-right="
 
 <script lang="ts">
 import 'reflect-metadata'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component({
 	name: 'timePicker',

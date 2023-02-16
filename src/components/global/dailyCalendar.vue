@@ -40,7 +40,6 @@ export default class dailyCalendar extends ScheduleBase {
     private focus: string = ''
     private events: { [key: string]: string | Date | boolean }[] = []
     private colors: string[] = ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1']
-    //private names: string[] = ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party']
     private student_workers: string[] = []
     private hours: { [key: string]: any } = {}
     private days = ['mon', 'tue', 'wed', 'thu', 'fri']
@@ -82,7 +81,6 @@ export default class dailyCalendar extends ScheduleBase {
         this.$axios.get('/schedules/list/')
 		.then(response => {
             response.data.forEach((schedule: schedule) => {
-                //console.log(typeof schedule.mon_start_1)
                 if (!this.student_workers.includes(schedule.user.full_name)) {
                     this.student_workers.push(schedule.user.full_name)
                 }
@@ -96,7 +94,6 @@ export default class dailyCalendar extends ScheduleBase {
                 })
             })
             this.events = events
-            //console.log(this.events)
         })
 		.catch(function (error: any) {
 			console.log(error)

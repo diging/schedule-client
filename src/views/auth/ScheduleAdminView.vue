@@ -1,6 +1,6 @@
 <template lang="pug">
-    div
-        Schedule
+div
+    Schedule
 </template>
 
 <script lang="ts">

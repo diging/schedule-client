@@ -18,8 +18,9 @@ const initialState: RootState = {
 }
 
 const mutations: MutationTree<RootState> = {
-	setTime(state: RootState, timePickerValue: timePickerType ) {
+	setTime(state: RootState, timePickerValue: timePickerType) {
 		state.schedule[timePickerValue['day']][timePickerValue['name'] as 'startTime1' | 'startTime2' | 'endTime1' | 'endTime2'] = timePickerValue['time']
+    console.log(state.schedule)
 	},
 	setUser(state: RootState, user) {
 		state.user = user

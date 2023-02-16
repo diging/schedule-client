@@ -3,7 +3,7 @@ v-card(width="256" clipped-left permanent)
 	v-navigation-drawer(app class="elevation-3")
 		v-list-item
 			v-list-item-content
-				v-list-item-title(class="title") Sched - O - Matic 5000
+				v-list-item-title(class="title") DigInG Scheduler
 		v-divider
 		v-list(dense nav)
 			v-list-item(v-for="item in items" :key="item.title" :to="item.path" link)

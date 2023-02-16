@@ -72,9 +72,9 @@ export class ScheduleBase extends Vue {
 		}
 	}
 
-	workerHours(avail: availability, hours: {[key: string]: any }) {
-		for (const key in avail) {
-			const value = avail[key]
+	workerHours(sched: schedule, hours: {[key: string]: any }) {
+		for (const key in sched) {
+			const value = sched[key]
 			if (key.indexOf('start') > -1 || key.indexOf('end') > -1) {
 				hours[key] = value
 			}

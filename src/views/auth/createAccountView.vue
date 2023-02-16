@@ -1,8 +1,8 @@
 <template lang="pug">
-    createAccount
+createAccount
 </template>
 
-<script>
+<script lang="ts">
 import Vue from 'vue';
 import '@mdi/font/css/materialdesignicons.css'
 import createAccount from '@/components/auth/createAccount.vue'
