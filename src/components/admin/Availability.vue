@@ -44,15 +44,19 @@ div
 				v-spacer
 				v-btn(color="primary" text @click="approve()") Submit
 	div(class="text-left")
-		v-menu
+		v-menu(:close-on-content-click="false")
 			template(v-slot:activator="{ on, attrs }")
 				v-btn(color="primary" dark v-bind="attrs" v-on="on") Set Team Meeting
 			v-list
 				v-list-item-group(color="primary")
 					v-list-item(v-for="(day, index) in days" :key="day.title")
-						v-list-item-title {{ day.title }}
-						v-btn(color="primary" @click="setMeeting(day.title)") Submit
+						v-checkbox(
+								v-model="meetingDays[day.title]"
+								:label="day.title"
+								:value="day.title"
+							)
 						timePicker(:day='day.title' :index='startTime1')
+					v-btn(color="primary" @click="setMeetings()") Submit
 	template
 		v-row
 			v-col(class="pa-12")
@@ -168,7 +172,7 @@ export default class Availability extends ScheduleBase {
 	private time_binary_list: number[][] = new Array(10)
 	private page: number = 1
 	private index: number = 0
-	private meetingDay: string = ""
+	private meetingDays: string[] = []
 	private best_times: string[][] = [
 		["9:00", "9:15", "9:30", "9:45", "10:00"], ["10:15", "10:30",
 		"10:45"], ["11:00", "11:15", "11:30", "11:45"], ["12:00", "12:15",
@@ -279,8 +283,11 @@ export default class Availability extends ScheduleBase {
 		})
 	}
 
-	setMeeting(meetingDay: string) {
-		console.log(meetingDay)
+	setMeetings() {
+		for(var day in this.meetingDays) {
+			console.log(store.getters.getDaySched(day)['startTime1'])
+
+		}
 	}
 
 	updateAvailability(day: string, id: number) {

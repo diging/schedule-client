@@ -1,25 +1,33 @@
 <template lang="pug">
-v-row(class="fill-height")
-    v-col
-        v-sheet(height="64")
-            v-toolbar(flat)
-                v-btn(outlined class="mr-4" color="grey darken-2" @click="setToday()") Today
-                v-btn(fab text small color="grey darken-2" @click="prev()")
-                    v-icon(small) mdi-chevron-left
-                v-btn(fab text small color="grey darken-2" @click="next()")
-                    v-icon(small) mdi-chevron-right
-                v-toolbar-title(v-if="$refs.calendar") {{ $refs.calendar.title }}
-        v-spacer
-        v-sheet(height="1100")
-            v-calendar(ref="calendar"
-                v-model="focus"
-                color="primary"
-                type="category"
-                category-show-all
-                :categories="student_workers"
-                :events="events"
-                :event-color="getEventColor"
-                @change="fetchEvents")
+div
+    v-sheet(tile height="64" class="d-flex")
+        v-toolbar(flat)
+            v-select(
+                v-model="type"
+                :items="types"
+                dense
+                outlined
+                hide-details
+                class="ma-2"
+                label="type"
+            )
+            v-btn(outlined class="mr-4" color="grey darken-2" @click="setToday()") Today
+            v-btn(fab text small color="grey darken-2" @click="prev()")
+                v-icon(small) mdi-chevron-left
+            v-btn(fab text small color="grey darken-2" @click="next()")
+                v-icon(small) mdi-chevron-right
+            v-toolbar-title(v-if="$refs.calendar") {{ $refs.calendar.title }}
+    v-sheet(height="1100")
+        v-calendar(ref="calendar"
+            v-model="focus"
+            color="primary"
+            type="category"
+            :type="type"
+            category-show-all
+            :categories="student_workers"
+            :events="events"
+            :event-color="getEventColor"
+            @change="fetchSchedules")
 
 </template>
 
@@ -43,17 +51,8 @@ export default class dailyCalendar extends ScheduleBase {
     private student_workers: string[] = []
     private hours: { [key: string]: any } = {}
     private days = ['mon', 'tue', 'wed', 'thu', 'fri']
-
-
-	// created() {
-	// 	this.$axios.get('/schedules/test/')
-	// 	.catch(function (error: any) {
-	// 		console.log(error)
-	// 	})
-	// 	.then(function () {
-	// 		// always executed
-	// 	})
-	// }
+    private types = ["month", "day"]
+    private type = "month"
 
     mounted() {
         (this.$refs.calendar as Vue & {checkChange: () => void}).checkChange()
@@ -75,9 +74,26 @@ export default class dailyCalendar extends ScheduleBase {
         (this.$refs.calendar as Vue & {next: () => void}).next()
     }
 
-    fetchEvents({ start, end }: any) {
+    fetchSchedules({ start, end }: any) {
         const events: any[] = []
         this.student_workers = []
+        this.$axios.get('/schedules/list/')
+		.then(response => {
+            response.data.forEach((schedule: schedule) => {
+                if (!this.student_workers.includes(schedule.user.full_name)) {
+                    this.student_workers.push(schedule.user.full_name)
+                }
+                this.workerHours(schedule, this.hours)
+                events.push({
+                    start: new Date(start.date.toString().concat('T', this.hours[`${this.days[start.weekday-1]}_start_1`])),
+                    end: new Date(start.date.toString().concat('T', this.hours[`${this.days[start.weekday-1]}_end_1`])),
+                    color: this.colors[this.rnd(0, this.colors.length - 1)],
+                    timed: true,
+                    category: schedule.user.full_name,
+                })
+            })
+            this.events = events
+        })
         this.$axios.get('/schedules/list/')
 		.then(response => {
             response.data.forEach((schedule: schedule) => {
