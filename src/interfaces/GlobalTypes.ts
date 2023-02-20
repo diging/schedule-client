@@ -132,16 +132,8 @@ export interface formattedSchedule {
 
 export interface meetings{
 	[key: string]: string | undefined
-	mon_start_1: string
-	mon_end_1: string
-	tue_start_1: string
-	tue_end_1: string
-	wed_start_1: string
-	wed_end_1: string
-	thu_start_1: string
-	thu_end_1: string
-	fri_start_1: string
-	fri_end_1: string
+	start: string
+	end: string
 	meeting_type: string
 	attendees: string
 }
