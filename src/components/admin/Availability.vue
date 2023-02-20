@@ -137,7 +137,7 @@ export default class Availability extends ScheduleBase {
 	private startTime2: string = "startTime2"
 	private endTime2: string = "endTime2"
 	private loading: boolean = false
-	private loadingText: string = 'The sched-o-matic is working hard on your request'
+	private loadingText: string = 'Working on rendering the Availabilities'
 	private itemsPerRow: number = 10
 	private reason: string = ""
 	private status: number = 0
@@ -284,10 +284,15 @@ export default class Availability extends ScheduleBase {
 	}
 
 	setMeetings() {
-		for(var day in this.meetingDays) {
-			console.log(store.getters.getDaySched(day)['startTime1'])
-
-		}
+		// this.$axios.post('/schedules/meetings/create', {
+		// 	''
+		// })
+		// .then((response: any) => {
+		// 	for(var day in this.meetingDays) {
+		// 		console.log(store.getters.getDaySched(day)['startTime1'])
+		// 	}
+		// })
+		
 	}
 
 	updateAvailability(day: string, id: number) {

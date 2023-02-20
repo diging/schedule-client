@@ -27,7 +27,7 @@ div
             :categories="student_workers"
             :events="events"
             :event-color="getEventColor"
-            @change="fetchSchedules")
+            @change="fetchEvents")
 
 </template>
 
@@ -35,7 +35,7 @@ div
 import Vue from 'vue'
 import '@mdi/font/css/materialdesignicons.css'
 import Component from 'vue-class-component'
-import {schedule} from '@/interfaces/GlobalTypes'
+import {schedule, meetings} from '@/interfaces/GlobalTypes'
 import {ScheduleBase}  from '@/components/Bases/ScheduleBase'
 
 @Component({
@@ -53,6 +53,8 @@ export default class dailyCalendar extends ScheduleBase {
     private days = ['mon', 'tue', 'wed', 'thu', 'fri']
     private types = ["month", "day"]
     private type = "month"
+    private day_times = {['mon_start']: '9:00', ['mon_end']: '10:00', ['tue']: '0:00',['wed']: '0:00',['thu']: '0:00',['fri']: '0:00'}
+    private attendees = ['Bob', 'Susie']
 
     mounted() {
         (this.$refs.calendar as Vue & {checkChange: () => void}).checkChange()
@@ -74,7 +76,7 @@ export default class dailyCalendar extends ScheduleBase {
         (this.$refs.calendar as Vue & {next: () => void}).next()
     }
 
-    fetchSchedules({ start, end }: any) {
+    fetchEvents({ start, end }: any) {
         const events: any[] = []
         this.student_workers = []
         this.$axios.get('/schedules/list/')
@@ -89,34 +91,30 @@ export default class dailyCalendar extends ScheduleBase {
                     end: new Date(start.date.toString().concat('T', this.hours[`${this.days[start.weekday-1]}_end_1`])),
                     color: this.colors[this.rnd(0, this.colors.length - 1)],
                     timed: true,
-                    category: schedule.user.full_name,
+                    category: schedule.user.full_name
                 })
             })
             this.events = events
         })
-        this.$axios.get('/schedules/list/')
-		.then(response => {
-            response.data.forEach((schedule: schedule) => {
-                if (!this.student_workers.includes(schedule.user.full_name)) {
-                    this.student_workers.push(schedule.user.full_name)
-                }
-                this.workerHours(schedule, this.hours)
-                events.push({
-                    start: new Date(start.date.toString().concat('T', this.hours[`${this.days[start.weekday-1]}_start_1`])),
-                    end: new Date(start.date.toString().concat('T', this.hours[`${this.days[start.weekday-1]}_end_1`])),
-                    color: this.colors[this.rnd(0, this.colors.length - 1)],
-                    timed: true,
-                    category: schedule.user.full_name,
-                })
-            })
-            this.events = events
+        //this.$axios.get('/schedules/meetings/list')
+		//.then(response => {
+            //response.data.forEach((meeting: meetings) => {
+        events.push({
+            start: new Date(start.date.toString().concat('T', this.day_times.mon_start)),
+            end: new Date(start.date.toString().concat('T', this.day_times.mon_end)),
+            color: this.colors[this.rnd(0, this.colors.length - 1)],
+            timed: true,
+            category: this.attendees
         })
-		.catch(function (error: any) {
-			console.log(error)
-		})
-		.then(function () {
-			// always executed   
-        })
+            //})
+        this.events = events
+       // })
+		// .catch(function (error: any) {
+		// 	console.log(error)
+		// })
+		// .then(function () {
+		// 	// always executed   
+        // })
     }
 
     rnd(a: number, b: number) {
