@@ -10,11 +10,14 @@ import Vue from 'vue';
 import '@mdi/font/css/materialdesignicons.css'
 import moment from 'moment'
 import dailyCalendar from '@/components/global/dailyCalendar.vue'
+import Schedule from '@/components/admin/Schedule.vue'
+import {formattedSchedule, schedule} from '@/interfaces/GlobalTypes'
 
 export default Vue.extend({
     name: 'adminHomeView',
     components: {
         dailyCalendar,
+        Schedule
     },
     data() { 
         return {
@@ -25,6 +28,7 @@ export default Vue.extend({
         moment: function () {
             return moment()
         }
+
     },
 })
 </script>

@@ -2,12 +2,13 @@
 div
 	h3.mb-5 Availabilites
 	v-data-table(
+		v-model="selected"
+		show-select
 		:headers="avail_headers"
 		:items="availabilities"
 		:items-per-page="itemsPerRow"
 		item-key='id'
 		class="elevation-1"
-		:single-select="singleSelect"
 		:loading='loading'
 		:loading-text="loadingText"
 		:sort-by="['created']"
@@ -43,20 +44,23 @@ div
 			v-card-actions
 				v-spacer
 				v-btn(color="primary" text @click="approve()") Submit
-	div(class="text-left")
-		v-menu(:close-on-content-click="false")
-			template(v-slot:activator="{ on, attrs }")
-				v-btn(color="primary" dark v-bind="attrs" v-on="on") Set Team Meeting
-			v-list
-				v-list-item-group(color="primary")
-					v-list-item(v-for="(day, index) in days" :key="day.title")
-						v-checkbox(
-								v-model="meetingDays[day.title]"
-								:label="day.title"
-								:value="day.title"
-							)
-						timePicker(:day='day.title' :index='startTime1')
-					v-btn(color="primary" @click="setMeetings()") Submit
+	template
+			v-card(flat)
+					v-container(class="px-0" fluid)
+						v-radio-group(color="primary" v-model='meetingDay')
+							v-radio(v-for="day in days" :key="day.title" :label="day.title" :value="day.title")
+							div(v-if="meetingDay")
+								v-col
+									timePicker(:day='meetingDay' :index='startTime1')
+									timePicker(:day='meetingDay' :index='endTime1')
+								v-col
+									v-container(fluid)
+										v-overflow-btn(
+											segmented 
+											label="Please select the meeting type"
+											:items="meeting_types"
+										)
+						v-btn(color="primary" @click="setMeeting()") Submit {{ meetingDay }}
 	template
 		v-row
 			v-col(class="pa-12")
@@ -97,7 +101,6 @@ div
 						tr
 							td(v-for="time in window_times" :key="time")
 								v-chip(:color="getColor(time)" dark large) {{ time }}
-
 		div(class="text-center")
 			v-pagination(
 				v-model="page"
@@ -129,7 +132,7 @@ const axios = require('axios')
 
 export default class Availability extends ScheduleBase {
 
-	private singleSelect: boolean = false
+	private selected: { [key: string]: string[]}[] = [] 
 	private singleExpand: boolean = false
 	private expanded: [] = []
 	private startTime1: string = "startTime1"
@@ -137,7 +140,7 @@ export default class Availability extends ScheduleBase {
 	private startTime2: string = "startTime2"
 	private endTime2: string = "endTime2"
 	private loading: boolean = false
-	private loadingText: string = 'Working on rendering the Availabilities'
+	private loadingText: string = 'Loading...'
 	private itemsPerRow: number = 10
 	private reason: string = ""
 	private status: number = 0
@@ -153,7 +156,6 @@ export default class Availability extends ScheduleBase {
 	private pickedDay: boolean = false
 	private picker = null
 	private day_time_strings: string[] = []
-	private colors: number[] = [0, 0, 0, 0.87]
 	private time_suffixes = ['_start_1', '_start_2', '_end_1', '_end_2']
 	private time: string = ""
 	private window_times: string[] = [
@@ -172,7 +174,9 @@ export default class Availability extends ScheduleBase {
 	private time_binary_list: number[][] = new Array(10)
 	private page: number = 1
 	private index: number = 0
-	private meetingDays: string[] = []
+	private meetingDay: string = ""
+	private attendees: string[] = ['Bob', 'Doug', 'Susie']
+	private meeting_types: string[] = ['Bi-weekly', 'Standup', 'Orientation']
 	private best_times: string[][] = [
 		["9:00", "9:15", "9:30", "9:45", "10:00"], ["10:15", "10:30",
 		"10:45"], ["11:00", "11:15", "11:30", "11:45"], ["12:00", "12:15",
@@ -200,13 +204,6 @@ export default class Availability extends ScheduleBase {
 	constructor() {
         super()
     }
-
-	tableStyle(color: number[]) {
-		console.log(color)
-		const [r, g, b, a] = color
-		console.log(color)
-		return {backgroundColor: `rgba(${r},${g},${b},${a})`}
-	}
 
 	next() {
 		this.index = this.index + 1
@@ -283,16 +280,39 @@ export default class Availability extends ScheduleBase {
 		})
 	}
 
-	setMeetings() {
-		// this.$axios.post('/schedules/meetings/create', {
-		// 	''
-		// })
-		// .then((response: any) => {
-		// 	for(var day in this.meetingDays) {
-		// 		console.log(store.getters.getDaySched(day)['startTime1'])
-		// 	}
-		// })
-		
+	setMeeting() {
+		let attendees = []
+		for(let avail of this.selected) {
+			attendees.push(avail.name)
+		}
+		let day = 0
+		switch (this.meetingDay) {
+			case 'Monday':
+				day = 1
+				break
+			case 'Tuesday':
+				day = 2
+				break
+			case 'Wednesday':
+				day = 3
+				break
+			case 'Thursday':
+				day = 4
+				break
+			case 'Friday':
+				day = 5
+				break
+		}
+		this.$axios.post('/schedules/meeting/create', {
+			'start': store.getters.getDaySched(this.meetingDay)['startTime1'],
+			'end': store.getters.getDaySched(this.meetingDay)['endTime1'],
+			'day': day,
+			'meeting_type': this.meeting_types[0],
+			'attendees': attendees
+		})
+		.then((response: any) => {
+			console.log(response.data)
+		})
 	}
 
 	updateAvailability(day: string, id: number) {
