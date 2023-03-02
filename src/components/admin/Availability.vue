@@ -56,11 +56,13 @@ div
 								v-col
 									v-container(fluid)
 										v-overflow-btn(
-											segmented 
+											editable 
 											label="Please select the meeting type"
 											:items="meeting_types"
+											item-value="text"
+											v-model="meeting_type"
 										)
-						v-btn(color="primary" @click="setMeeting()") Submit {{ meetingDay }}
+						v-btn(color="primary" @click="setMeeting()" :disabled="disableBtn()") Submit
 	template
 		v-row
 			v-col(class="pa-12")
@@ -176,7 +178,9 @@ export default class Availability extends ScheduleBase {
 	private index: number = 0
 	private meetingDay: string = ""
 	private attendees: string[] = ['Bob', 'Doug', 'Susie']
-	private meeting_types: string[] = ['Bi-weekly', 'Standup', 'Orientation']
+	private meeting_types: { [key: string]: any }[] = [{text: 'Bi-weekly'}, {text: 'Standup'}, {text: 'Orientation'}]
+	private meeting_type: string = ""
+	private disabled: boolean = true
 	private best_times: string[][] = [
 		["9:00", "9:15", "9:30", "9:45", "10:00"], ["10:15", "10:30",
 		"10:45"], ["11:00", "11:15", "11:30", "11:45"], ["12:00", "12:15",
@@ -280,6 +284,10 @@ export default class Availability extends ScheduleBase {
 		})
 	}
 
+	disableBtn() {
+		return this.selected.length == 0 || !this.meetingDay || !this.meeting_type
+	}
+
 	setMeeting() {
 		let attendees = []
 		for(let avail of this.selected) {
@@ -303,15 +311,12 @@ export default class Availability extends ScheduleBase {
 				day = 5
 				break
 		}
-		this.$axios.post('/schedules/meeting/create', {
+		this.$axios.post('/schedules/meeting/create/', {
 			'start': store.getters.getDaySched(this.meetingDay)['startTime1'],
 			'end': store.getters.getDaySched(this.meetingDay)['endTime1'],
 			'day': day,
-			'meeting_type': this.meeting_types[0],
+			'meeting_type': this.meeting_type,
 			'attendees': attendees
-		})
-		.then((response: any) => {
-			console.log(response.data)
 		})
 	}
 

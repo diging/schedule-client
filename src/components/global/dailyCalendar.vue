@@ -147,7 +147,7 @@ export default class dailyCalendar extends ScheduleBase {
                 weekStart = start_month
                 this.hours = {}
             })
-            this.$axios.get('/schedules/meetings/list')
+            this.$axios.get('/schedules/meetings/list/')
             .then(response => {
                 response.data.forEach((meeting: meetings) => {
                     let current_day = start_date.getDate()
