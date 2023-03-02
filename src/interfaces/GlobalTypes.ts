@@ -129,3 +129,12 @@ export interface formattedSchedule {
 	name: User["first_name"]
 	id: number
 }
+
+export interface meetings{
+	[key: string]: string | number
+	start: string
+	end: string
+	day: number
+	meeting_type: string
+	attendees: string
+}

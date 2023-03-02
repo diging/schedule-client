@@ -39,6 +39,7 @@ export default class Schedule extends ScheduleBase {
     private singleSelect: boolean = false
     private loading: boolean = false
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
+    private itemsPerRow: number = 10
 
     headers = [
         {text: 'Submitted', value: 'created'},

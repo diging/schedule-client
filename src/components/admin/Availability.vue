@@ -1,12 +1,14 @@
 <template lang="pug">
 div
 	h3.mb-5 Availabilites
-	v-data-table(:headers="headers"
+	v-data-table(
+		v-model="selected"
+		show-select
+		:headers="avail_headers"
 		:items="availabilities"
 		:items-per-page="itemsPerRow"
 		item-key='id'
 		class="elevation-1"
-		:single-select="singleSelect"
 		:loading='loading'
 		:loading-text="loadingText"
 		:sort-by="['created']"
@@ -18,16 +20,16 @@ div
 		template(v-slot:expanded-item="{ headers, item }")
 			td(:colspan="headers.length")
 				v-container
-					div(v-for="day in days1" :key="day")
+					div(v-for="(day, index) in days" :key="day.title")
 						v-row
 							v-col(cols='3')
-								p(class="font-weight-medium body-2") {{day}}
+								p(class="font-weight-medium body-2") {{ day.title }}
 							v-col(cols='4')
-								timePicker(:day='day' :index='startTime1')
+								timePicker(:day='day.title' :index='startTime1')
 							v-col(cols='4')
-								timePicker(:day='day' :index='endTime1')
+								timePicker(:day='day.title' :index='endTime1')
 							v-col(cols='1')
-								v-btn(icon color="#F2594B" @click="updateAvailability(day, item.id)")
+								v-btn(icon color="#F2594B" @click="updateAvailability(day.title, item.id)")
 									v-icon mdi-plus-circle-outline
 		template(v-slot:item.actions="{ item }")
 			v-icon(@click="triggerDialog(item.id, 1)" color="green") mdi-check
@@ -42,15 +44,25 @@ div
 			v-card-actions
 				v-spacer
 				v-btn(color="primary" text @click="approve()") Submit
-	div(class="text-left")
-		v-menu(ref="menu" offset-y :close-on-content-click="false" :return-value.sync="time")
-			template(v-slot:activator="{ on, attrs }")
-				v-btn(color="primary" dark v-bind="attrs" v-on="on" @click="pickedDay = false") Set Team Meeting
-			v-list
-				v-list-item-group(color="primary")
-					v-list-item(v-for="(day, index) in days" :key="index")
-						v-list-item-title(@click="pickedDay = true") {{ day.title }}
-				v-time-picker(v-if="pickedDay" v-model="time" @click:minute="$refs.menu.save(time)" elevation="15" format="ampm")
+	template
+			v-card(flat)
+					v-container(class="px-0" fluid)
+						v-radio-group(color="primary" v-model='meetingDay')
+							v-radio(v-for="day in days" :key="day.title" :label="day.title" :value="day.title")
+							div(v-if="meetingDay")
+								v-col
+									timePicker(:day='meetingDay' :index='startTime1')
+									timePicker(:day='meetingDay' :index='endTime1')
+								v-col
+									v-container(fluid)
+										v-overflow-btn(
+											editable 
+											label="Please select the meeting type"
+											:items="meeting_types"
+											item-value="text"
+											v-model="meeting_type"
+										)
+						v-btn(color="primary" @click="setMeeting()" :disabled="disableBtn()") Submit
 	template
 		v-row
 			v-col(class="pa-12")
@@ -82,15 +94,15 @@ div
 						)
 				div(class="text-left")
 					v-btn(color="primary" v-model="best_meeting_times" @click="getBestMeetingTime(window_times[range[0]], window_times[range[1]])") Get Team Meeting Times
-		div(class="text-center")
-			v-row(no-gutters)
-				v-col
-					v-card(v-model="days" class="pa-2 text-center black white--text" outlined tile) {{ days[index].title }}
-			v-row(v-for="avail in availabilities" :key="avail" no-gutters)
-				v-col(cols="1")
-					v-card(class="pa-2 grey lighten-1" outlined tile) {{ avail['name'] }}
-				v-col(v-for="time in window_times" :key="time" v-model="best_meeting_times")
-					v-card(:color="best_meeting_times[index].includes(time) ? 'green' : 'red'" class="pa-2" outlined tile) {{ time }}
+		div
+			h2(class="text-center") {{ days[index].title }}
+			v-simple-table(light)
+				template
+					thead
+						tr(class="text-center")
+						tr
+							td(v-for="time in window_times" :key="time")
+								v-chip(:color="getColor(time)" dark large) {{ time }}
 		div(class="text-center")
 			v-pagination(
 				v-model="page"
@@ -108,7 +120,6 @@ import Vuex from 'vuex'
 import timePicker from '@/components/global/timePicker.vue'
 import store from '@/store'
 import {formattedAvailability, availability} from '@/interfaces/GlobalTypes'
-import moment, { relativeTimeThreshold } from 'moment'
 import {ScheduleBase}  from '@/components/Bases/ScheduleBase'
 
 const axios = require('axios')
@@ -123,7 +134,7 @@ const axios = require('axios')
 
 export default class Availability extends ScheduleBase {
 
-	private singleSelect: boolean = false
+	private selected: { [key: string]: string[]}[] = [] 
 	private singleExpand: boolean = false
 	private expanded: [] = []
 	private startTime1: string = "startTime1"
@@ -131,7 +142,7 @@ export default class Availability extends ScheduleBase {
 	private startTime2: string = "startTime2"
 	private endTime2: string = "endTime2"
 	private loading: boolean = false
-	private loadingText: string = 'The sched-o-matic is working hard on your request'
+	private loadingText: string = 'Loading...'
 	private itemsPerRow: number = 10
 	private reason: string = ""
 	private status: number = 0
@@ -142,7 +153,7 @@ export default class Availability extends ScheduleBase {
 	private alertMessage: string = ''
 	private invalidLogin: boolean = false
 	private selectedItem: number = 1
-	private days1 = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+	private day: string = ""
 	private days: {}[] = [{title: 'Monday'}, {title: 'Tuesday'}, {title: 'Wednesday'}, {title: 'Thursday'}, {title: 'Friday'}]
 	private pickedDay: boolean = false
 	private picker = null
@@ -165,6 +176,11 @@ export default class Availability extends ScheduleBase {
 	private time_binary_list: number[][] = new Array(10)
 	private page: number = 1
 	private index: number = 0
+	private meetingDay: string = ""
+	private attendees: string[] = ['Bob', 'Doug', 'Susie']
+	private meeting_types: { [key: string]: any }[] = [{text: 'Bi-weekly'}, {text: 'Standup'}, {text: 'Orientation'}]
+	private meeting_type: string = ""
+	private disabled: boolean = true
 	private best_times: string[][] = [
 		["9:00", "9:15", "9:30", "9:45", "10:00"], ["10:15", "10:30",
 		"10:45"], ["11:00", "11:15", "11:30", "11:45"], ["12:00", "12:15",
@@ -174,7 +190,7 @@ export default class Availability extends ScheduleBase {
 		["12:00"], ["12:00"], ["12:00"], ["12:00"], ["12:00"],
 		["12:00"], ["12:00"], ["12:00"], ["12:00"], ["12:00"]
 	]
-	headers = [
+	avail_headers = [
 		{text: 'Submitted', value: 'created'},
 		{text: 'STATUS', value: 'status'},
 		{text: 'Name', value: 'name'},
@@ -203,6 +219,14 @@ export default class Availability extends ScheduleBase {
 
 	setStatus(status: number) {
 		this.status = status
+	}
+
+	getColor(time_slot: string) {
+		if(this.best_meeting_times[this.index].includes(time_slot)) {
+			return 'blue'
+		} else {
+			return 'orange'
+		}
 	}
 
 	created() {
@@ -257,6 +281,42 @@ export default class Availability extends ScheduleBase {
 		})
 		.catch((error) => {
 			console.log(error)
+		})
+	}
+
+	disableBtn() {
+		return this.selected.length == 0 || !this.meetingDay || !this.meeting_type
+	}
+
+	setMeeting() {
+		let attendees = []
+		for(let avail of this.selected) {
+			attendees.push(avail.name)
+		}
+		let day = 0
+		switch (this.meetingDay) {
+			case 'Monday':
+				day = 1
+				break
+			case 'Tuesday':
+				day = 2
+				break
+			case 'Wednesday':
+				day = 3
+				break
+			case 'Thursday':
+				day = 4
+				break
+			case 'Friday':
+				day = 5
+				break
+		}
+		this.$axios.post('/schedules/meeting/create/', {
+			'start': store.getters.getDaySched(this.meetingDay)['startTime1'],
+			'end': store.getters.getDaySched(this.meetingDay)['endTime1'],
+			'day': day,
+			'meeting_type': this.meeting_type,
+			'attendees': attendees
 		})
 	}
 
@@ -410,7 +470,5 @@ export default class Availability extends ScheduleBase {
 </script>
 
 <style scoped>
-	.green-card >>> .v-card {
-		color: green
-	}
+
 </style>

@@ -1,7 +1,7 @@
 <template lang="pug">
-    div
-        addEmployee
-        employeeTable
+div
+    addEmployee
+    employeeTable
 </template>
 
 <script lang="ts">
