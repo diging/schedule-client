@@ -1,5 +1,5 @@
 <template lang="pug">
-div
+v-card(:width="responsiveWidth")
     v-sheet(tile height="64" class="d-flex")
         v-toolbar(flat)
             v-select(
@@ -17,17 +17,52 @@ div
             v-btn(fab text small color="grey darken-2" @click="next()")
                 v-icon(small) mdi-chevron-right
             v-toolbar-title(v-if="$refs.calendar") {{ $refs.calendar.title }}
-    v-sheet(height="1100" width="1200")
+    v-sheet
         v-calendar(ref="calendar"
             v-model="focus"
             color="primary"
             :weekdays="weekdays"
             :categories="student_workers"
+            category-show-all
             :type="type"
             :events="events"
             :event-color="getEventColor"
-            @change="dateRange")
-
+            @click:event="showEvent"
+            @click:more="viewDay"
+            @click:date="viewDay"
+            @change="dateRange"
+        )
+        v-menu(
+            v-model="selectedOpen"
+            :close-on-content-click="false"
+            :activator="selectedElement"
+            offset-x
+        )
+            v-card(
+                color="grey lighten-4"
+                min-width="350px"
+                flat
+            )
+                v-toolbar(
+                    :color="selectedEvent.color"
+                    dark
+                )
+                    v-btn(icon)
+                        v-icon mdi-pencil
+                    v-toolbar-title(v-html="selectedEvent.name")
+                    v-spacer
+                    v-btn(icon)
+                        v-icon mdi-heart
+                    v-btn(icon)
+                        v-icon mdi-dots-vertical
+                v-card-text
+                    span(v-html="selectedEvent.details")
+                v-card-actions
+                    v-btn(
+                        text
+                        color="secondary"
+                        @click="selectedOpen = false"
+                    ) Cancel
 </template>
 
 <script lang="ts">
@@ -46,6 +81,9 @@ export default class dailyCalendar extends ScheduleBase {
 
     private focus: string = ''
     private events: { [key: string]: string | Date | boolean }[] = []
+    private selectedEvent: {} = {}
+    private selectedElement = null
+    private selectedOpen: boolean = false
     private colors: string[] = ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1']
     private student_workers: string[] = []
     private hours: { [key: string]: string[]} = {}
@@ -57,9 +95,43 @@ export default class dailyCalendar extends ScheduleBase {
     private day_times: { [key: string]: string[] } = {'mon': ['9:00', '10:00'], 'tue': ['0:00', '0:00'], 'wed': ['0:00', '0:00'],'thu': ['0:00', '0:00'], 'fri': ['0:00', '0:00']}
     private attendees = ['Bob', 'Susie']
     private weekdays = [1, 2, 3, 4, 5]
+    private responsiveWidth: number = 600
+
+    beforeDestroy() {
+		if (typeof window === 'undefined') {
+			return
+		} 
+
+      	window.removeEventListener('resize', this.onResize)
+	}
 
     mounted() {
         (this.$refs.calendar as Vue & {checkChange: () => void}).checkChange()
+
+        this.onResize()
+        
+        window.addEventListener('resize', this.onResize, { passive: true })
+
+        
+    }
+
+	onResize() {
+        switch (this.$vuetify.breakpoint.name) {
+            case 'xs':
+		  	this.responsiveWidth = 400
+            break
+          case 'sm': 
+		  	this.responsiveWidth = 600
+            break
+          case 'md': 
+		  	this.responsiveWidth = 900
+            break
+          case 'lg':
+            this.responsiveWidth = 950
+            break
+          case 'xl':
+		  	this.responsiveWidth = 1200
+        }
     }
 
     getEventColor(event: any) {
@@ -76,6 +148,28 @@ export default class dailyCalendar extends ScheduleBase {
     
     next() {
         (this.$refs.calendar as Vue & {next: () => void}).next()
+    }
+
+    showEvent({ nativeEvent, event }: any) {
+        const open = () => {
+          this.selectedEvent = event
+          this.selectedElement = nativeEvent.target
+          requestAnimationFrame(() => requestAnimationFrame(() => this.selectedOpen = true))
+        }
+        console.log("SELECTED EVENT: ", this.selectedEvent)
+        if (this.selectedOpen) {
+          this.selectedOpen = false
+          requestAnimationFrame(() => requestAnimationFrame(() => open()))
+        } else {
+          open()
+        }
+
+        nativeEvent.stopPropagation()
+    }
+
+    viewDay({ date }: any) {
+        this.focus = date
+        this.type = 'day'
     }
 
     dateRange({ start, end }: any) {
@@ -127,7 +221,8 @@ export default class dailyCalendar extends ScheduleBase {
                         weekday: weekday,
                         color: this.colors[this.rnd(0, this.colors.length - 1)],
                         timed: true,
-                        name: schedule.user.full_name
+                        name: schedule.user.full_name,
+                        details: `${shift_start} - ${shift_end}`
                     })
                     let next_date = new Date(start_date.setDate(start_date.getDate() + 1))
                     if (next_date.getDay() == 0) {
@@ -161,7 +256,8 @@ export default class dailyCalendar extends ScheduleBase {
                                 color: this.colors[this.rnd(0, this.colors.length - 1)],
                                 timed: true,
                                 category: meeting.attendees,
-                                name: meeting.meeting_type
+                                name: meeting.meeting_type,
+                                details: `${meeting.start} - ${meeting.end}`
                             })
                         }
                         let next_date = new Date(start_date.setDate(start_date.getDate() + 1))
