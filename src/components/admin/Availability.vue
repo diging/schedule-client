@@ -1,5 +1,5 @@
 <template lang="pug">
-div
+v-card(:width="responsiveWidth")
 	h3.mb-5 Availabilites
 	v-data-table(
 		v-model="selected"
@@ -43,30 +43,31 @@ div
 			v-divider
 			v-card-actions
 				v-spacer
-				v-btn(color="primary" text @click="approve()") Submit
+				v-btn(color="primary" class="secondary--text" text @click="approve()") Submit
 	template
-			v-card(flat)
-					v-container(class="px-0" fluid)
-						v-radio-group(color="primary" v-model='meetingDay')
-							v-radio(v-for="day in days" :key="day.title" :label="day.title" :value="day.title")
-							div(v-if="meetingDay")
-								v-col
-									timePicker(:day='meetingDay' :index='startTime1')
-									timePicker(:day='meetingDay' :index='endTime1')
-								v-col
-									v-container(fluid)
-										v-overflow-btn(
-											editable 
-											label="Please select the meeting type"
-											:items="meeting_types"
-											item-value="text"
-											v-model="meeting_type"
-										)
-						v-btn(color="primary" @click="setMeeting()" :disabled="disableBtn()") Submit
+		v-card(flat)
+				v-container(class="px-0" fluid)
+					v-radio-group(color="primary" v-model='meetingDay')
+						v-radio(v-for="day in days" :key="day.title" :label="day.title" :value="day.title")
+						div(v-if="meetingDay")
+							v-col
+								timePicker(:day='meetingDay' :index='startTime1')
+								timePicker(:day='meetingDay' :index='endTime1')
+							v-col
+								v-container(fluid)
+									v-overflow-btn(
+										editable 
+										label="Please select the meeting type"
+										:items="meeting_types"
+										item-value="text"
+										v-model="meeting_type"
+									)
+					v-btn(color="primary" class="secondary--text" @click="setMeeting()" :disabled="disableBtn()") Submit
 	template
 		v-row
 			v-col(class="pa-12")
-				v-range-slider(:tick-labels="tick_labels"
+				v-range-slider(
+					:tick-labels="$vuetify.breakpoint.name == 'xs' ? no_tick_labels : tick_labels"
 					v-model="range"
 					:value="[0,1]"
 					:min="min"
@@ -75,18 +76,18 @@ div
 					tick-size="4"
 				)
 					template(v-slot:prepend)
-						v-text-field(:value="window_times[range[0]]"
+						v-text-field(
+							:value="window_times[range[0]]"
 							class="mt-0 pt-0"
-							hide-details
 							single-line
 							type="string"
 							style="width: 60px"
 							@change="$set(range, 0, $event)"
 						)
 					template(v-slot:append)
-						v-text-field(:value="window_times[range[1]]"
+						v-text-field(
+							:value="window_times[range[1]]"
 							class="mt-0 pt-0"
-							hide-details
 							single-line
 							type="string"
 							style="width: 60px"
@@ -96,13 +97,13 @@ div
 					v-btn(color="primary" v-model="best_meeting_times" @click="getBestMeetingTime(window_times[range[0]], window_times[range[1]])") Get Team Meeting Times
 		div
 			h2(class="text-center") {{ days[index].title }}
-			v-simple-table(light)
+			v-simple-table
 				template
 					thead
 						tr(class="text-center")
 						tr
 							td(v-for="time in window_times" :key="time")
-								v-chip(:color="getColor(time)" dark large) {{ time }}
+								v-chip(:color="getColor(time)" dark large label) {{ time }}
 		div(class="text-center")
 			v-pagination(
 				v-model="page"
@@ -134,6 +135,7 @@ const axios = require('axios')
 
 export default class Availability extends ScheduleBase {
 
+	private responsiveWidth: number = 600
 	private selected: { [key: string]: string[]}[] = [] 
 	private singleExpand: boolean = false
 	private expanded: [] = []
@@ -170,6 +172,7 @@ export default class Availability extends ScheduleBase {
 		"", "11:00", "", "", "", "12:00", "",
 		"", "", "13:00", "", "", "", "14:00"
 	]
+	private no_tick_labels: string[] = []
 	private range: number[] = [0, 20]
 	private min: number = 0
 	private max: number = 20
@@ -244,6 +247,38 @@ export default class Availability extends ScheduleBase {
 		.then(function () {
 			// always executed
 		})
+	}
+	beforeDestroy() {
+		if (typeof window === 'undefined') {
+			return
+		} 
+
+      	window.removeEventListener('resize', this.onResize)
+	}
+
+	mounted() {
+		this.onResize()
+
+		window.addEventListener('resize', this.onResize, { passive: true })
+	}
+
+	onResize() {
+        switch (this.$vuetify.breakpoint.name) {
+          case 'xs':
+		  	this.responsiveWidth = 450
+			break
+          case 'sm':
+		  	this.responsiveWidth = 580
+			break
+          case 'md':
+		  	this.responsiveWidth = 850
+			break
+          case 'lg':
+		  	this.responsiveWidth = 950
+			break
+          case 'xl':
+		  	this.responsiveWidth = 1200
+        }
 	}
 
 	postSched() {

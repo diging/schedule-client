@@ -1,6 +1,13 @@
 <template lang="pug">
-v-card(width="256" clipped-left permanent)
-	v-navigation-drawer(app class="elevation-3")
+v-card(permanent)
+	v-app-bar(v-if="showAppBar" dark prominent :height="50" color="primary")
+		v-app-bar-nav-icon(@click.stop="drawer = !drawer" color="secondary")
+	v-navigation-drawer(
+		app
+		clipped
+		class="elevation-3"
+		v-model="drawer"
+	)
 		v-list-item
 			v-list-item-content
 				v-list-item-title(class="title") DigInG Scheduler
@@ -14,7 +21,7 @@ v-card(width="256" clipped-left permanent)
 
 		template(v-slot:append)
 			div(class="pa-5")
-				v-btn(color="#F2594B" block class="white--text text-center" medium v-if="" @click='signout()') Sign Out
+				v-btn(color="primary" class="white--text block text-center" medium @click='signout()') Sign Out
 
 </template>
 
@@ -32,6 +39,43 @@ export default class SideNav extends Vue {
 	private items: Array<SideNavItem> = [
 		{ title: '',icon: '', path: ''},
 	]
+	private drawer: boolean = false
+	private showAppBar: boolean = false
+
+	beforeDestroy() {
+		if (typeof window === 'undefined') {
+			return
+		} 
+
+      	window.removeEventListener('resize', this.onResize)
+	}
+
+	mounted() {
+		this.onResize()
+
+		window.addEventListener('resize', this.onResize, { passive: true })
+	}
+
+	onResize() {
+        switch (this.$vuetify.breakpoint.name) {
+          case 'xs':
+		  	this.showAppBar = true
+			break
+          case 'sm':
+		  	this.showAppBar = true
+			break
+          case 'md':
+		  	this.showAppBar = true
+			break
+          case 'lg':
+		  	this.showAppBar = false
+			this.drawer = true
+			break
+          case 'xl':
+		  	this.showAppBar = false
+			this.drawer = true
+        }
+    }
 
 	created() {
 		if(this.$store.getters.getUser.is_superuser) {
@@ -50,7 +94,23 @@ export default class SideNav extends Vue {
 			]
 		}
 	}
+
+	// showAppBar() {
+	// 	if(this.myEventHandler() == 'xs' || this.myEventHandler() == 'sm' || this.myEventHandler() == 'md') {
+	// 		return true
+	// 	} else {
+	// 		return false
+	// 	}
+	// }
 	
+	// showNavDrawer() {
+	// 	if(this.myEventHandler() == 'lg' || this.myEventHandler() == 'xl') {
+	// 		return true
+	// 	} else {
+	// 		return false
+	// 	}
+	// }
+
 	signout() {
 		localStorage.removeItem('token')
 		sessionStorage.clear()

@@ -1,9 +1,9 @@
 <template lang="pug">
-	v-app(d-flex flex-row color="primary")
-		v-main(d-flex flex-row)
-			SideNav.flex-column.justify-start(v-if="this.$route.path != '/' && this.$route.path != '/createAccount'")
-			v-container.flex-column(fill-height)
-				router-view
+v-app(d-flex flex-row color="primary")
+	v-main(d-flex flex-row)
+		SideNav.flex-column.justify-start(v-if="this.$route.path != '/' && this.$route.path != '/createAccount'")
+		v-container.flex-column(fill-height)
+			router-view
 </template>
 
 <script lang="ts">
