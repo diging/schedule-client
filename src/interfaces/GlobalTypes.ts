@@ -3,10 +3,10 @@ import Vue from 'vue';
 export type VForm = Vue & { validate: () => boolean; };
 
 export interface PaginatedResult<T> {
-	count: number;
-	next?: number;
-	previous?: number;
-	results: T[];
+	count: number
+	next?: number
+	previous?: number
+	results: T[]
 }
 
 export interface User {
@@ -19,18 +19,18 @@ export interface User {
 }
 
 export interface TokenDto {
-	token_type: string;
-	exp: number;
-	jti: string;
-	user_id: number;
-	github_token: boolean;
+	token_type: string
+	exp: number
+	jti: string
+	user_id: number
+	github_token: boolean
 }
 
 export interface time {
-    startTime1: string;
-    startTime2: string;
-    endTime1: string;
-    endTime2: string;
+    startTime1: string
+    startTime2: string
+    endTime1: string
+    endTime2: string
 }
 
 export interface RootState {
@@ -104,7 +104,7 @@ export interface SideNavItem {
 }
 
 export interface formattedAvailability {
-	[key: string]: string | undefined | number | User
+	[key: string]: string | undefined | number
 	created: string
 	mon: string
 	tue: string
@@ -130,11 +130,39 @@ export interface formattedSchedule {
 	id: number
 }
 
-export interface meetings{
+export interface meetings {
 	[key: string]: string | number
 	start: string
 	end: string
 	day: number
 	meeting_type: string
 	attendees: string
+}
+
+export interface ITimeoff {
+	id: number
+	user: User
+	start_date: string
+	end_date: string
+	start_time: string
+	end_time: string
+	all_day: boolean
+	request_type: string
+	reason: string
+	status: number
+	created: string
+}
+
+export interface IFormattedTimeoff {
+	id: number
+	user: User['first_name']
+	start_date: string
+	end_date: string
+	start_time: string
+	end_time: string
+	all_day: boolean
+	request_type: string
+	reason: string
+	status: string | undefined
+	created: string
 }

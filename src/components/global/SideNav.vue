@@ -89,27 +89,11 @@ export default class SideNav extends Vue {
 		} else {
 			this.items = [
 				{ title: 'My Schedule', icon: 'mdi-calendar-clock', path: '/userHome'},
-				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/workerRequests'},
+				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/leaveRequests'},
 				{ title: 'Submit Availability', icon: 'mdi-clock-time-five-outline', path: '/user/availability'},
 			]
 		}
 	}
-
-	// showAppBar() {
-	// 	if(this.myEventHandler() == 'xs' || this.myEventHandler() == 'sm' || this.myEventHandler() == 'md') {
-	// 		return true
-	// 	} else {
-	// 		return false
-	// 	}
-	// }
-	
-	// showNavDrawer() {
-	// 	if(this.myEventHandler() == 'lg' || this.myEventHandler() == 'xl') {
-	// 		return true
-	// 	} else {
-	// 		return false
-	// 	}
-	// }
 
 	signout() {
 		localStorage.removeItem('token')
