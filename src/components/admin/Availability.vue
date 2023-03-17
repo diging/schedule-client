@@ -248,6 +248,7 @@ export default class Availability extends ScheduleBase {
 			// always executed
 		})
 	}
+	
 	beforeDestroy() {
 		if (typeof window === 'undefined') {
 			return

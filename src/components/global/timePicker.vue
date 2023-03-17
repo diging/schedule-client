@@ -22,17 +22,17 @@ export default class timePicker extends Vue {
 	@Prop() day!: string
 	@Prop() index!: string
 	@Prop() start!: Boolean
-	private localDay: string = this.day
-	private localIndex: string = this.index
-	private localStart: Boolean = this.start
+	// private localDay: string = this.day
+	// private localIndex: string = this.index
+	// private localStart: Boolean = this.start
 
 	@Watch('time')
 	watchTime(value: string, oldValue: string) {
 		let data = {
-			'day': this.localDay,
-			'name': this.localIndex,
+			'day': this.day,
+			'name': this.index,
 			'time': this.time,
-			'start': this.localStart
+			'start': this.start
 		}
 		this.$store.commit('setTime', data)
 	}
