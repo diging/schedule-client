@@ -88,9 +88,9 @@ export default class SideNav extends Vue {
 			]
 		} else {
 			this.items = [
-				{ title: 'My Schedule', icon: 'mdi-calendar-clock', path: '/userHome'},
-				{ title: 'Leave Requests', icon: 'mdi-checkbox-multiple-marked', path: '/leaveRequests'},
-				{ title: 'Submit Availability', icon: 'mdi-clock-time-five-outline', path: '/user/availability'},
+				{ title: 'Calendar', icon: 'mdi-calendar-clock', path: '/userHome'},
+				{ title: 'Requests', icon: 'mdi-checkbox-multiple-marked', path: '/leaveRequests'},
+				{ title: 'Availability', icon: 'mdi-clock-time-five-outline', path: '/user/availability'},
 			]
 		}
 	}

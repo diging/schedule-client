@@ -14,6 +14,8 @@ export default Vue.extend({
         requestsTable,
     },
 })
+
+
 </script>
 
 <style scoped>

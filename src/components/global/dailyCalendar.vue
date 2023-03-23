@@ -23,7 +23,6 @@ v-card(:width="responsiveWidth")
             color="primary"
             :weekdays="weekdays"
             :categories="student_workers"
-            category-show-all
             :type="type"
             :events="events"
             :event-color="getEventColor"
@@ -69,8 +68,9 @@ v-card(:width="responsiveWidth")
 import Vue from 'vue'
 import '@mdi/font/css/materialdesignicons.css'
 import Component from 'vue-class-component'
-import {schedule, meetings} from '@/interfaces/GlobalTypes'
-import {ScheduleBase}  from '@/components/Bases/ScheduleBase'
+import {schedule, meetings, ITimeoff} from '@/interfaces/GlobalTypes'
+import {ScheduleBase} from '@/components/Bases/ScheduleBase'
+import moment from 'moment'
 
 @Component({
     name: 'dailyCalendar',
@@ -156,7 +156,6 @@ export default class dailyCalendar extends ScheduleBase {
           this.selectedElement = nativeEvent.target
           requestAnimationFrame(() => requestAnimationFrame(() => this.selectedOpen = true))
         }
-        console.log("SELECTED EVENT: ", this.selectedEvent)
         if (this.selectedOpen) {
           this.selectedOpen = false
           requestAnimationFrame(() => requestAnimationFrame(() => open()))
@@ -178,24 +177,28 @@ export default class dailyCalendar extends ScheduleBase {
 
     getWeekday(day: number) {
         let day_remainder = day % 5
-        if (day_remainder == 0) {
+        if (day_remainder === 0) {
             day_remainder = 5
         }
         return day_remainder
     }
 
     getMonthStart(start: string, weekday: number) {
+        //DS-40 MomentJS conversion starting point
         let start_date = new Date(`${start}T00:00:00`)
+        //let start_date1 = moment.utc(start)
+        //console.log("NATIVE: ", new Date(start_date.setUTCDate(start_date.getUTCDate() + 2)).toISOString().split('T')[0])
+        //console.log("MOMENT: ", start_date1.date(start_date1.date() + 2).format('YYYY-MM-DD'))
         if (weekday == 6) {
-            start = new Date(start_date.setDate(start_date.getDate() + 2)).toISOString().split('T')[0]
+            start = new Date(start_date.setUTCDate(start_date.getUTCDate() + 2)).toISOString().split('T')[0]
         }
         if (weekday == 0) {
-            start = new Date(start_date.setDate(start_date.getDate() + 1)).toISOString().split('T')[0]
+            start = new Date(start_date.setUTCDate(start_date.getUTCDate() + 1)).toISOString().split('T')[0]
         }
         return start
     }
 
-    fetchEvents(start: any, end: any, weekStart: number)  {
+    fetchEvents(start: string, end: string, weekStart: number)  {
         const events: any[] = []
         this.student_workers = []
         let start_month = weekStart
@@ -209,28 +212,32 @@ export default class dailyCalendar extends ScheduleBase {
                     this.student_workers.push(schedule.user.full_name)
                 }
                 this.workerHours(schedule, this.hours)
-                let current_day = start_date.getDate()
-                let last_day = end_date.getDate()
+                let current_day = start_date.getUTCDate()
+                let last_day = end_date.getUTCDate()
                 while (current_day <= last_day) {
                     let weekday = this.days[this.getWeekday(weekStart)]
                     let shift_start = this.hours[weekday][0]
                     let shift_end = this.hours[weekday][1]
-                    events.push({
-                        start: new Date(start.toString().concat('T', shift_start)),
-                        end: new Date(start.toString().concat('T', shift_end)),
-                        weekday: weekday,
-                        color: this.colors[this.rnd(0, this.colors.length - 1)],
-                        timed: true,
-                        name: schedule.user.full_name,
-                        details: `${shift_start} - ${shift_end}`
-                    })
-                    let next_date = new Date(start_date.setDate(start_date.getDate() + 1))
-                    if (next_date.getDay() == 0) {
-                        next_date = new Date(start_date.setDate(start_date.getDate() + 1))
+                    if(shift_start != '00:00:00') {
+                        events.push({
+                            start: new Date(start.concat('T', shift_start)),
+                            end: new Date(start.concat('T', shift_end)),
+                            weekday: weekday,
+                            color: this.colors[this.rnd(0, this.colors.length - 1)],
+                            timed: true,
+                            user: schedule.user.id,
+                            name: schedule.user.full_name,
+                            details: `${shift_start} - ${shift_end}`,
+                            day: current_day
+                        })
+                    }
+                    let next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 1))
+                    if (next_date.getUTCDay() === 0) {
+                        next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 1))
                         current_day++
                     }
-                    if (next_date.getDay() == 6) {
-                        next_date = new Date(start_date.setDate(start_date.getDate() + 2))
+                    if (next_date.getUTCDay() === 6) {
+                        next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 2))
                         current_day = current_day + 2
                     }
                     start = next_date.toISOString().split('T')[0]
@@ -245,14 +252,14 @@ export default class dailyCalendar extends ScheduleBase {
             this.$axios.get('/schedules/meetings/list/')
             .then(response => {
                 response.data.forEach((meeting: meetings) => {
-                    let current_day = start_date.getDate()
-                    let last_day = end_date.getDate()
+                    let current_day = start_date.getUTCDate()
+                    let last_day = end_date.getUTCDate()
                     while (current_day <= last_day) {
                         let weekday = this.getWeekday(weekStart)
                         if(weekday === meeting.day) {
                             events.push({
-                                start: new Date(start.toString().concat('T', meeting.start)),
-                                end: new Date(start.toString().concat('T', meeting.end)),
+                                start: new Date(start.concat('T', meeting.start)),
+                                end: new Date(start.concat('T', meeting.end)),
                                 color: this.colors[this.rnd(0, this.colors.length - 1)],
                                 timed: true,
                                 category: meeting.attendees,
@@ -260,13 +267,13 @@ export default class dailyCalendar extends ScheduleBase {
                                 details: `${meeting.start} - ${meeting.end}`
                             })
                         }
-                        let next_date = new Date(start_date.setDate(start_date.getDate() + 1))
-                        if (next_date.getDay() == 0) {
-                            next_date = new Date(start_date.setDate(start_date.getDate() + 1))
+                        let next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 1))
+                        if (next_date.getUTCDay() === 0) {
+                            next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 1))
                             current_day++
                         }
-                        if (next_date.getDay() == 6) {
-                            next_date = new Date(start_date.setDate(start_date.getDate() + 2))
+                        if (next_date.getUTCDay() === 6) {
+                            next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 2))
                             current_day = current_day + 2
                         }
                         start = next_date.toISOString().split('T')[0]
@@ -276,6 +283,46 @@ export default class dailyCalendar extends ScheduleBase {
                     start = initial_start
                     start_date = new Date(`${start}T00:00:00`)
                     weekStart = start_month
+                })
+                this.$axios.get('/timeoff/all/')
+                .then(response => {
+                    response.data.forEach((timeoff: ITimeoff) => {
+                        let allDay = false
+                        let end_date = new Date(timeoff.start_date.concat('T', timeoff.end_time))
+                        if(timeoff.status === 1) {
+                            let start_day = timeoff.start_date.split('-')[2]
+                            if(timeoff.all_day) {
+                                allDay = true
+                                if(timeoff.end_date != null) {
+                                end_date = new Date(timeoff.end_date.concat('T', timeoff.end_time))
+                                }
+                                events.push({
+                                    start: new Date(timeoff.start_date.concat('T', timeoff.start_time)),
+                                    end: end_date,
+                                    color: this.colors[this.rnd(0, this.colors.length - 1)],
+                                    timed: !allDay,
+                                    category: timeoff.user,
+                                    name: `${timeoff.user.first_name} Not Working`,
+                                    details: `${timeoff.request_type}`
+                                })
+                            } else {
+                                let start_timeoff = parseInt(timeoff.start_time.split(':')[0]) + (parseInt(timeoff.start_time.split(':')[1]) / 60)
+                                for(let event of events) {
+                                    if(event.day == start_day && event.user == timeoff.user.id) {
+                                        let start_sched = parseInt(event.start.getHours()) + (parseInt(event.start.getMinutes()) / 60)
+                                        let diff: number = start_timeoff - start_sched
+                                        if(diff == 0) {
+                                            event.start = new Date(timeoff.start_date.concat('T', timeoff.end_time))
+                                            event.name = `${timeoff.user.first_name} Working ${moment(timeoff.end_time, 'HH:mm:ss').format('HH:mm A')} - ${moment(event.end).format('hh:mm A')}`
+                                        } else {
+                                            event.end = new Date(timeoff.start_date.concat('T', timeoff.start_time))
+                                            event.name = `${timeoff.user.first_name} Working ${moment(event.start).format('hh:mm A')} - ${moment(timeoff.start_time, 'HH:mm:ss').format('hh:mm A')}`
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    })
                 })
             })
         })
