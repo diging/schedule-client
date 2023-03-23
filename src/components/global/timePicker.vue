@@ -22,9 +22,6 @@ export default class timePicker extends Vue {
 	@Prop() day!: string
 	@Prop() index!: string
 	@Prop() start!: Boolean
-	// private localDay: string = this.day
-	// private localIndex: string = this.index
-	// private localStart: Boolean = this.start
 
 	@Watch('time')
 	watchTime(value: string, oldValue: string) {

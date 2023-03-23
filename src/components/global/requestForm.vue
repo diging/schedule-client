@@ -29,18 +29,18 @@ v-dialog(v-model="dialog" max-width="500px")
                                 v-spacer
                                 v-btn(text color="grey" @click="menuTo = false") Cancel
                                 v-btn(text color="#F2594B" @click="$refs.menuTo.save(dateTo)") OK
-                    v-col(cols="6" v-show="type=='Time Off' && allDay!=true && dateTo==''")
+                    v-col(cols="6" v-show="allDay!=true && dateTo==''")
                         timePicker(:day='dayFrom' :index='startTime1')
-                    v-col(cols="6" v-show="type=='Time Off' && allDay!=true && dateTo==''")
+                    v-col(cols="6" v-show="allDay!=true && dateTo==''")
                         timePicker(:day='dayFrom' :index='endTime1')
-                    v-col(cols="6" v-show="type=='Time Off'")
+                    v-col(cols="6" v-show="dateTo==''")
                         v-checkbox(v-model="allDay" label="All Day" color="#F2594B")
                     v-col(cols="12")
                         v-textarea(outlined name="request description" label="Description" v-model="reason")
         v-card-actions
             v-spacer
             v-btn(color="grey" text @click="dialog = false") Cancel
-            v-btn(color="#F2594B" medium class="white--text" @click="dialog = false; submit()") Submit
+            v-btn(color="#F2594B" medium class="white--text" :disabled="disableBtn()" @click="dialog = false; submit()") Submit
 
 </template>
 
@@ -48,16 +48,19 @@ v-dialog(v-model="dialog" max-width="500px")
 import '@mdi/font/css/materialdesignicons.css'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import timePicker from '@/components/global/timePicker.vue'
+import {ScheduleBase} from '@/components/Bases/ScheduleBase'
+import {schedule} from '@/interfaces/GlobalTypes'
 import store from '@/store'
 
 @Component({
     name: 'requestForm',
     components: {
         timePicker,
-    }
+    },
+    extends: ScheduleBase
 })
 
-export default class requestForm extends Vue {
+export default class requestForm extends ScheduleBase {
     private menu1: string = ''
     private dateFrom: string = ''
     private menu2: string = ''
@@ -69,34 +72,55 @@ export default class requestForm extends Vue {
 	private endTime1: string = "endTime1"
     private reason: string = ''
     private dayFrom: string = ''
+    private hours: { [key: string]: string[]} = {}
+    private schedule_days: string[] = ['mon_start_1', 'tue_start_1', 'wed_start_1', 'thu_start_1', 'fri_start_1']
+    private dayOfWeek: number = 0
+    private startTime: string = '00:00:00'
+    private endTime: string = '00:00:00'
 
 	submit() {
-        console.log("TYPE: ", this.type)
-        console.log("FROM DATE: ", this.dateFrom)
-        console.log("NEW FROM DATE: ", new Date(`${this.dateFrom}T00:00:00`))
-        console.log("TO DATE: ", this.dateTo)
-        console.log("LEAVE TYPE: ", this.type)
-        console.log("ALL DAY: ", this.allDay)
-        this.$axios.post('/timeoff/create/', {
-            'start_date': this.dateFrom,
-            'end_date': this.dateTo,
-            'start_time': store.getters.timeValues[this.dayFrom].startTime1,
-            'end_time': store.getters.timeValues[this.dayFrom].endTime1,
-            'all_day': this.allDay,
-            'request_type': this.type,
-            'reason': this.reason,
-		})
+        if(this.dateTo != '') {
+            this.allDay = true
+        }
+        if(!this.allDay) {
+            this.startTime = store.getters.timeValues[this.dayFrom].startTime1
+            this.endTime = store.getters.timeValues[this.dayFrom].endTime1
+        }
+        this.$axios.get('/schedules/user/')
 		.then((response: any) => {
+            let schedule: schedule = response.data[0]
+            if(schedule[this.schedule_days[this.dayOfWeek-1]] != "00:00:00") {
+                this.$axios.post('/timeoff/create/', {
+                    'start_date': this.dateFrom,
+                    'end_date': this.dateTo,
+                    'start_time': this.startTime,
+                    'end_time': this.endTime,
+                    'all_day': this.allDay,
+                    'request_type': this.type,
+                    'reason': this.reason
+                })
+                .then((response: any) => {
+                })
+                .catch(function (error: any) {
+                    console.log(error)
+                })
+            } else {
+                alert("Your 'From' date does not occur on a day that you are working, please select a different day")
+            }
         })
 		.catch(function (error: any) {
-			console.log(error);
+			console.log(error)
 		})
 	}
 
     getDayOfWeek(date: string) {
-        const dayOfWeek = new Date(date).getDay()
-        this.dayFrom = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek]
+        this.dayOfWeek = new Date(date).getUTCDay()
+        this.dayFrom = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][this.dayOfWeek]
     }
+
+    disableBtn() {
+		return this.type == '' || this.dayFrom == ''
+	}
 }
 </script>
 

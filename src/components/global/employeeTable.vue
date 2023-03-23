@@ -1,8 +1,8 @@
 <template lang="pug">
-    div
-        v-data-table(:headers="employee" :items-per-page="5" show-select class="elevation-1" :single-select="singleSelect1")
-            template(v-slot:top)
-                v-switch(v-model="singleSelect1" label="Single select" class="pa-3")
+div
+    v-data-table(:headers="employee" :items-per-page="5" show-select class="elevation-1" :single-select="singleSelect1")
+        template(v-slot:top)
+            v-switch(v-model="singleSelect1" label="Single select" class="pa-3")
 </template>
 
 <script lang="ts">
