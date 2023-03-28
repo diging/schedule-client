@@ -11,8 +11,8 @@ import router from '@/router';
 import Vue from 'vue';
 import Vuetify from 'vuetify/lib'
 import '@mdi/font/css/materialdesignicons.css'
-import SideNav from './components/global/SideNav.vue';
-import Signin from './components/auth/Signin.vue';
+import SideNav from './components/global/SideNav.vue'
+import Signin from './components/auth/Signin.vue'
 
 Vue.use(Vuetify)
 

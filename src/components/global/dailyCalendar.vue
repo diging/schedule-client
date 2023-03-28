@@ -84,7 +84,11 @@ export default class dailyCalendar extends ScheduleBase {
     private selectedEvent: {} = {}
     private selectedElement = null
     private selectedOpen: boolean = false
-    private colors: string[] = ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1']
+    private colors: { [key: string]: string } = {
+        'Doug': 'blue-grey darken-3', 'Susie': 'blue darken-4',
+        'Bob': 'green darken-3', 'Standup': 'red darken-4',
+        'Bi-weekly': 'cyan darken-1', 'Orientation': 'orange darken-3'
+    }
     private student_workers: string[] = []
     private hours: { [key: string]: string[]} = {}
     private mock_hours: { [key: string]: string[] } = {'mon': ['09:00', '10:00'], 'tue': ['12:00', '13:00'], 'wed': ['08:00', '14:00'],
@@ -223,7 +227,7 @@ export default class dailyCalendar extends ScheduleBase {
                             start: new Date(start.concat('T', shift_start)),
                             end: new Date(start.concat('T', shift_end)),
                             weekday: weekday,
-                            color: this.colors[this.rnd(0, this.colors.length - 1)],
+                            color: this.colors[schedule.user.first_name],
                             timed: true,
                             user: schedule.user.id,
                             name: schedule.user.full_name,
@@ -260,7 +264,7 @@ export default class dailyCalendar extends ScheduleBase {
                             events.push({
                                 start: new Date(start.concat('T', meeting.start)),
                                 end: new Date(start.concat('T', meeting.end)),
-                                color: this.colors[this.rnd(0, this.colors.length - 1)],
+                                color: this.colors[meeting.meeting_type],
                                 timed: true,
                                 category: meeting.attendees,
                                 name: meeting.meeting_type,
@@ -299,7 +303,7 @@ export default class dailyCalendar extends ScheduleBase {
                                 events.push({
                                     start: new Date(timeoff.start_date.concat('T', timeoff.start_time)),
                                     end: end_date,
-                                    color: this.colors[this.rnd(0, this.colors.length - 1)],
+                                    color: this.colors[timeoff.user.first_name],
                                     timed: !allDay,
                                     category: timeoff.user,
                                     name: `${timeoff.user.first_name} Not Working`,
