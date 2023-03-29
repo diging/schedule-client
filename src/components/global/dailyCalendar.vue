@@ -18,7 +18,8 @@ v-card(:width="responsiveWidth")
                 v-icon(small) mdi-chevron-right
             v-toolbar-title(v-if="$refs.calendar") {{ $refs.calendar.title }}
     v-sheet
-        v-calendar(ref="calendar"
+        v-calendar(
+            ref="calendar"
             v-model="focus"
             color="primary"
             :weekdays="weekdays"
@@ -55,7 +56,7 @@ v-card(:width="responsiveWidth")
                     v-btn(icon)
                         v-icon mdi-dots-vertical
                 v-card-text
-                    span(v-html="selectedEvent.details")
+                    span(v-html="selectedEvent.timeRange")
                 v-card-actions
                     v-btn(
                         text
@@ -87,7 +88,8 @@ export default class dailyCalendar extends ScheduleBase {
     private colors: { [key: string]: string } = {
         'Doug': 'blue-grey darken-3', 'Susie': 'blue darken-4',
         'Bob': 'green darken-3', 'Standup': 'red darken-4',
-        'Bi-weekly': 'cyan darken-1', 'Orientation': 'orange darken-3'
+        'Bi-weekly': 'cyan darken-1', 'Orientation': 'orange darken-3',
+        'Other': 'green accent-3', 'Other Recurring': 'yellow accent-2'
     }
     private student_workers: string[] = []
     private hours: { [key: string]: string[]} = {}
@@ -115,8 +117,6 @@ export default class dailyCalendar extends ScheduleBase {
         this.onResize()
         
         window.addEventListener('resize', this.onResize, { passive: true })
-
-        
     }
 
 	onResize() {
@@ -231,7 +231,7 @@ export default class dailyCalendar extends ScheduleBase {
                             timed: true,
                             user: schedule.user.id,
                             name: schedule.user.full_name,
-                            details: `${shift_start} - ${shift_end}`,
+                            timeRange: `${shift_start} - ${shift_end}`,
                             day: current_day
                         })
                     }
@@ -256,33 +256,45 @@ export default class dailyCalendar extends ScheduleBase {
             this.$axios.get('/schedules/meetings/list/')
             .then(response => {
                 response.data.forEach((meeting: meetings) => {
-                    let current_day = start_date.getUTCDate()
-                    let last_day = end_date.getUTCDate()
-                    while (current_day <= last_day) {
-                        let weekday = this.getWeekday(weekStart)
-                        if(weekday === meeting.day) {
-                            events.push({
-                                start: new Date(start.concat('T', meeting.start)),
-                                end: new Date(start.concat('T', meeting.end)),
-                                color: this.colors[meeting.meeting_type],
-                                timed: true,
-                                category: meeting.attendees,
-                                name: meeting.meeting_type,
-                                details: `${meeting.start} - ${meeting.end}`
-                            })
-                        }
-                        let next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 1))
-                        if (next_date.getUTCDay() === 0) {
-                            next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 1))
+                    if(meeting.meeting_type == "Standup" || meeting.meeting_type == "Bi-weekly") {
+                        let current_day = start_date.getUTCDate()
+                        let last_day = end_date.getUTCDate()
+                        while (current_day <= last_day) {
+                            let weekday = this.getWeekday(weekStart).toString()
+                            if(meeting.days.includes(weekday)) {
+                                events.push({
+                                    start: new Date(start.concat('T', meeting.start)),
+                                    end: new Date(start.concat('T', meeting.end)),
+                                    color: this.colors[meeting.meeting_type],
+                                    timed: true,
+                                    category: meeting.attendees,
+                                    name: meeting.meeting_type,
+                                    timeRange: `${meeting.start} - ${meeting.end}`
+                                })
+                            }
+                            let next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 1))
+                            if (next_date.getUTCDay() === 0) {
+                                next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 1))
+                                current_day++
+                            }
+                            if (next_date.getUTCDay() === 6) {
+                                next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 2))
+                                current_day = current_day + 2
+                            }
+                            start = next_date.toISOString().split('T')[0]
+                            weekStart++
                             current_day++
                         }
-                        if (next_date.getUTCDay() === 6) {
-                            next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 2))
-                            current_day = current_day + 2
-                        }
-                        start = next_date.toISOString().split('T')[0]
-                        weekStart++
-                        current_day++
+                    } else {
+                        events.push({
+                            start: new Date(meeting.date.concat('T', meeting.start)),
+                            end: new Date(meeting.date.concat('T', meeting.end)),
+                            color: this.colors[meeting.meeting_type],
+                            timed: true,
+                            category: meeting.attendees,
+                            name: meeting.meeting_type,
+                            timeRange: `${meeting.start} - ${meeting.end}`
+                        })
                     }
                     start = initial_start
                     start_date = new Date(`${start}T00:00:00`)
@@ -307,7 +319,7 @@ export default class dailyCalendar extends ScheduleBase {
                                     timed: !allDay,
                                     category: timeoff.user,
                                     name: `${timeoff.user.first_name} Not Working`,
-                                    details: `${timeoff.request_type}`
+                                    timeRange: `${timeoff.request_type}`
                                 })
                             } else {
                                 let start_timeoff = parseInt(timeoff.start_time.split(':')[0]) + (parseInt(timeoff.start_time.split(':')[1]) / 60)
@@ -332,11 +344,6 @@ export default class dailyCalendar extends ScheduleBase {
         })
         return events
     }
-
-    rnd(a: number, b: number) {
-        return Math.floor((b - a + 1) * Math.random()) + a
-    }
-
 }
 </script>
 

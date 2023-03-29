@@ -54,20 +54,18 @@ v-card(:width="responsiveWidth")
 					v-model="meetingType"
 				)
 			v-radio-group(v-if="meetingType == 'Bi-weekly'" color="primary" v-model="meetingDay")
-				v-radio(v-for="day in days" :key="day.title" :label="day.title" :value="day.title" class="ml-7")
+				v-radio(v-show="meetingType == 'Bi-weekly'" v-for="day in days" :key="day.title" :label="day.title" :value="day.title" class="ml-7")
 				v-col(cols='3' class="ml-4")
 					timePicker(:day='meetingDay' :index='startTime1')
 					timePicker(:day='meetingDay' :index='endTime1')
-			v-row(v-if="meetingType == 'Orientation' || meetingType == 'Standup'")
-				v-col(v-show="meetingType == 'Orientation'" cols='2' class="ml-4")
+			v-row(v-if="meetingType != 'Bi-weekly'")
+				v-col(v-show="meetingType == 'Other Recurring'" cols='2' class="ml-4")
 					v-checkbox(v-for="day in days" v-model="meetingDays" :key="day.title" :label="day.title" :value="day.title")
-				v-col(v-show="meetingType == 'Orientation'" cols='3')
-					v-date-picker(v-model="dates" multiple elevation="5")
-				v-col(cols='3')
-					v-time-picker(v-model="time1" :allowed-minutes="allowedStep" elevation="5")
-				v-col(cols='3')
-					v-time-picker(v-model="time2" :allowed-minutes="allowedStep" elevation="5")
-			v-btn(color="primary" class="secondary--text ml-4" @click="setMeeting()" :disabled="disableBtn()") Submit
+				v-col(v-if="meetingType != ''")   
+					datePicker(v-show="meetingType == 'Other' || meetingType == 'Orientation'" multiple elevation="5" class="ml-4")                                                                                                                 
+					v-time-picker(v-model="time1" :allowed-minutes="allowedStep" elevation="5" class="ml-4")
+					v-time-picker(v-model="time2" :allowed-minutes="allowedStep" elevation="5" class="ml-4")
+			v-btn(color="primary" class="ml-4" @click="setMeeting()" :disabled="disableBtn()") Submit
 	template
 		v-row
 			v-col(class="pa-12")
@@ -124,6 +122,7 @@ import '@mdi/font/css/materialdesignicons.css'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import Vuex from 'vuex'
 import timePicker from '@/components/global/timePicker.vue'
+import datePicker from '@/components/global/datePicker.vue'
 import store from '@/store'
 import {formattedAvailability, availability} from '@/interfaces/GlobalTypes'
 import {ScheduleBase}  from '@/components/Bases/ScheduleBase'
@@ -134,6 +133,7 @@ const axios = require('axios')
 	name: 'Availability',
 	components: {
 		timePicker,
+		datePicker
 	},
 	extends: ScheduleBase
 })
@@ -162,6 +162,7 @@ export default class Availability extends ScheduleBase {
 	private selectedItem: number = 1
 	private day: string = ""
 	private days: {}[] = [{title: 'Monday'}, {title: 'Tuesday'}, {title: 'Wednesday'}, {title: 'Thursday'}, {title: 'Friday'}]
+	private dayIndices: string[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 	private pickedDay: boolean = false
 	private picker = null
 	private day_time_strings: string[] = []
@@ -189,7 +190,7 @@ export default class Availability extends ScheduleBase {
 	private time1: string = ""
 	private time2: string = ""
 	private attendees: string[] = ['Bob', 'Doug', 'Susie']
-	private meetingTypes: { [key: string]: any }[] = [{text: 'Bi-weekly'}, {text: 'Standup'}, {text: 'Orientation'}]
+	private meetingTypes: { [key: string]: any }[] = [{text: 'Bi-weekly'}, {text: 'Standup'}, {text: 'Orientation'}, {text: 'Other'}, {text: 'Other Recurring'}]
 	private meetingType: string = ""
 	private disabled: boolean = true
 	private best_times: string[][] = [
@@ -329,7 +330,7 @@ export default class Availability extends ScheduleBase {
 	}
 
 	disableBtn() {
-		return this.selected.length == 0 || !this.meetingDay || !this.meetingType
+		return this.selected.length == 0 || !this.meetingType 
 	}
 
 	setMeeting() {
@@ -338,25 +339,28 @@ export default class Availability extends ScheduleBase {
 			attendees.push(avail.name)
 		}
 
-		let days = null
+		let days = []
 		let startTime = this.time1
 		let endTime = this.time2
+		let date = store.getters.dateValue.date
 		if(this.meetingType == 'Standup') {
 			days = [1, 2, 3, 4, 5]
+			date = "2000-01-01"
 		} else if(this.meetingType == 'Bi-weekly') {
-			days = [this.meetingDay]
+			days.push(this.dayIndices.indexOf(this.meetingDay))
 			startTime = store.getters.getDaySched(this.meetingDay)['startTime1']
 			endTime = store.getters.getDaySched(this.meetingDay)['endTime1']
-		} else {
-			days = this.meetingDays
+			date = "2000-01-01"
+		} else if (this.meetingType == 'Other Recurring') {
+			for(let day in this.meetingDays) {
+				days.push(this.dayIndices.indexOf(day))
+			}
 		}
-		console.log("DAYS: ", days)
-		console.log("START TIME: ", startTime)
-		console.log("END TIME	: ", endTime)
 		this.$axios.post('/schedules/meeting/create/', {
 			'start': startTime,
 			'end': endTime,
-			'day': days,
+			'days': days,
+			'date': date,
 			'meeting_type': this.meetingType,
 			'attendees': attendees
 		})

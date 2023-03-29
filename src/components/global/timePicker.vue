@@ -11,12 +11,12 @@ v-menu(
 )
 	template(v-slot:activator="{ on, attrs }")
 		v-text-field(
-			dense 
-			v-model="time" 
-			label="" 
+			dense
+			v-model="time"
+			label=""
 			prepend-icon="mdi-clock-time-four-outline"
-			readonly 
-			v-bind="attrs" 
+			readonly
+			v-bind="attrs"
 			v-on="on"
 		)
 	v-time-picker(
