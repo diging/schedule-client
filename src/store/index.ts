@@ -14,6 +14,7 @@ const initialState: RootState = {
     Thursday: { startTime1: '00:00', endTime1: '00:00', startTime2: '00:00', endTime2: '00:00'},
     Friday: { startTime1: '00:00', endTime1: '00:00', startTime2: '00:00', endTime2: '00:00'}
   },
+  date: {},
   user: {}
 }
 
@@ -21,6 +22,9 @@ const mutations: MutationTree<RootState> = {
 	setTime(state: RootState, timePickerValue: timePickerType) {
 		state.schedule[timePickerValue['day']][timePickerValue['name'] as 'startTime1' | 'startTime2' | 'endTime1' | 'endTime2'] = timePickerValue['time']
 	},
+  setDate(state: RootState, date) {
+    state.date = date
+  },
 	setUser(state: RootState, user) {
 		state.user = user
 	}
@@ -35,6 +39,9 @@ export default new Vuex.Store({
   getters: {
     timeValues: state => {
       return state.schedule
+    },
+    dateValue: state => {
+      return state.date
     },
     getUser: state => {
       return state.user

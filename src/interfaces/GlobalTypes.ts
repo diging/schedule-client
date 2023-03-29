@@ -37,6 +37,9 @@ export interface RootState {
 	schedule: {
         [key: string] : time
     },
+	date: {
+		[key: string] : string
+	},
 	user: {
 		[key: string] : string
 	}
@@ -131,10 +134,11 @@ export interface formattedSchedule {
 }
 
 export interface meetings {
-	[key: string]: string | number
+	[key: string]: string | string[]
 	start: string
 	end: string
-	day: number
+	days: string[]
+	date: string
 	meeting_type: string
 	attendees: string
 }

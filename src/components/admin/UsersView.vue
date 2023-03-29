@@ -65,7 +65,6 @@ export default class UserView extends Vue {
         });
         this.filteredUsers = this.users;
         this.loading = false;
-        console.log(this.loading);
       })
       .catch((error: any) => {
         console.log(error);
