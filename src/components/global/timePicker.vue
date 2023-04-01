@@ -1,12 +1,12 @@
 <template lang="pug">
 v-menu(
 	ref="menu"
-	v-model="menu2" 
-	:close-on-content-click="false" 
-	:nudge-right="40" 
+	v-model="menu2"
+	:close-on-content-click="false"
+	:nudge-right="40"
 	:return-value.sync="time"
-	transition="scale-transition" 
-	offset-y max-width="290px" 
+	transition="scale-transition"
+	offset-y max-width="290px"
 	min-width="290px"
 )
 	template(v-slot:activator="{ on, attrs }")
@@ -20,11 +20,11 @@ v-menu(
 			v-on="on"
 		)
 	v-time-picker(
-		v-if="menu2" 
-		v-model="time" 
-		full-width 
-		@click:minute="$refs.menu.save(time)" 
-		format="ampm" 
+		v-if="menu2"
+		v-model="time"
+		full-width
+		@click:minute="$refs.menu.save(time)"
+		format="ampm"
 		:allowed-minutes="allowedStep"
 	)
 </template>
@@ -43,7 +43,6 @@ export default class timePicker extends Vue {
 	private time: string = ''
 	@Prop() day!: string
 	@Prop() index!: string
-	@Prop() start!: Boolean
 
 	@Watch('time')
 	watchTime(value: string, oldValue: string) {
@@ -51,7 +50,6 @@ export default class timePicker extends Vue {
 			'day': this.day,
 			'name': this.index,
 			'time': this.time,
-			'start': this.start
 		}
 		this.$store.commit('setTime', data)
 	}

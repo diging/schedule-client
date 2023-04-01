@@ -35,7 +35,7 @@ div
                 v-switch(v-model="singleSelect2" label="Single select" class="pa-3")
             template(v-slot:item.actions="{ item }")
                 v-icon(@click="triggerDialog(item.id, 1)" color="green") mdi-check
-                v-icon(@click="setStatus(2)" color="red") mdi-cancel
+                v-icon(@click="denyTimeoff(item.id, 2)" color="red") mdi-cancel
                 v-menu(offset-y)
         v-dialog(v-model="dialog" width="500")
             v-card
@@ -46,6 +46,7 @@ div
                 v-card-actions
                     v-spacer
                     v-btn(color="primary" class="secondary--text" text @click="approveTimeoff()") Submit
+        timeoffEmailForm(v-if="sendEmail" hidden :toName="requesterName" :fromName="currentUser" :email="requesterEmail" :message="message")
 </template>
 <script lang="ts">
 import Vue from 'vue'
@@ -53,9 +54,13 @@ import Component from 'vue-class-component'
 import {ITimeoff, IFormattedTimeoff} from '@/interfaces/GlobalTypes'
 import moment from 'moment'
 import { ScheduleBase } from '../Bases/ScheduleBase'
+import timeoffEmailForm from '@/components/global/timeoffEmailForm.vue'
 
 @Component({
     name: 'requestsTable',
+    components: {
+        timeoffEmailForm
+    },
     extends: ScheduleBase
 })
 
@@ -73,6 +78,10 @@ export default class requestsTable extends ScheduleBase {
     private reason: string = ""
     private isAdmin: boolean = this.$store.getters.getUser.is_superuser
     private currentUser: string = this.$store.getters.getUser.first_name
+    private requesterName: string = ""
+    private sendEmail: boolean = false
+    private requesterEmail: string = ""
+    private message: string = ""
     private user: {[key: string]: string}[] = [
             { text: 'Request type', value: 'request_type' },
             { text: 'From', value: 'start_date' },
@@ -137,6 +146,7 @@ export default class requestsTable extends ScheduleBase {
                             'status': this.parseStatus(timeoff.status),
                             'created': moment(timeoff.created).format('MM-DD-YYYY')
                         }
+                        this.requesterEmail = timeoff.user.email
                         this.timeoffRequests.push(formattedTimeoff)
                     })
                     this.loading = false
@@ -160,6 +170,9 @@ export default class requestsTable extends ScheduleBase {
 		.then((response: any) => {
 			var removeIndex = this.timeoffRequests.map(item => item.id).indexOf(this.id)
 			this.timeoffRequests[removeIndex]['status'] = this.parseStatus(this.status)
+            this.requesterName = this.timeoffRequests[removeIndex]['user']
+            this.message = this.writeEmailMessage(this.timeoffRequests[removeIndex])
+            this.sendEmail = true
 			this.status = 0
 			this.reason = ''
 			this.id = 0
@@ -169,14 +182,27 @@ export default class requestsTable extends ScheduleBase {
 		})
     }
 
+    writeEmailMessage(timeoffObj: IFormattedTimeoff) {
+        let endDate = ""
+        if(timeoffObj.end_date != null) {
+            endDate = ` to ${timeoffObj.end_date}`
+        }
+        let newMessage = `Your ${timeoffObj.request_type} request for ${timeoffObj.start_date}${endDate} has been ${timeoffObj.status}`
+        return newMessage
+    }
+
     triggerDialog(id: number, status: number) {
 		this.dialog = true
 		this.id = id
 		this.status = status
 	}
 
-    setStatus(status: number) {
-		this.status = status
+    denyTimeoff(id: number, status: number) {
+        var removeIndex = this.timeoffRequests.map(item => item.id).indexOf(id)
+        this.timeoffRequests[removeIndex]['status'] = this.parseStatus(status)
+        this.requesterName = this.timeoffRequests[removeIndex]['user']
+        this.message = this.writeEmailMessage(this.timeoffRequests[removeIndex])
+        this.sendEmail = true
 	}
 }
 </script>
