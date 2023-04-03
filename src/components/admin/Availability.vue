@@ -33,7 +33,7 @@ v-card(:width="responsiveWidth")
 									v-icon mdi-plus-circle-outline
 		template(v-slot:item.actions="{ item }")
 			v-icon(@click="triggerDialog(item.id, 1)" color="green") mdi-check
-			v-icon(@click="setStatus(2)" color="red") mdi-cancel
+			v-icon(@click="setStatus(item.id, 2)" color="red") mdi-cancel
 			v-menu(offset-y)
 	v-dialog(v-model="dialog" width="500")
 		v-card
@@ -114,7 +114,7 @@ v-card(:width="responsiveWidth")
 				@next="next"
 				@previous="prev"
 			)
-
+	timeoffEmailForm(v-if="sendEmail" hidden :toName="requesterName" :fromName="currentUser" :email="requesterEmails[requesterName]" :message="message")
 </template>
 
 <script lang="ts">
@@ -126,6 +126,7 @@ import datePicker from '@/components/global/datePicker.vue'
 import store from '@/store'
 import {formattedAvailability, availability} from '@/interfaces/GlobalTypes'
 import {ScheduleBase}  from '@/components/Bases/ScheduleBase'
+import timeoffEmailForm from '@/components/global/timeoffEmailForm.vue'
 
 const axios = require('axios')
 
@@ -133,7 +134,8 @@ const axios = require('axios')
 	name: 'Availability',
 	components: {
 		timePicker,
-		datePicker
+		datePicker,
+		timeoffEmailForm
 	},
 	extends: ScheduleBase
 })
@@ -154,6 +156,11 @@ export default class Availability extends ScheduleBase {
 	private reason: string = ""
 	private status: number = 0
 	private id: number = 0
+	private currentUser: string = this.$store.getters.getUser.first_name
+    private requesterName: string = ""
+    private sendEmail: boolean = false
+    private requesterEmails: {[key: string]: string} = {}
+    private message: string = ""
 	private name: string = ""
 	private dialog: boolean = false
 	private availabilities: formattedAvailability[] = []
@@ -246,6 +253,7 @@ export default class Availability extends ScheduleBase {
 		this.$axios.get('schedules/availability/list')
 		.then(response => {
 			response.data.forEach((avail: availability) => {
+				this.requesterEmails[avail.user.first_name] = avail.user.email
 				this.formatAvailabilityTime(avail, this.availabilities)
 			})
 			this.loading = false
@@ -320,6 +328,9 @@ export default class Availability extends ScheduleBase {
 		.then((response: any) => {
 			var removeIndex = this.availabilities.map(item => item.id).indexOf(this.id)
 			this.availabilities[removeIndex]['status'] = this.parseStatus(this.status)
+			this.requesterName = this.availabilities[removeIndex]['name']
+            this.message = this.writeEmailMessage(this.availabilities[removeIndex])
+            this.sendEmail = true
 			this.status = 0
 			this.reason = ''
 			this.id = 0
@@ -327,6 +338,18 @@ export default class Availability extends ScheduleBase {
 		.catch((error) => {
 			console.log(error)
 		})
+	}
+
+	writeEmailMessage(availObj: formattedAvailability) {
+        return `Your schedule has been ${availObj.status}. Please see the 'Schedules' tab or visit the calendar to check schedule.`
+    }
+
+	denyTimeoff(id: number, status: number) {
+        var removeIndex = this.availabilities.map(item => item.id).indexOf(id)
+        this.availabilities[removeIndex]['status'] = this.parseStatus(status)
+        this.requesterName = this.availabilities[removeIndex]['name']
+        this.message = this.writeEmailMessage(this.availabilities[removeIndex])
+        this.sendEmail = true
 	}
 
 	disableBtn() {
