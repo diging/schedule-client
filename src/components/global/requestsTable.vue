@@ -46,7 +46,7 @@ div
                 v-card-actions
                     v-spacer
                     v-btn(color="primary" class="secondary--text" text @click="approveTimeoff()") Submit
-        timeoffEmailForm(v-if="sendEmail" hidden :toName="requesterName" :fromName="currentUser" :email="requesterEmail" :message="message")
+        timeoffEmailForm(v-if="sendEmail" hidden :toName="requesterName" :fromName="currentUser" :email="requesterEmails[requesterName]" :message="message")
 </template>
 <script lang="ts">
 import Vue from 'vue'
@@ -80,7 +80,7 @@ export default class requestsTable extends ScheduleBase {
     private currentUser: string = this.$store.getters.getUser.first_name
     private requesterName: string = ""
     private sendEmail: boolean = false
-    private requesterEmail: string = ""
+    private requesterEmails: {[key: string]: string} = {}
     private message: string = ""
     private user: {[key: string]: string}[] = [
             { text: 'Request type', value: 'request_type' },
@@ -110,7 +110,7 @@ export default class requestsTable extends ScheduleBase {
         ]
 
     created() {
-        let formattedTimeoff: IFormattedTimeoff;
+        let formattedTimeoff: IFormattedTimeoff
         this.$axios.get('/timeoff/user/')
         .then(response => {
             response.data.forEach((timeoff: ITimeoff) => {
@@ -146,7 +146,7 @@ export default class requestsTable extends ScheduleBase {
                             'status': this.parseStatus(timeoff.status),
                             'created': moment(timeoff.created).format('MM-DD-YYYY')
                         }
-                        this.requesterEmail = timeoff.user.email
+                        this.requesterEmails[timeoff.user.first_name] = timeoff.user.email
                         this.timeoffRequests.push(formattedTimeoff)
                     })
                     this.loading = false
