@@ -1,13 +1,14 @@
 <template lang="pug">
 v-card(:width="responsiveWidth")
 	h3.mb-5 Availabilites
+	v-alert(v-if="updateAlert" type="success") Availability updated successfully.
 	v-data-table(
 		v-model="selected"
 		show-select
 		:headers="avail_headers"
 		:items="availabilities"
 		:items-per-page="itemsPerRow"
-		item-key='id'
+		item-key="id"
 		class="elevation-1"
 		:loading='loading'
 		:loading-text="loadingText"
@@ -54,13 +55,25 @@ v-card(:width="responsiveWidth")
 					v-model="meetingType"
 				)
 			v-radio-group(v-if="meetingType == 'Bi-weekly'" color="primary" v-model="meetingDay")
-				v-radio(v-show="meetingType == 'Bi-weekly'" v-for="day in days" :key="day.title" :label="day.title" :value="day.title" class="ml-7")
+				v-radio(
+					v-show="meetingType == 'Bi-weekly'"
+					v-for="day in days"
+					:key="day.title"
+					:label="day.title"
+					:value="day.title"
+					class="ml-7"
+				)
 				v-col(cols='3' class="ml-4")
 					timePicker(:day='meetingDay' :index='startTime1')
 					timePicker(:day='meetingDay' :index='endTime1')
 			v-row(v-if="meetingType != 'Bi-weekly'")
 				v-col(v-show="meetingType == 'Other Recurring'" cols='2' class="ml-4")
-					v-checkbox(v-for="day in days" v-model="meetingDays" :key="day.title" :label="day.title" :value="day.title")
+					v-checkbox(v-for="day in days"
+						v-model="checkboxDays"
+						:key="day.title"
+						:label="day.title"
+						:value="day.title"
+					)
 				v-col(v-if="meetingType != ''")   
 					datePicker(v-show="meetingType == 'Other' || meetingType == 'Orientation'" multiple elevation="5" class="ml-4")                                                                                                                 
 					v-time-picker(v-model="time1" :allowed-minutes="allowedStep" elevation="5" class="ml-4")
@@ -97,7 +110,10 @@ v-card(:width="responsiveWidth")
 							@change="$set(range, 1, $event)"
 						)
 				div(class="text-left")
-					v-btn(color="primary" v-model="best_meeting_times" @click="getBestMeetingTime(window_times[range[0]], window_times[range[1]])") Get Team Meeting Times
+					v-btn(color="primary"
+						v-model="best_meeting_times"
+						@click="getBestMeetingTime(window_times[range[0]], window_times[range[1]])"
+					) Get Team Meeting Times
 		div
 			h2(class="text-center") {{ days[index].title }}
 			v-simple-table
@@ -114,13 +130,19 @@ v-card(:width="responsiveWidth")
 				@next="next"
 				@previous="prev"
 			)
-	timeoffEmailForm(v-if="sendEmail" hidden :toName="requesterName" :fromName="currentUser" :email="requesterEmails[requesterName]" :message="message")
+	timeoffEmailForm(
+		hidden
+		v-if="sendEmail"
+		:toName="requesterName"
+		:fromName="currentUser"
+		:email="requesterEmails[requesterName]"
+		:message="emailMessage"
+	)
 </template>
 
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import Vuex from 'vuex'
+import { Component } from 'vue-property-decorator'
 import timePicker from '@/components/global/timePicker.vue'
 import datePicker from '@/components/global/datePicker.vue'
 import store from '@/store'
@@ -143,7 +165,7 @@ const axios = require('axios')
 export default class Availability extends ScheduleBase {
 
 	private responsiveWidth: number = 600
-	private selected: { [key: string]: string[]}[] = [] 
+	private selected: { [key: string]: string }[] = [] 
 	private singleExpand: boolean = false
 	private expanded: [] = []
 	private startTime1: string = "startTime1"
@@ -151,30 +173,45 @@ export default class Availability extends ScheduleBase {
 	private startTime2: string = "startTime2"
 	private endTime2: string = "endTime2"
 	private loading: boolean = false
-	private loadingText: string = 'Loading...'
+	private loadingText: string = "Loading..."
 	private itemsPerRow: number = 10
 	private reason: string = ""
 	private status: number = 0
 	private id: number = 0
-	private currentUser: string = this.$store.getters.getUser.first_name
+	private currentUser: string = store.getters.getUser.first_name
     private requesterName: string = ""
     private sendEmail: boolean = false
     private requesterEmails: {[key: string]: string} = {}
-    private message: string = ""
-	private name: string = ""
+    private emailMessage: string = ""
 	private dialog: boolean = false
 	private availabilities: formattedAvailability[] = []
-	private alertMessage: string = ''
-	private invalidLogin: boolean = false
-	private selectedItem: number = 1
+	private updateAlert: boolean = false
 	private day: string = ""
-	private days: {}[] = [{title: 'Monday'}, {title: 'Tuesday'}, {title: 'Wednesday'}, {title: 'Thursday'}, {title: 'Friday'}]
+	private days: { [key: string]: string }[] = [{title: 'Monday'}, {title: 'Tuesday'}, {title: 'Wednesday'}, {title: 'Thursday'}, {title: 'Friday'}]
 	private dayIndices: string[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 	private pickedDay: boolean = false
 	private picker = null
 	private day_time_strings: string[] = []
 	private time_suffixes = ['_start_1', '_start_2', '_end_1', '_end_2']
 	private time: string = ""
+	private no_tick_labels: string[] = []
+	private range: number[] = [0, 20]
+	private min: number = 0
+	private max: number = 20
+	private time_binary_list: number[][] = new Array(10)
+	private page: number = 1
+	private index: number = 0
+	private meetingDay: string = ""
+	private checkboxDays: string[] = []
+	private date: string = store.getters.dateValue.date
+	private meetingDays: number[] = []
+	private time1: string = ""
+	private time2: string = ""
+	private attendees: string[] = []
+	private meeting_days: string[] = []
+	private meetingTypes: { [key: string]: string }[] = [{text: 'Bi-weekly'}, {text: 'Standup'}, {text: 'Orientation'}, {text: 'Other'}, {text: 'Other Recurring'}]
+	private meetingType: string = ""
+	private disabled: boolean = true
 	private window_times: string[] = [
 		"9:00", "9:15", "9:30", "9:45", "10:00", "10:15", "10:30",
 		"10:45", "11:00", "11:15", "11:30", "11:45", "12:00", "12:15",
@@ -185,21 +222,6 @@ export default class Availability extends ScheduleBase {
 		"", "11:00", "", "", "", "12:00", "",
 		"", "", "13:00", "", "", "", "14:00"
 	]
-	private no_tick_labels: string[] = []
-	private range: number[] = [0, 20]
-	private min: number = 0
-	private max: number = 20
-	private time_binary_list: number[][] = new Array(10)
-	private page: number = 1
-	private index: number = 0
-	private meetingDay: string = ""
-	private meetingDays: string[] = []
-	private time1: string = ""
-	private time2: string = ""
-	private attendees: string[] = ['Bob', 'Doug', 'Susie']
-	private meetingTypes: { [key: string]: any }[] = [{text: 'Bi-weekly'}, {text: 'Standup'}, {text: 'Orientation'}, {text: 'Other'}, {text: 'Other Recurring'}]
-	private meetingType: string = ""
-	private disabled: boolean = true
 	private best_times: string[][] = [
 		["9:00", "9:15", "9:30", "9:45", "10:00"], ["10:15", "10:30",
 		"10:45"], ["11:00", "11:15", "11:30", "11:45"], ["12:00", "12:15",
@@ -223,10 +245,6 @@ export default class Availability extends ScheduleBase {
 		//d-none must have leading space in string to work. Hide from table but id is still attached
 		{text: 'Id', value: 'id', align: ' d-none'}
 	]
-
-	constructor() {
-        super()
-    }
 
 	next() {
 		this.index = this.index + 1
@@ -260,9 +278,6 @@ export default class Availability extends ScheduleBase {
 		})
 		.catch(function (error: any) {
 			console.log(error)
-		})
-		.then(function () {
-			// always executed
 		})
 	}
 	
@@ -302,8 +317,8 @@ export default class Availability extends ScheduleBase {
 	postSched() {
 		let maxHoursDecimal = Number.parseFloat(this.maxHours).toFixed(2)
 		this.$axios.post('/schedules/availability/create', {
-			schedule: store.getters.timeValues,
-			maxHours: maxHoursDecimal
+			'schedule': store.getters.timeValues,
+			'maxHours': maxHoursDecimal
 		})
 		.then((response: any) => {
 			this.formatAvailabilityTime(response.data, this.availabilities)
@@ -329,7 +344,7 @@ export default class Availability extends ScheduleBase {
 			var removeIndex = this.availabilities.map(item => item.id).indexOf(this.id)
 			this.availabilities[removeIndex]['status'] = this.parseStatus(this.status)
 			this.requesterName = this.availabilities[removeIndex]['name']
-            this.message = this.writeEmailMessage(this.availabilities[removeIndex])
+            this.emailMessage = this.writeEmailMessage(this.availabilities[removeIndex])
             this.sendEmail = true
 			this.status = 0
 			this.reason = ''
@@ -337,6 +352,7 @@ export default class Availability extends ScheduleBase {
 		})
 		.catch((error) => {
 			console.log(error)
+			alert("Check that the schedule that you are trying to approve does not exceed the maximum hours alotted")
 		})
 	}
 
@@ -348,7 +364,7 @@ export default class Availability extends ScheduleBase {
         var removeIndex = this.availabilities.map(item => item.id).indexOf(id)
         this.availabilities[removeIndex]['status'] = this.parseStatus(status)
         this.requesterName = this.availabilities[removeIndex]['name']
-        this.message = this.writeEmailMessage(this.availabilities[removeIndex])
+        this.emailMessage = this.writeEmailMessage(this.availabilities[removeIndex])
         this.sendEmail = true
 	}
 
@@ -357,35 +373,30 @@ export default class Availability extends ScheduleBase {
 	}
 
 	setMeeting() {
-		let attendees = []
-		for(let avail of this.selected) {
-			attendees.push(avail.name)
+		for(let selected_avail of this.selected) {
+			this.attendees.push(selected_avail.name)
 		}
 
-		let days = []
-		let startTime = this.time1
-		let endTime = this.time2
-		let date = store.getters.dateValue.date
 		if(this.meetingType == 'Standup') {
-			days = [1, 2, 3, 4, 5]
-			date = "2000-01-01"
+			this.meetingDays = [1, 2, 3, 4, 5]
+			this.date = "2000-01-01"
 		} else if(this.meetingType == 'Bi-weekly') {
-			days.push(this.dayIndices.indexOf(this.meetingDay))
-			startTime = store.getters.getDaySched(this.meetingDay)['startTime1']
-			endTime = store.getters.getDaySched(this.meetingDay)['endTime1']
-			date = "2000-01-01"
+			this.meetingDays.push(this.dayIndices.indexOf(this.meetingDay))
+			this.time1 = store.getters.getDaySched(this.meetingDay)['startTime1']
+			this.time2 = store.getters.getDaySched(this.meetingDay)['endTime1']
+			this.date = "2000-01-01"
 		} else if (this.meetingType == 'Other Recurring') {
 			for(let day in this.meetingDays) {
-				days.push(this.dayIndices.indexOf(day))
+				this.meetingDays.push(this.dayIndices.indexOf(day))
 			}
 		}
 		this.$axios.post('/schedules/meeting/create/', {
-			'start': startTime,
-			'end': endTime,
-			'days': days,
-			'date': date,
+			'start': this.time1,
+			'end': this.time2,
+			'days': this.meetingDays,
+			'date': this.date,
 			'meeting_type': this.meetingType,
-			'attendees': attendees
+			'attendees': this.attendees
 		})
 	}
 
@@ -400,17 +411,11 @@ export default class Availability extends ScheduleBase {
 			this.day_time_strings.push(day_abbrev + time)
 		}
 		this.$axios.patch('/schedules/availability/update/' + id, {
-  			time_strings: this.day_time_strings,
-			sched_times: store.getters.getDaySched(day)
+  			'time_strings': this.day_time_strings,
+			'sched_times': store.getters.getDaySched(day)
 		})
 		.then((response: any) => {
-			var updated_time = this.formatDayTime(response.data.day)
-			var selected_avail = this.availabilities.find((obj) => {
-				return obj.id === this.selectedItem
-			})
-			if (selected_avail !== undefined) {
-				selected_avail[day_abbrev] = updated_time
-			}
+			this.updateAlert = true
 		})
 		.catch(function (error: any) {
 			console.log(error)
@@ -524,9 +529,6 @@ export default class Availability extends ScheduleBase {
 		})
 		.catch(function (error: any) {
 			console.log(error)
-		})
-		.then(function () {
-			// always executed
 		})
 	}
 

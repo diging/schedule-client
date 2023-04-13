@@ -2,6 +2,7 @@
 div
 	v-card(class="pa-5 mb-10")
 		h4(class="text-center") Edit your schedule.
+		v-alert(v-if="updateAlert" type="success") Availability updated successfully.
 		v-container
 			p(class="body-2 mb-10") Lab hours are from 9:00 AM to 4:30 PM.
 			div(v-for="day in days" :key="day")
@@ -96,7 +97,7 @@ const axios = require('axios')
 export default class Availability extends ScheduleBase {
 
 	private singleSelect: boolean = false
-	private selectedItemID: number = 0
+	private updateAlert: boolean = false
 	private loading: boolean = false
 	private loadingText: string = 'The sched-o-matic is working hard on your request'
 	private dialog: boolean = false
@@ -125,10 +126,6 @@ export default class Availability extends ScheduleBase {
 		{text: 'Id', value: 'id', align: ' d-none'}
 	]
 
-	// constructor() {
-    //     super()
-    // }
-
 	updateAvailability(day: string, id: number) {
 		this.day_time_strings = []
 		var day_abbrev = day.slice(0, 3).toLowerCase()
@@ -136,17 +133,11 @@ export default class Availability extends ScheduleBase {
 			this.day_time_strings.push(day_abbrev + time)
 		}
 		this.$axios.patch('/schedules/availability/update/' + id, {
-			time_strings: this.day_time_strings,
-			sched_times: store.getters.getDaySched(day)
+			'time_strings': this.day_time_strings,
+			'sched_times': store.getters.getDaySched(day)
 		})
 		.then((response: any) => {
-			var updated_time = this.formatDayTime(response.data.day)
-			var selected_avail = this.availabilities.find((obj) => {
-				return obj.id === this.selectedItemID
-			})
-			if (selected_avail !== undefined) {
-				selected_avail[day_abbrev] = updated_time
-			}
+			this.updateAlert = true
 		})
 		.catch(function (error: any) {
 			console.log(error)
@@ -167,9 +158,6 @@ export default class Availability extends ScheduleBase {
 		})
 		.catch(function (error: any) {
 			console.log(error)
-		})
-		.then(function () {
-			// always executed
 		})
 	}
 

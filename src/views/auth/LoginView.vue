@@ -1,17 +1,19 @@
-
 <template lang="pug">
 LoginForm
 </template>
 
 <script lang="ts">
-import LoginForm from '@/components/auth/LoginForm.vue';
-import { Component, Vue } from 'vue-property-decorator';
+
+import LoginForm from '@/components/auth/LoginForm.vue'
+import { Component, Vue } from 'vue-property-decorator'
+
 export default Vue.extend({
   name: 'login',
   components: {
 	LoginForm,
   },
-});
+})
+
 </script>
 
 <style scoped lang="scss">

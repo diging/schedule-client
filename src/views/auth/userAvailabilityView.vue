@@ -1,6 +1,6 @@
 <template lang="pug">
-    div
-        Availability
+div
+    Availability
 </template>
 
 <script lang="ts">

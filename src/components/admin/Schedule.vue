@@ -1,13 +1,14 @@
 <template lang="pug">
 div
     h3.mb-5 Schedules
-    v-data-table(:headers="headers"
+    v-data-table(
+        :headers="headers"
         :items="schedules"
         :items-per-page="itemsPerRow"
         item-key='id'
         class="elevation-1"
         :single-select="singleSelect"
-        :loading='loading'
+        :loading="loading"
         :loading-text="loadingText"
         :sort-by="['created']"
         :sort-desc="[true]"
@@ -17,8 +18,7 @@ div
 
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import Vuex from 'vuex'
+import { Component } from 'vue-property-decorator'
 import timePicker from '@/components/global/timePicker.vue'
 import {formattedSchedule, schedule} from '@/interfaces/GlobalTypes'
 import {ScheduleBase}  from '@/components/Bases/ScheduleBase'
@@ -38,7 +38,7 @@ export default class Schedule extends ScheduleBase {
     private schedules: formattedSchedule[] = []
     private singleSelect: boolean = false
     private loading: boolean = false
-	private loadingText: string = 'The sched-o-matic is working hard on your request'
+	private loadingText: string = 'Loading...'
     private itemsPerRow: number = 10
 
     headers = [
@@ -69,9 +69,6 @@ export default class Schedule extends ScheduleBase {
 		})
 		.catch(function (error: any) {
 			console.log(error)
-		})
-		.then(function () {
-			// always executed
 		})
 	}
 }
