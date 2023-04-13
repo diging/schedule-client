@@ -93,13 +93,9 @@ export default class dailyCalendar extends ScheduleBase {
     }
     private student_workers: string[] = []
     private hours: { [key: string]: string[]} = {}
-    private mock_hours: { [key: string]: string[] } = {'mon': ['09:00', '10:00'], 'tue': ['12:00', '13:00'], 'wed': ['08:00', '14:00'],
-    'thu': ['07:30', '03:30'], 'fri': ['10:00', '04:30']}
     private days: { [key: number]: string } = {[1]: 'mon', [2]: 'tue', [3]: 'wed', [4]: 'thu', [5]: 'fri'}
     private types = ['month', 'day']
     private type = 'month'
-    private day_times: { [key: string]: string[] } = {'mon': ['9:00', '10:00'], 'tue': ['0:00', '0:00'], 'wed': ['0:00', '0:00'],'thu': ['0:00', '0:00'], 'fri': ['0:00', '0:00']}
-    private attendees = ['Bob', 'Susie']
     private weekdays = [1, 2, 3, 4, 5]
     private responsiveWidth: number = 600
 
@@ -115,7 +111,6 @@ export default class dailyCalendar extends ScheduleBase {
         (this.$refs.calendar as Vue & {checkChange: () => void}).checkChange()
 
         this.onResize()
-        
         window.addEventListener('resize', this.onResize, { passive: true })
     }
 
