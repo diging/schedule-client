@@ -2,7 +2,7 @@
 v-card(class="pa-10 ma-auto text-center" width="300")
 	h2(class="mb-8") Welcome.
 	div(v-if="invalidLogin")
-		v-alert(color="error") Oops, error logging in
+		v-alert(color="error") Invalid login. Please try different credentials.
 	div(v-if="emptyField")
 		v-alert(color="error") A username and password must be present
 	v-form

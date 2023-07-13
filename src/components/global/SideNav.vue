@@ -88,7 +88,7 @@ export default class SideNav extends Vue {
 			]
 		} else {
 			this.items = [
-				{ title: 'Calendar', icon: 'mdi-calendar-clock', path: '/userHome'},
+				{ title: 'Calendar', icon: 'mdi-calendar-month', path: '/userHome'},
 				{ title: 'Requests', icon: 'mdi-checkbox-multiple-marked', path: '/leaveRequests'},
 				{ title: 'Availability', icon: 'mdi-clock-time-five-outline', path: '/user/availability'},
 			]
