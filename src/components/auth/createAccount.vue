@@ -83,8 +83,6 @@ export default class createAccount extends Vue {
                 setTimeout(() => {this.$router.push({name: 'Signin'})}, 4000)
             })
             .catch((error: AxiosError) => {
-                console.log("AXIOS ERROR: ", error)
-                console.log("ERROR RESPONSE: ", error.response)
                 if (error.response && error.response.data && error.response.data.message) {
 					this.message = error.response.data.message;
 				} else if (error.response && error.response.data.password) {
