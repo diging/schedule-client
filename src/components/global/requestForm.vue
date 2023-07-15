@@ -46,7 +46,7 @@ v-dialog(v-model="dialog" max-width="500px")
 
 <script lang="ts">
 import '@mdi/font/css/materialdesignicons.css'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import timePicker from '@/components/global/timePicker.vue'
 import {ScheduleBase} from '@/components/Bases/ScheduleBase'
 import {schedule} from '@/interfaces/GlobalTypes'
@@ -77,6 +77,11 @@ export default class requestForm extends ScheduleBase {
     private dayOfWeek: number = 0
     private startTime: string = '00:00:00'
     private endTime: string = '00:00:00'
+    
+    @Emit('show-alert')
+    showAlert(message: string, msgType: string): [string, string] {
+        return [message, msgType]
+    }
 
 	submit() {
         if(this.dateTo != '') {
@@ -88,24 +93,29 @@ export default class requestForm extends ScheduleBase {
         }
         this.$axios.get('/schedules/user/')
 		.then((response: any) => {
-            let schedule: schedule = response.data[0]
-            if(schedule[this.schedule_days[this.dayOfWeek-1]] != "00:00:00") {
-                this.$axios.post('/timeoff/create/', {
-                    'start_date': this.dateFrom,
-                    'end_date': this.dateTo,
-                    'start_time': this.startTime,
-                    'end_time': this.endTime,
-                    'all_day': this.allDay,
-                    'request_type': this.type,
-                    'reason': this.reason
-                })
-                .then((response: any) => {
-                })
-                .catch(function (error: any) {
-                    console.log(error)
-                })
+            if(response.data.length != 0) {
+                let schedule: schedule = response.data[0]
+                if(schedule[this.schedule_days[this.dayOfWeek-1]] != "00:00:00") {
+                    this.$axios.post('/timeoff/create/', {
+                        'start_date': this.dateFrom,
+                        'end_date': this.dateTo,
+                        'start_time': this.startTime,
+                        'end_time': this.endTime,
+                        'all_day': this.allDay,
+                        'request_type': this.type,
+                        'reason': this.reason
+                    })
+                    .then((response: any) => {
+                        this.showAlert("Timeoff request submitted successfully.", "success")
+                    })
+                    .catch(function (error: any) {
+                        console.log(error)
+                    })
+                } else {
+                    this.showAlert("Your 'From' date does not occur on a day that you are working, please select a different day...", "error")
+                }
             } else {
-                alert("Your 'From' date does not occur on a day that you are working, please select a different day")
+                this.showAlert("You must have an approved work schedule before you can make a timeoff request.", "error")
             }
         })
 		.catch(function (error: any) {

@@ -5,27 +5,27 @@ div(class="pa-10")
 </template>
 
 <script lang="ts">
-    import Vue from 'vue';
-    import '@mdi/font/css/materialdesignicons.css'
-    import moment from 'moment'
-    import dailyCalendar from '@/components/global/dailyCalendar.vue'
+import Vue from 'vue';
+import '@mdi/font/css/materialdesignicons.css'
+import moment from 'moment'
+import dailyCalendar from '@/components/global/dailyCalendar.vue'
 
-    export default Vue.extend({
-        name: 'userHomeView',
-        components: {
-            dailyCalendar,
-        },
-        data() { 
-            return {
+export default Vue.extend({
+    name: 'userHomeView',
+    components: {
+        dailyCalendar,
+    },
+    data() { 
+        return {
 
-            };
-        },
-        methods:{
-            moment: function () {
-                return moment();
-            }
-        },
-    });
+        };
+    },
+    methods:{
+        moment: function () {
+            return moment();
+        }
+    },
+});
 </script>
 
 <style scoped>
