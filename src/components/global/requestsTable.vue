@@ -208,3 +208,5 @@ export default class requestsTable extends ScheduleBase {
 </script>
 
 <style scoped>
+
+</style>
