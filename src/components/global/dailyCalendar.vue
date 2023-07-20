@@ -85,12 +85,32 @@ export default class dailyCalendar extends ScheduleBase {
     private selectedEvent: {} = {}
     private selectedElement = null
     private selectedOpen: boolean = false
-    private colors: { [key: string]: string } = {
-        'Doug': 'blue-grey darken-3', 'Susie': 'blue darken-4',
-        'Bob': 'green darken-3', 'Standup': 'red darken-4',
-        'Bi-weekly': 'cyan darken-1', 'Orientation': 'orange darken-3',
-        'Other': 'green accent-3', 'Other Recurring': 'yellow accent-2'
+    private colorDict: { [key: string]: string } = {}
+    private colors: { [key: string]: string[] } = {
+        'schedule': [
+            'blue-grey darken-3',
+            'green darken-3',
+            'orange lighten-1',
+            'purple darken-1',
+            'blue accent-3',
+            'pink accent-1',
+            'teal lighten-3',
+            'lime lighten-2',
+            'blue darken-4',
+            'light-green accent-3',
+            'brown darken-1',
+            'grey lighten-1'
+        ],
+        'meeting': [
+            'cyan darken-1',
+            'orange darken-3',
+            'green accent-3',
+            'yellow accent-2',
+            'red darken-1'
+        ]
     }
+    private schedColorIndex: number = 0
+    private meetingColorIndex: number = 0
     private student_workers: string[] = []
     private hours: { [key: string]: string[]} = {}
     private days: { [key: number]: string } = {[1]: 'mon', [2]: 'tue', [3]: 'wed', [4]: 'thu', [5]: 'fri'}
@@ -98,6 +118,9 @@ export default class dailyCalendar extends ScheduleBase {
     private type = 'month'
     private weekdays = [1, 2, 3, 4, 5]
     private responsiveWidth: number = 600
+    private nextDate!: moment.Moment
+    private currentDay: number = 0
+    private calendarEvents: any[] = []
 
     beforeDestroy() {
 		if (typeof window === 'undefined') {
@@ -119,7 +142,7 @@ export default class dailyCalendar extends ScheduleBase {
             case 'xs':
 		  	this.responsiveWidth = 400
             break
-          case 'sm': 
+          case 'sm':
 		  	this.responsiveWidth = 600
             break
           case 'md': 
@@ -135,6 +158,11 @@ export default class dailyCalendar extends ScheduleBase {
 
     getEventColor(event: any) {
         return event.color                                                                                                                          
+    }
+
+    getColor(calendarEvent: string, field: any, index: number) {
+        this.colorDict[field] = this.colors[calendarEvent][index]
+        return this.colorDict[field]
     }
 
     setToday() {
@@ -182,28 +210,57 @@ export default class dailyCalendar extends ScheduleBase {
         return day_remainder
     }
 
-    getMonthStart(start: string, weekday: number) {
-        //DS-40 MomentJS conversion starting point
-        let start_date = new Date(`${start}T00:00:00`)
-        //let start_date1 = moment.utc(start)
-        //console.log("NATIVE: ", new Date(start_date.setUTCDate(start_date.getUTCDate() + 2)).toISOString().split('T')[0])
-        //console.log("MOMENT: ", start_date1.date(start_date1.date() + 2).format('YYYY-MM-DD'))
-        if (weekday == 6) {
-            start = new Date(start_date.setUTCDate(start_date.getUTCDate() + 2)).toISOString().split('T')[0]
+    getMonthStart(start: string, weekStart: number): [string, number] {
+        let start_date = moment.utc(start)
+        if (weekStart == 6) {
+            start = start_date.date(start_date.date() + 2).format('YYYY-MM-DD')
+            weekStart = 1
         }
-        if (weekday == 0) {
-            start = new Date(start_date.setUTCDate(start_date.getUTCDate() + 1)).toISOString().split('T')[0]
+        if (weekStart == 0) {
+            start = start_date.date(start_date.date() + 1).format('YYYY-MM-DD')
+            weekStart = 1
         }
-        return start
+        return [start, weekStart]
     }
 
-    fetchEvents(start: string, end: string, weekStart: number)  {
-        const events: any[] = []
+    getNextDayofMonth(start_date: moment.Moment, current_day: number) {
+        let next_date = moment(start_date.set('date', start_date.date() + 1))
+        if (next_date.day() === 0) {
+            next_date = moment(start_date.set('date', start_date.date() + 1))
+            current_day++
+        }
+        if (next_date.day() === 6) {
+            next_date = moment(start_date.set('date', start_date.date() + 2))
+            current_day = current_day + 2
+        }
+        this.nextDate = next_date
+        this.currentDay = current_day
+    }
+
+    deleteSchedConflicts(events: any[], timeoff: ITimeoff) {
+        const filteredEvents = events.filter(
+            (event) =>
+                event.type === "Schedule" &&
+                event.user === timeoff.user.id &&
+                (event.day >= parseInt(timeoff.start_date.split("-")[2]) && event.day <= parseInt(timeoff.end_date.split("-")[2]))
+        )
+        if (filteredEvents.length > 0) {
+            this.calendarEvents.splice(filteredEvents[0].index, filteredEvents.length)
+        }
+    }
+
+    fetchEvents(start: string, end: string, weekStart: number) {
+        this.calendarEvents = []
+        let eventIndex = 0
         this.student_workers = []
-        let start_month = weekStart
-        let initial_start = this.getMonthStart(start, weekStart)
-        let start_date = new Date(`${initial_start}T00:00:00`)
-        let end_date = new Date(`${end}T00:00:00`)
+        this.colorDict = {}
+        this.schedColorIndex = 0
+        this.meetingColorIndex = 0
+        let [initial_start, weekDay] = this.getMonthStart(start, weekStart)
+        let start_month = weekDay
+        start = initial_start
+        let start_date = moment.utc(initial_start)
+        let end_date = moment.utc(end)
         this.$axios.get('/schedules/list/')
 		.then(response => {
             response.data.forEach((schedule: schedule) => {
@@ -211,80 +268,71 @@ export default class dailyCalendar extends ScheduleBase {
                     this.student_workers.push(schedule.user.full_name)
                 }
                 this.workerHours(schedule, this.hours)
-                let current_day = start_date.getUTCDate()
-                let last_day = end_date.getUTCDate()
+                let current_day = start_date.date()
+                let last_day = end_date.date()
+                let workerColor = this.getColor('schedule', schedule.user.first_name, this.schedColorIndex++)
                 while (current_day <= last_day) {
                     let weekday = this.days[this.getWeekday(weekStart)]
                     let shift_start = this.hours[weekday][0]
                     let shift_end = this.hours[weekday][1]
                     if(shift_start != '00:00:00') {
-                        events.push({
+                        this.calendarEvents.push({
                             start: new Date(start.concat('T', shift_start)),
                             end: new Date(start.concat('T', shift_end)),
+                            startDate: start,
                             weekday: weekday,
-                            color: this.colors[schedule.user.first_name],
+                            color: workerColor,
                             timed: true,
                             user: schedule.user.id,
                             name: schedule.user.full_name,
                             timeRange: `${shift_start} - ${shift_end}`,
-                            day: current_day
+                            day: current_day,
+                            type: "Schedule",
+                            index: eventIndex++
                         })
                     }
-                    let next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 1))
-                    if (next_date.getUTCDay() === 0) {
-                        next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 1))
-                        current_day++
-                    }
-                    if (next_date.getUTCDay() === 6) {
-                        next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 2))
-                        current_day = current_day + 2
-                    }
-                    start = next_date.toISOString().split('T')[0]
+                    this.getNextDayofMonth(start_date, current_day)
+                    start = this.nextDate.format("YYYY-MM-DD")
                     weekStart++
-                    current_day++
+                    current_day = ++this.currentDay
                 }
                 start = initial_start
-                start_date = new Date(`${start}T00:00:00`)
+                start_date = moment.utc(start)
                 weekStart = start_month
                 this.hours = {}
             })
             this.$axios.get('/schedules/meetings/list/')
             .then(response => {
                 response.data.forEach((meeting: meetings) => {
+                    let meetingColor = this.getColor('meeting', meeting.meeting_type, this.meetingColorIndex++)
                     if(meeting.meeting_type == "Standup" || meeting.meeting_type == "Bi-weekly") {
-                        let current_day = start_date.getUTCDate()
-                        let last_day = end_date.getUTCDate()
+                        let current_day = start_date.date()
+                        let last_day = end_date.date()
                         while (current_day <= last_day) {
                             let weekday = this.getWeekday(weekStart).toString()
                             if(meeting.days.includes(weekday)) {
-                                events.push({
+                                this.calendarEvents.push({
                                     start: new Date(start.concat('T', meeting.start)),
                                     end: new Date(start.concat('T', meeting.end)),
-                                    color: this.colors[meeting.meeting_type],
+                                    color: meetingColor,
                                     timed: true,
                                     category: meeting.attendees,
                                     name: meeting.meeting_type,
-                                    timeRange: `${meeting.start} - ${meeting.end}`
+                                    timeRange: `${meeting.start} - ${meeting.end}`,
+                                    type: "Meeting",
+                                    index: eventIndex++
                                 })
                             }
-                            let next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 1))
-                            if (next_date.getUTCDay() === 0) {
-                                next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 1))
-                                current_day++
-                            }
-                            if (next_date.getUTCDay() === 6) {
-                                next_date = new Date(start_date.setUTCDate(start_date.getUTCDate() + 2))
-                                current_day = current_day + 2
-                            }
-                            start = next_date.toISOString().split('T')[0]
+                            this.getNextDayofMonth(start_date, current_day)
+                            start = this.nextDate.format("YYYY-MM-DD")
                             weekStart++
-                            current_day++
+                            current_day = ++this.currentDay
                         }
                     } else {
-                        events.push({
+                        this.calendarEvents.push({
                             start: new Date(meeting.date.concat('T', meeting.start)),
                             end: new Date(meeting.date.concat('T', meeting.end)),
-                            color: this.colors[meeting.meeting_type],
+                            color: meetingColor,
                             timed: true,
                             category: meeting.attendees,
                             name: meeting.meeting_type,
@@ -292,43 +340,39 @@ export default class dailyCalendar extends ScheduleBase {
                         })
                     }
                     start = initial_start
-                    start_date = new Date(`${start}T00:00:00`)
+                    start_date = moment.utc(start)
                     weekStart = start_month
                 })
                 this.$axios.get('/timeoff/all/')
                 .then(response => {
                     response.data.forEach((timeoff: ITimeoff) => {
-                        let allDay = false
                         let end_date = new Date(timeoff.start_date.concat('T', timeoff.end_time))
-                        if(timeoff.status === 1) {
-                            let start_day = timeoff.start_date.split('-')[2]
-                            if(timeoff.all_day) {
-                                allDay = true
-                                if(timeoff.end_date != null) {
+                        if (timeoff.status === 1 && timeoff.all_day) {
+                            if (timeoff.end_date != null) {
                                 end_date = new Date(timeoff.end_date.concat('T', timeoff.end_time))
-                                }
-                                events.push({
-                                    start: new Date(timeoff.start_date.concat('T', timeoff.start_time)),
-                                    end: end_date,
-                                    color: this.colors[timeoff.user.first_name],
-                                    timed: !allDay,
-                                    category: timeoff.user,
-                                    name: `${timeoff.user.first_name} Not Working`,
-                                    timeRange: `${timeoff.request_type}`
-                                })
-                            } else {
-                                let start_timeoff = parseInt(timeoff.start_time.split(':')[0]) + (parseInt(timeoff.start_time.split(':')[1]) / 60)
-                                for(let event of events) {
-                                    if(event.day == start_day && event.user == timeoff.user.id) {
-                                        let start_sched = parseInt(event.start.getHours()) + (parseInt(event.start.getMinutes()) / 60)
-                                        let diff: number = start_timeoff - start_sched
-                                        if(diff == 0) {
-                                            event.start = new Date(timeoff.start_date.concat('T', timeoff.end_time))
-                                            event.name = `${timeoff.user.first_name} Working ${moment(timeoff.end_time, 'HH:mm:ss').format('HH:mm A')} - ${moment(event.end).format('hh:mm A')}`
-                                        } else {
-                                            event.end = new Date(timeoff.start_date.concat('T', timeoff.start_time))
-                                            event.name = `${timeoff.user.first_name} Working ${moment(event.start).format('hh:mm A')} - ${moment(timeoff.start_time, 'HH:mm:ss').format('hh:mm A')}`
-                                        }
+                            }
+                            this.calendarEvents.push({
+                                start: new Date(timeoff.start_date.concat('T', timeoff.start_time)),
+                                end: end_date,
+                                color: this.colorDict[timeoff.user.first_name],
+                                category: timeoff.user,
+                                name: `${timeoff.user.first_name} Not Working`,
+                                timeRange: '',
+                                type: "Timeoff",
+                                index: eventIndex++
+                            })
+                            this.deleteSchedConflicts(this.calendarEvents, timeoff)
+                        } else {
+                            let start_timeoff = parseInt(timeoff.start_time.split(':')[0]) + (parseInt(timeoff.start_time.split(':')[1]) / 60)
+                            for (let event of this.calendarEvents) {
+                                if (event.startDate == timeoff.start_date && event.user == timeoff.user.id) {
+                                    let start_sched = parseInt(event.start.getHours()) + (parseInt(event.start.getMinutes()) / 60)
+                                    if (start_timeoff - start_sched == 0) {
+                                        event.start = new Date(timeoff.start_date.concat('T', timeoff.end_time))
+                                        event.name = `${timeoff.user.first_name} Working ${moment(timeoff.end_time, 'HH:mm:ss').format('HH:mm A')} - ${moment(event.end).format('hh:mm A')}`
+                                    } else {
+                                        event.end = new Date(timeoff.start_date.concat('T', timeoff.start_time))
+                                        event.name = `${timeoff.user.first_name} Working ${moment(event.start).format('hh:mm A')} - ${moment(timeoff.start_time, 'HH:mm:ss').format('hh:mm A')}`
                                     }
                                 }
                             }
@@ -337,7 +381,7 @@ export default class dailyCalendar extends ScheduleBase {
                 })
             })
         })
-        return events
+        return this.calendarEvents
     }
 }
 </script>
