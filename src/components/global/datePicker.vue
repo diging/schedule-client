@@ -38,13 +38,11 @@ export default class datePicker extends Vue {
 	private menu: boolean = false
 
 	private date: string = ""
-	//@Prop() index!: string
 	@Prop() start!: Boolean
 
 	@Watch('date')
 	watchTime(value: string[], oldValue: string[]) {
 		let data = {
-			//'name': this.index,
 			'date': this.date,
 			'start': this.start
 		}

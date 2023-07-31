@@ -24,8 +24,8 @@ v-menu(
 		v-model="time"
 		full-width
 		@click:minute="$refs.menu.save(time)"
-		format="ampm"
 		:allowed-minutes="allowedStep"
+		format="24hr"
 	)
 </template>
 
@@ -39,7 +39,6 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 export default class timePicker extends Vue {
 	private menu2: string = ''
-
 	private time: string = ''
 	@Prop() day!: string
 	@Prop() index!: string

@@ -1,7 +1,12 @@
 <template lang="pug">
 v-card(:width="responsiveWidth")
+	v-alert(
+		v-if="message"
+		:type="msgType"
+		v-model= "message"
+		:value = "!!message"
+	) {{ message }}
 	h3.mb-5 Availabilites
-	v-alert(v-if="updateAlert" type="success") Availability updated successfully.
 	v-data-table(
 		v-model="selected"
 		show-select
@@ -33,8 +38,8 @@ v-card(:width="responsiveWidth")
 								v-btn(icon color="#F2594B" @click="updateAvailability(day.title, item.id)")
 									v-icon mdi-plus-circle-outline
 		template(v-slot:item.actions="{ item }")
-			v-icon(@click="triggerDialog(item.id, 1)" color="green") mdi-check
-			v-icon(@click="setStatus(item.id, 2)" color="red") mdi-cancel
+			v-icon(@click="triggerDialog(item.id)" color="green") mdi-check
+			v-icon(@click="denyTimeoff(item.id)" color="red") mdi-cancel
 			v-menu(offset-y)
 	v-dialog(v-model="dialog" width="500")
 		v-card
@@ -141,6 +146,7 @@ v-card(:width="responsiveWidth")
 </template>
 
 <script lang="ts">
+import { AxiosError, AxiosResponse } from 'axios';
 import '@mdi/font/css/materialdesignicons.css'
 import { Component } from 'vue-property-decorator'
 import timePicker from '@/components/global/timePicker.vue'
@@ -212,6 +218,9 @@ export default class Availability extends ScheduleBase {
 	private meetingTypes: { [key: string]: string }[] = [{text: 'Bi-weekly'}, {text: 'Standup'}, {text: 'Orientation'}, {text: 'Other'}, {text: 'Other Recurring'}]
 	private meetingType: string = ""
 	private disabled: boolean = true
+	private maxHours!: number
+	private message: string = ''
+    private msgType: string = 'primary'
 	private window_times: string[] = [
 		"9:00", "9:15", "9:30", "9:45", "10:00", "10:15", "10:30",
 		"10:45", "11:00", "11:15", "11:30", "11:45", "12:00", "12:15",
@@ -252,10 +261,6 @@ export default class Availability extends ScheduleBase {
 
 	prev() {
 		this.index = this.index - 1
-	}
-
-	setStatus(status: number) {
-		this.status = status
 	}
 
 	getColor(time_slot: string) {
@@ -315,10 +320,9 @@ export default class Availability extends ScheduleBase {
 	}
 
 	postSched() {
-		let maxHoursDecimal = Number.parseFloat(this.maxHours).toFixed(2)
 		this.$axios.post('/schedules/availability/create', {
 			'schedule': store.getters.timeValues,
-			'maxHours': maxHoursDecimal
+			'maxHours': this.maxHours
 		})
 		.then((response: any) => {
 			this.formatAvailabilityTime(response.data, this.availabilities)
@@ -328,10 +332,10 @@ export default class Availability extends ScheduleBase {
 		})
 	}
 
-	triggerDialog(id: number, status: number) {
+	triggerDialog(id: number) {
 		this.dialog = true
 		this.id = id
-		this.status = status
+		this.status = 1
 	}
 
 	approve() {
@@ -346,13 +350,16 @@ export default class Availability extends ScheduleBase {
 			this.requesterName = this.availabilities[removeIndex]['name']
             this.emailMessage = this.writeEmailMessage(this.availabilities[removeIndex])
             this.sendEmail = true
+			this.msgType = "success"
+			this.message = "Availability successfully approved."
 			this.status = 0
 			this.reason = ''
 			this.id = 0
 		})
-		.catch((error) => {
-			console.log(error)
-			alert("Check that the schedule that you are trying to approve does not exceed the maximum hours alotted")
+		.catch((error: AxiosError) => {
+			this.msgType = "error"
+			this.message = error.response?.data.message
+			this.status = 0
 		})
 	}
 
@@ -360,12 +367,12 @@ export default class Availability extends ScheduleBase {
         return `Your schedule has been ${availObj.status}. Please see the 'Schedules' tab or visit the calendar to check schedule.`
     }
 
-	denyTimeoff(id: number, status: number) {
+	denyTimeoff(id: number) {
         var removeIndex = this.availabilities.map(item => item.id).indexOf(id)
-        this.availabilities[removeIndex]['status'] = this.parseStatus(status)
+        this.availabilities[removeIndex]['status'] = this.parseStatus(2)
         this.requesterName = this.availabilities[removeIndex]['name']
         this.emailMessage = this.writeEmailMessage(this.availabilities[removeIndex])
-        this.sendEmail = true
+    	this.sendEmail = true
 	}
 
 	disableBtn() {
@@ -415,7 +422,8 @@ export default class Availability extends ScheduleBase {
 			'sched_times': store.getters.getDaySched(day)
 		})
 		.then((response: any) => {
-			this.updateAlert = true
+			this.msgType = "success"
+			this.message = "Availability updated successfully."
 		})
 		.catch(function (error: any) {
 			console.log(error)
@@ -505,15 +513,10 @@ export default class Availability extends ScheduleBase {
 			}
 			var day_lists = []
 			day_lists.push(monday_times1)
-			//day_lists.push(monday_times2)
 			day_lists.push(tuesday_times1)
-			//day_lists.push(tuesday_times2)
 			day_lists.push(wednesday_times1)
-			//day_lists.push(wednesday_times2)
 			day_lists.push(thursday_times1)
-			//day_lists.push(thursday_times2)
 			day_lists.push(friday_times1)
-			//day_lists.push(friday_times2)
 
 			var best_meeting_times = []
 			for (var list of day_lists) {
