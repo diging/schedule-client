@@ -6,8 +6,6 @@ import moment from 'moment'
 @Component
 export class ScheduleBase extends Vue {
 
-	protected maxHours: string = '0.0'
-
 	parseStatus(status: number | undefined) {
 		switch(status) {
 			case 0:
@@ -91,27 +89,6 @@ export class ScheduleBase extends Vue {
 				} else {
                     hours[new_key][1] = value
                 }
-			}
-		}
-	}
-
-	formatMaxHours() {
-		if(!this.maxHours.includes('.')) {
-			if(this.maxHours.length > 2) {
-				let last = this.maxHours.slice(-2)
-				let rest = this.maxHours.slice(0, -2)
-				this.maxHours = rest + "." + last
-			} else {
-				this.maxHours = '.' + this.maxHours
-			}
-		} else {
-			let split = this.maxHours.split('.').join("")
-			if(split.length > 2) {
-				let last = split.slice(-2)
-				let rest = split.slice(0, -2)
-				this.maxHours = rest + "." + last
-			} else {
-				this.maxHours = '.' + split
 			}
 		}
 	}

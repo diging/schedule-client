@@ -27,11 +27,24 @@ v-card(:width="responsiveWidth")
             :type="type"
             :events="events"
             :event-color="getEventColor"
+            :event-ripple="false"
             @click:event="showEvent"
             @click:more="viewDay"
             @click:date="viewDay"
             @change="dateRange"
+            @mousedown:event="startDrag"
+            @mousedown:time="startTime"
+            @mousemove:time="mouseMove"
+            @mouseup:time="endDrag"
+            @mouseleave.native="cancelDrag"
         )
+            template(v-if="type=='day'" v-slot:event="{ event, timed, eventSummary }")
+                div(class="v-event-draggable")
+                    component(:is="{ render: eventSummary }")
+                div(
+                    class="v-event-drag-bottom"
+                    @mousedown.stop="extendBottom(event)"
+                )
         v-menu(
             v-model="selectedOpen"
             :close-on-content-click="false"
@@ -121,6 +134,97 @@ export default class dailyCalendar extends ScheduleBase {
     private nextDate!: moment.Moment
     private currentDay: number = 0
     private calendarEvents: any[] = []
+    private dragTime: any = null
+    private dragEvent: any = null
+    private dragStart: any = null
+    private createEvent: any = null
+    private createStart: any = null
+    private extendOriginal: any = null
+
+    startDrag({ event, timed }: any) {
+        if (event && timed) {
+          this.dragEvent = event
+          this.dragTime = null
+          this.extendOriginal = null
+        }
+    }
+
+    startTime (tms: any) {
+        const mouse = this.toTime(tms)
+
+        if (this.dragEvent && this.dragTime === null) {
+          const start = this.dragEvent.start
+          this.dragTime = mouse - start
+        }
+    }
+    
+    roundTime (time: any, down = true) {
+        const roundTo = 15 // minutes
+        const roundDownTime = roundTo * 60 * 1000
+
+        return down
+          ? time - time % roundDownTime
+          : time + (roundDownTime - (time % roundDownTime))
+    }
+
+    toTime (tms: any) {
+        return new Date(tms.year, tms.month - 1, tms.day, tms.hour, tms.minute).getTime()
+    }
+
+    extendBottom (event: any) {
+        this.createEvent = event
+        this.createStart = event.start
+        this.extendOriginal = event.end
+    }
+
+    mouseMove (tms: any) {
+        const mouse = this.toTime(tms)
+
+        if (this.dragEvent && this.dragTime !== null) {
+            const start = this.dragEvent.start
+            const end = this.dragEvent.end
+            const duration = end - start
+            const newStartTime = mouse - this.dragTime
+            const newStart = this.roundTime(newStartTime)
+            const newEnd = newStart + duration
+
+            this.dragEvent.start = newStart
+            this.dragEvent.end = newEnd
+        } else if (this.createEvent && this.createStart !== null) {
+            const mouseRounded = this.roundTime(mouse, false)
+            const min = Math.min(mouseRounded, this.createStart)
+            const max = Math.max(mouseRounded, this.createStart)
+
+            this.createEvent.start = min
+            this.createEvent.end = max
+        }
+    }
+
+    endDrag () {
+        this.dragTime = null
+        this.dragEvent = null
+        this.createStart = null
+        this.createEvent = null
+        this.extendOriginal = null
+    }
+
+    cancelDrag () {
+        if (this.createEvent) {
+            if (this.extendOriginal) {
+                this.createEvent.end = this.extendOriginal
+            } else {
+                const i = this.events.indexOf(this.createEvent)
+                if (i !== -1) {
+                    this.events.splice(i, 1)
+                }
+            }
+        }
+
+        this.createEvent = null
+        this.createStart = null
+        this.dragTime = null
+        this.dragEvent = null
+    }
 
     beforeDestroy() {
 		if (typeof window === 'undefined') {
@@ -145,7 +249,7 @@ export default class dailyCalendar extends ScheduleBase {
           case 'sm':
 		  	this.responsiveWidth = 600
             break
-          case 'md': 
+          case 'md':
 		  	this.responsiveWidth = 900
             break
           case 'lg':
@@ -167,7 +271,7 @@ export default class dailyCalendar extends ScheduleBase {
 
     setToday() {
         this.focus = ''
-    }
+    } 
 
     prev() {
         (this.$refs.calendar as Vue & {prev: () => void}).prev()
@@ -191,6 +295,10 @@ export default class dailyCalendar extends ScheduleBase {
         }
 
         nativeEvent.stopPropagation()
+    }
+
+    editEvent() {
+
     }
 
     viewDay({ date }: any) {
@@ -355,6 +463,7 @@ export default class dailyCalendar extends ScheduleBase {
                                 start: new Date(timeoff.start_date.concat('T', timeoff.start_time)),
                                 end: end_date,
                                 color: this.colorDict[timeoff.user.first_name],
+                                timed: true,
                                 category: timeoff.user,
                                 name: `${timeoff.user.first_name} Not Working`,
                                 timeRange: '',
@@ -386,6 +495,39 @@ export default class dailyCalendar extends ScheduleBase {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.v-event-draggable {
+  padding-left: 6px;
+}
 
+.v-event-timed {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.v-event-drag-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  height: 4px;
+  cursor: ns-resize;
+
+  &::after {
+    display: none;
+    position: absolute;
+    left: 50%;
+    height: 4px;
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
+    width: 16px;
+    margin-left: -8px;
+    opacity: 0.8;
+    content: '';
+  }
+
+  &:hover::after {
+    display: block;
+  }
+}
 </style>

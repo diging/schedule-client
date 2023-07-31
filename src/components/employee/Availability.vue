@@ -4,16 +4,16 @@ div
 		h4(class="text-center") Edit your schedule.
 		v-alert(v-if="updateAlert" type="success") Availability updated successfully.
 		v-container
-			p(class="body-2 mb-10") Lab hours are from 9:00 AM to 4:30 PM.
+			p(class="body-2 mb-10") Lab hours are from 8:00 AM to 5:00 PM.
 			div(v-for="day in days" :key="day")
 				div(v-if="availabilityTimes[day].length===0")
 					v-row
 						v-col(cols='3')
 							p(class="font-weight-medium body-2") {{day}}
 						v-col(cols='4')
-							timePicker(:day='day' :index='startTime1')
+							timePicker(:day='day' :index='startTime1' :maxTime='endTime1')
 						v-col(cols='4')
-							timePicker(:day='day' :index='endTime1')
+							timePicker(:day='day' :index='endTime1' :minTime='startTime1')
 						v-col(cols='1')
 							v-btn(icon color="#F2594B" @click="updateAvailability(day, selectedItemID)")
 								v-icon mdi-plus-circle-outline
@@ -40,7 +40,7 @@ div
 				v-col.pt-4(cols='3')
 				p.pt-3(class="font-weight-medium body-2") Max Hours
 				v-col(cols='3')
-				v-text-field(v-model="maxHours" @input='formatMaxHours()' outlined dense)
+				v-text-field(v-model="maxHours" outlined dense)
 		v-card-actions
 			v-spacer
 			v-btn(color="grey" text @click="dialog = false") Cancel
@@ -111,6 +111,7 @@ export default class Availability extends ScheduleBase {
 	private time_suffixes = ['_start_1', '_start_2', '_end_1', '_end_2']
 	private day_time_strings: string[] = []
 	private availabilities: formattedAvailability[] = []
+	private maxHours!: number
 
 	headers = [
 		{text: 'Submitted', value: 'created'},
@@ -162,10 +163,9 @@ export default class Availability extends ScheduleBase {
 	}
 
 	postSched() {
-		let maxHoursDecimal = Number.parseFloat(this.maxHours).toFixed(2)
 		this.$axios.post('/schedules/availability/create', {
 			schedule: store.getters.timeValues,
-			maxHours: maxHoursDecimal
+			maxHours: this.maxHours
 		})
 		.then((response: any) => {
 			this.formatAvailabilityTime(response.data, this.availabilities)

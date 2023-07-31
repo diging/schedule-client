@@ -81,7 +81,8 @@ export default class SideNav extends Vue {
 		if(this.$store.getters.getUser.is_superuser) {
 			this.items = [
 				{ title: 'Calendar', icon: 'mdi-calendar-month', path: '/userHome'},
-				{ title: 'Requests', icon: 'mdi-checkbox-multiple-marked', path: '/workerRequests'},
+				// use '/workerRequests' if admins shouldn't have option to make personal requests
+				{ title: 'Requests', icon: 'mdi-checkbox-multiple-marked', path: '/leaveRequests'},
 				{ title: 'Schedules', icon: 'mdi-calendar-clock', path: '/admin/schedule'},
 				{ title: 'Availabilities', icon: 'mdi-clock-outline', path: '/admin/availability'},
 				{ title: 'Users', icon: 'mdi-account-multiple', path: '/users'},
