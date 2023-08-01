@@ -7,34 +7,35 @@ v-dialog(v-model="dialog" max-width="500px")
     v-card(class="pa-5")
         h4(class="text-center") Leave Request Form
         v-card-text
-            v-container
-                v-row
-                    v-col(cols="12")
-                        v-select(v-model="type" :items="['Time Off', 'Sick Leave', 'Additional Work Hours']" label="Request type*" required)
-                    v-col(cols="6")
-                        v-menu(ref="menuFrom" v-model="menuFrom" :close-on-content-click="false" :return-value.sync="dateFrom"
-                                transition="scale-transition" offset-y min-width="auto")
-                            template(v-slot:activator="{ on, attrs }")
-                                v-text-field(v-model="dateFrom" label="From" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on")
-                            v-date-picker(v-model="dateFrom" @input="$refs.menuFrom.save(dateFrom); getDayOfWeek(dateFrom)" no-title scrollable)
-                                v-spacer
-                                v-btn(text color="grey" @click="menuFrom = false") Cancel
-                    v-col(cols="6")
-                        v-menu(ref="menuTo" v-model="menuTo" :close-on-content-click="false" :return-value.sync="dateTo"
-                                transition="scale-transition" offset-y min-width="auto")
-                            template(v-slot:activator="{ on, attrs }")
-                                v-text-field(v-model="dateTo" label="To" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on")
-                            v-date-picker(v-model="dateTo" @input="$refs.menuTo.save(dateTo)" no-title scrollable)
-                                v-spacer
-                                v-btn(text color="grey" @click="menuTo = false") Cancel
-                    v-col(cols="6" v-show="allDay!=true && dateTo==''")
-                        timePicker(:day='dayFrom' :index='startTime1')
-                    v-col(cols="6" v-show="allDay!=true && dateTo==''")
-                        timePicker(:day='dayFrom' :index='endTime1')
-                    v-col(cols="6" v-show="dateTo==''")
-                        v-checkbox(v-model="allDay" label="All Day" color="#F2594B")
-                    v-col(cols="12")
-                        v-textarea(outlined name="request description" label="Description" v-model="reason")
+            v-form(ref="form")
+                v-container
+                    v-row
+                        v-col(cols="12")
+                            v-select(v-model="type" :items="['Time Off', 'Sick Leave', 'Additional Work Hours']" label="Request type*" required)
+                        v-col(cols="6")
+                            v-menu(ref="menuFrom" v-model="menuFrom" :close-on-content-click="false" :return-value.sync="dateFrom"
+                                    transition="scale-transition" offset-y min-width="auto")
+                                template(v-slot:activator="{ on, attrs }")
+                                    v-text-field(v-model="dateFrom" label="From" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on")
+                                v-date-picker(v-model="dateFrom" @input="$refs.menuFrom.save(dateFrom); getDayOfWeek(dateFrom)" no-title scrollable)
+                                    v-spacer
+                                    v-btn(text color="grey" @click="menuFrom = false") Cancel
+                        v-col(cols="6")
+                            v-menu(ref="menuTo" v-model="menuTo" :close-on-content-click="false" :return-value.sync="dateTo"
+                                    transition="scale-transition" offset-y min-width="auto")
+                                template(v-slot:activator="{ on, attrs }")
+                                    v-text-field(v-model="dateTo" label="To" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on")
+                                v-date-picker(v-model="dateTo" @input="$refs.menuTo.save(dateTo)" no-title scrollable)
+                                    v-spacer
+                                    v-btn(text color="grey" @click="menuTo = false") Cancel
+                        v-col(cols="6" v-show="allDay!=true && dateTo==''")
+                            timePicker(:day='dayFrom' :index='startTime1')
+                        v-col(cols="6" v-show="allDay!=true && dateTo==''")
+                            timePicker(:day='dayFrom' :index='endTime1')
+                        v-col(cols="6" v-show="dateTo==''")
+                            v-checkbox(v-model="allDay" label="All Day" color="#F2594B")
+                        v-col(cols="12")
+                            v-textarea(outlined name="request description" label="Description" v-model="reason")
         v-card-actions
             v-spacer
             v-btn(color="grey" text @click="dialog = false") Cancel
@@ -79,6 +80,11 @@ export default class requestForm extends ScheduleBase {
     @Emit('show-alert')
     showAlert(message: string, msgType: string): [string, string] {
         return [message, msgType]
+    }
+
+    @Watch('dialog')
+    watchDialog() {
+        (this.$refs.form as HTMLFormElement).reset()
     }
 
 	submit() {
