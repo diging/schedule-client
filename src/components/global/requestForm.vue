@@ -12,23 +12,21 @@ v-dialog(v-model="dialog" max-width="500px")
                     v-col(cols="12")
                         v-select(v-model="type" :items="['Time Off', 'Sick Leave', 'Additional Work Hours']" label="Request type*" required)
                     v-col(cols="6")
-                        v-menu(ref="menuFrom" v-model="menu1" :close-on-content-click="false" :return-value.sync="dateFrom"
+                        v-menu(ref="menuFrom" v-model="menuFrom" :close-on-content-click="false" :return-value.sync="dateFrom"
                                 transition="scale-transition" offset-y min-width="auto")
                             template(v-slot:activator="{ on, attrs }")
                                 v-text-field(v-model="dateFrom" label="From" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on")
-                            v-date-picker(v-model="dateFrom" no-title scrollable)
+                            v-date-picker(v-model="dateFrom" @input="$refs.menuFrom.save(dateFrom); getDayOfWeek(dateFrom)" no-title scrollable)
                                 v-spacer
                                 v-btn(text color="grey" @click="menuFrom = false") Cancel
-                                v-btn(text color="#F2594B" @click="$refs.menuFrom.save(dateFrom); getDayOfWeek(dateFrom)") OK
                     v-col(cols="6")
-                        v-menu(ref="menuTo" v-model="menu2" :close-on-content-click="false" :return-value.sync="dateTo"
+                        v-menu(ref="menuTo" v-model="menuTo" :close-on-content-click="false" :return-value.sync="dateTo"
                                 transition="scale-transition" offset-y min-width="auto")
                             template(v-slot:activator="{ on, attrs }")
                                 v-text-field(v-model="dateTo" label="To" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on")
-                            v-date-picker(v-model="dateTo" no-title scrollable)
+                            v-date-picker(v-model="dateTo" @input="$refs.menuTo.save(dateTo)" no-title scrollable)
                                 v-spacer
                                 v-btn(text color="grey" @click="menuTo = false") Cancel
-                                v-btn(text color="#F2594B" @click="$refs.menuTo.save(dateTo)") OK
                     v-col(cols="6" v-show="allDay!=true && dateTo==''")
                         timePicker(:day='dayFrom' :index='startTime1')
                     v-col(cols="6" v-show="allDay!=true && dateTo==''")
@@ -61,9 +59,9 @@ import store from '@/store'
 })
 
 export default class requestForm extends ScheduleBase {
-    private menu1: string = ''
+    private menuFrom: string = ''
     private dateFrom: string = ''
-    private menu2: string = ''
+    private menuTo: string = ''
     private dateTo: string = ''
     private dialog: boolean = false
 	private type: string = ''
