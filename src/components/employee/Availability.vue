@@ -169,6 +169,7 @@ export default class Availability extends ScheduleBase {
 		})
 		.then((response: any) => {
 			this.formatAvailabilityTime(response.data, this.availabilities)
+			alert("HELLO")
 		})
 		.catch(function (error: any) {
 			console.log(error)
