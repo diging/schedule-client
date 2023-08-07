@@ -111,7 +111,7 @@ export default class Availability extends ScheduleBase {
 	private time_suffixes = ['_start_1', '_start_2', '_end_1', '_end_2']
 	private day_time_strings: string[] = []
 	private availabilities: formattedAvailability[] = []
-	private maxHours!: number
+	private maxHours: number = 0
 
 	headers = [
 		{text: 'Submitted', value: 'created'},
@@ -169,7 +169,7 @@ export default class Availability extends ScheduleBase {
 		})
 		.then((response: any) => {
 			this.formatAvailabilityTime(response.data, this.availabilities)
-			alert("HELLO")
+			store.commit('resetState')
 		})
 		.catch(function (error: any) {
 			console.log(error)
