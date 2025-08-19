@@ -102,15 +102,6 @@ export default class requestForm extends ScheduleBase {
                 let schedule: schedule = response.data[0]
                 if(schedule[this.schedule_days[this.dayOfWeek-1]] != "00:00:00") {
 
-                    // TODO - fix this request
-                    // the form data is not being sent to the server
-                    console.log(this.dateFrom)
-                    console.log(this.dateTo)
-                    console.log(this.startTime)
-                    console.log(this.endTime)
-                    console.log(this.allDay)
-                    console.log(this.type)
-                    console.log(this.reason)
                     this.$axios.post('/timeoff/create/', {
                         'start_date': this.dateFrom,
                         'end_date': this.dateTo,
