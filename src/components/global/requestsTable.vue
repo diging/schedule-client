@@ -36,6 +36,7 @@ div
             template(v-slot:item.actions="{ item }")
                 v-icon(@click="triggerDialog(item.id, 1)" color="green") mdi-check
                 v-icon(@click="denyTimeoff(item.id, 2)" color="red") mdi-cancel
+                v-icon(@click="deleteTimeOffRequest(item.id)" color="red") mdi-delete-outline
                 v-menu(offset-y)
         v-dialog(v-model="dialog" width="500")
             v-card
@@ -198,12 +199,43 @@ export default class requestsTable extends ScheduleBase {
 	}
 
     denyTimeoff(id: number, status: number) {
+        this.$axios.patch('/timeoff/'+ id + '/review_user_timeoff_request/', {
+            // 2 is becuase it's denied, 1 is approved, will fix magic number later
+            'status': 2,
+            'reason': this.reason
+        })
+            .then((response: any) => {
+                var removeIndex = this.timeoffRequests.map(item => item.id).indexOf(this.id)
+                this.timeoffRequests[removeIndex]['status'] = this.parseStatus(this.status)
+                this.requesterName = this.timeoffRequests[removeIndex]['user']
+                this.message = this.writeEmailMessage(this.timeoffRequests[removeIndex])
+                this.sendEmail = true
+                this.status = 0
+                this.reason = ''
+                this.id = 0
+            })
+            .catch((error) => {
+                console.log(error)
+            })
         var removeIndex = this.timeoffRequests.map(item => item.id).indexOf(id)
         this.timeoffRequests[removeIndex]['status'] = this.parseStatus(status)
         this.requesterName = this.timeoffRequests[removeIndex]['user']
         this.message = this.writeEmailMessage(this.timeoffRequests[removeIndex])
         this.sendEmail = true
+        this.dialog = false
 	}
+
+    deleteTimeOffRequest(id: number) {
+        this.$axios.delete('/timeoff/'+ id + '/delete/')
+        .then((response: any) => {
+            var removeIndex = this.timeoffRequests.map(item => item.id).indexOf(id)
+            this.timeoffRequests.splice(removeIndex, 1)
+        })
+        .catch(function (error: any) {
+            console.log(error)
+        })
+    }
+    
 }
 </script>
 

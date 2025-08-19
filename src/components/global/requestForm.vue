@@ -20,6 +20,7 @@ v-dialog(v-model="dialog" max-width="500px")
                                 v-date-picker(v-model="dateFrom" @input="$refs.menuFrom.save(dateFrom); getDayOfWeek(dateFrom)" no-title scrollable)
                                     v-spacer
                                     v-btn(text color="grey" @click="menuFrom = false") Cancel
+
                         v-col(cols="6")
                             v-menu(ref="menuTo" v-model="menuTo" :close-on-content-click="false" :return-value.sync="dateTo"
                                     transition="scale-transition" offset-y min-width="auto")
@@ -39,7 +40,7 @@ v-dialog(v-model="dialog" max-width="500px")
         v-card-actions
             v-spacer
             v-btn(color="grey" text @click="dialog = false") Cancel
-            v-btn(color="#F2594B" medium class="white--text" :disabled="disableBtn()" @click="dialog = false; submit()") Submit
+            v-btn(color="#F2594B" medium class="white--text" :disabled="disableBtn()" @click="submit(); this.dialog = false") Submit
 
 </template>
 
@@ -100,6 +101,7 @@ export default class requestForm extends ScheduleBase {
             if(response.data.length != 0) {
                 let schedule: schedule = response.data[0]
                 if(schedule[this.schedule_days[this.dayOfWeek-1]] != "00:00:00") {
+
                     this.$axios.post('/timeoff/create/', {
                         'start_date': this.dateFrom,
                         'end_date': this.dateTo,
